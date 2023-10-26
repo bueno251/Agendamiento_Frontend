@@ -50,11 +50,10 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Swal from 'sweetalert2'
 
 export default {
-    name: 'App',
+    name: 'calendarApp',
 
     data: () => ({
         mode: 'stack',
@@ -63,7 +62,6 @@ export default {
         dates: [],
         dialogOcupar: false,
         dialogDesocupar: false,
-        url: 'http://127.0.0.1:8000/',
     }),
     methods: {
         openDialog({ date }) {
@@ -79,13 +77,13 @@ export default {
             this.dialogDesocupar = !open
         },
         ocupar() {
-            let url = this.url + 'api/days/create'
+            let url = 'api/days/create'
 
             let data = {
                 dia: this.value
             }
 
-            axios.post(url, data)
+            this.$axios.post(url, data)
                 .then(res => {
                     this.dialogOcupar = false
                     this.getOcupados()
@@ -103,9 +101,9 @@ export default {
                 })
         },
         desocupar() {
-            let url = this.url + `api/days/delete/${this.value}`
+            let url = `api/days/delete/${this.value}`
 
-            axios.delete(url)
+            this.$axios.delete(url)
                 .then(res => {
                     console.log(res);
                     this.dialogDesocupar = false
@@ -124,10 +122,10 @@ export default {
                 })
         },
         getOcupados() {
-            let url = this.url + 'api/days/read'
+            let url = 'api/days/read'
 
             this.events = []
-            axios.get(url)
+            this.$axios.get(url)
                 .then(res => {
                     res.data.forEach(obj => {
                         this.events.push({
