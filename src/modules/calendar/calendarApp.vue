@@ -77,7 +77,7 @@ export default {
             this.dialogDesocupar = !open
         },
         ocupar() {
-            let url = 'api/days/create'
+            let url = 'days/create'
 
             let data = {
                 dia: this.value
@@ -101,7 +101,7 @@ export default {
                 })
         },
         desocupar() {
-            let url = `api/days/delete/${this.value}`
+            let url = `days/delete/${this.value}`
 
             this.$axios.delete(url)
                 .then(res => {
@@ -122,7 +122,7 @@ export default {
                 })
         },
         getOcupados() {
-            let url = 'api/days/read'
+            let url = 'days/read'
 
             this.events = []
             this.$axios.get(url)
