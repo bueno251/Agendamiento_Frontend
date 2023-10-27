@@ -280,7 +280,7 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.tipoDocumento = ''
+                    this.tipoDocumento = 1
                     this.documento = ''
                     this.nombre1 = ''
                     this.nombre2 = ''
@@ -418,7 +418,32 @@ export default {
                 })
         },
         searchDocument() {
-            alert('hello')
+            if (!this.documento) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'No hay documento a buscar',
+                })
+            } else {
+                let url = `client/find/document/${this.documento}`
+
+                this.$axios.get(url)
+                    .then(res => {
+                        if (res.data.length) {
+                            Swal.fire({
+                                icon: 'error',
+                                text: 'Ya se encuentra registrado ese número de documento',
+                            })
+                        }else{
+                            Swal.fire({
+                                icon: 'success',
+                                text: 'Documento disponible',
+                            })
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            }
         }
     },
     mounted() {
