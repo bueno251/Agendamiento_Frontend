@@ -1,5 +1,5 @@
 <template>
-    <nav class="elevation-4 nav">
+    <nav class="elevation-4 nav mb-5">
         <router-link :to="{ name: 'calendario' }" class="link">Calendario</router-link>
         <router-link :to="{ name: 'clientes' }" class="link">Clientes</router-link>
     </nav>
@@ -26,6 +26,10 @@ export default {
     height: 50px;
     position: sticky;
     top: 0;
+    z-index: 1;
+    background: #ffffff;
+    width: 100%;
+    justify-self: flex-end;
 }
 
 .link {

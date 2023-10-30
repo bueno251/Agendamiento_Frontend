@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="content">
         <h1>
             Consultar Clientes
         </h1>
@@ -45,7 +45,7 @@
         </v-card>
         <v-dialog v-model="dialogCreate" width="90%" persistent>
             <v-card class="pa-5">
-                <form @submit.prevent="newClient">
+                <v-form  ref="form" v-model="valid" @submit.prevent="newClient">
                     <v-row>
                         <v-col cols="12" md="4">
                             <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
@@ -186,9 +186,9 @@
                     </v-row>
                     <div class="buttons">
                         <v-btn @click="dialogCreate = false" color="red">cancelar</v-btn>
-                        <v-btn type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
                     </div>
-                </form>
+                </v-form>
             </v-card>
         </v-dialog>
     </div>
@@ -201,7 +201,7 @@ export default {
     data() {
         return {
             search: '',
-            tipoDocumento: 1,
+            tipoDocumento: '',
             documento: '',
             nombre1: '',
             nombre2: '',
@@ -219,6 +219,7 @@ export default {
             tipoRegimen: '',
             observacion: '',
             token: '',
+            valid: false,
             loading: false,
             loadingbtn: false,
             loadingState: false,
@@ -280,23 +281,7 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.tipoDocumento = 1
-                    this.documento = ''
-                    this.nombre1 = ''
-                    this.nombre2 = ''
-                    this.apellido1 = ''
-                    this.apellido2 = ''
-                    this.direccion = ''
-                    this.pais = ''
-                    this.departamento = ''
-                    this.ciudad = ''
-                    this.correo = ''
-                    this.telefono = ''
-                    this.telefonoAlt = ''
-                    this.tipoPersona = ''
-                    this.tipoObligacion = ''
-                    this.tipoRegimen = ''
-                    this.observacion = ''
+                    this.$refs.form.reset()
                     this.getClients()
                     Swal.fire({
                         icon: 'success',

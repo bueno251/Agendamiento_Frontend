@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="content">
         <v-sheet tile height="54" class="d-flex">
             <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
                 <v-icon>mdi-chevron-left</v-icon>
@@ -148,12 +148,4 @@ export default {
 </script>
 
 <style scoped>
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
 </style>

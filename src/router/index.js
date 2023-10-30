@@ -6,13 +6,30 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'calendario',
-    component: () => import(/* webpackChunkName: "about" */ '@/modules/calendar/calendarApp.vue')
+    component: () => import('@/components/baseApp.vue'),
+    redirect: { name: 'login' },
+    children: [
+      {
+        path: 'calendario',
+        name: 'calendario',
+        component: ()=>import('@/modules/calendar/calendarApp.vue'),
+      },
+      {
+        path: 'clientes',
+        name: 'clientes',
+        component: () => import('@/modules/client/clientApp.vue')
+      }
+    ]
   },
   {
-    path: '/clientes',
-    name: 'clientes',
-    component: () => import(/* webpackChunkName: "about" */ '@/modules/client/clientApp.vue')
+    path: '/login',
+    name: 'login',
+    component: () => import('@/modules/auth/loginApp.vue')
+  },
+  {
+    path: '*',
+    name: '',
+    redirect: { name: 'login' }
   }
 ]
 
