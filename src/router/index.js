@@ -18,7 +18,12 @@ const routes = [
         path: 'clientes',
         name: 'clientes',
         component: () => import('@/modules/client/clientApp.vue')
-      }
+      },
+      {
+        path: 'habitaciones',
+        name: 'habitaciones',
+        component: () => import('@/modules/room/roomApp.vue')
+      },
     ]
   },
   {

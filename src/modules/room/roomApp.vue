@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="content">
         <h1>
             Consultar Habitaciones
         </h1>
@@ -8,11 +8,11 @@
                 <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
                     hide-details></v-text-field>
                 <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                    <v-icon>mdi-plus-circle</v-icon> agregar cliente
+                    <v-icon>mdi-plus-circle</v-icon> agregar
                 </v-btn>
             </v-card-title>
             <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ningun cliente que coincida" no-data-text="No hay clientes"
+                no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                 <template v-slot:item="row">
@@ -34,32 +34,67 @@
                                 </v-list>
                             </v-menu>
                         </td>
-                        <td>{{ row.item.fullname }}</td>
-                        <td>{{ row.item.direccion }}</td>
-                        <td>{{ row.item.documento }}</td>
-                        <td>{{ row.item.correo }}</td>
-                        <td>{{ row.item.observacion }}</td>
+                        <td>{{ row.item.nombre }}</td>
+                        <td>{{ row.item.descripcion }}</td>
+                        <td>{{ row.item.tipo }}</td>
+                        <td>{{ row.item.capacidad }}</td>
+                        <td>{{ row.item.estado ? 'Inactivo' : 'Activo' }}</td>
                     </tr>
                 </template>
             </v-data-table>
         </v-card>
+        <DialogCreate :show="dialogCreate" @close="closeCreate" @create="getRooms"></DialogCreate>
     </div>
 </template>
 
 <script>
+
+import DialogCreate from "./components/DialogCreate";
+
 export default {
+    name: 'roomApp',
+    components: {
+        DialogCreate,
+    },
     data() {
         return {
+            search: '',
+            loading: false,
+            dialogCreate: false,
             desserts: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
-                { text: 'Nombre', key: 'nombre', value: 'fullname' },
-                { text: 'Dirección', key: 'direccion', value: 'direccion' },
-                { text: 'Documento', key: 'documento', value: 'documento' },
-                { text: 'Correo', key: 'correo', value: 'correo' },
-                { text: 'Observaciones', key: 'observaciones', value: 'observaciones' },
+                { text: 'Nombre', key: 'nombre', value: 'nombre' },
+                { text: 'Descripción', key: 'descripcion', value: 'descripcion' },
+                { text: 'Tipo', key: 'tipo', value: 'tipo' },
+                { text: 'Capacidad', key: 'capacidad', value: 'capacidad' },
+                { text: 'estado', key: 'estado', value: 'estado' },
             ],
         }
+    },
+    methods: {
+        getRooms() {
+            this.loading = true
+            this.dialogCreate = false
+
+            let url = "room/read"
+
+            this.$axios.get(url)
+                .then(res => {
+                    this.loading = false
+                    this.desserts = res.data
+                })
+                .catch(err => {
+                    console.log(err);
+                    this.loading = false
+                })
+        },
+        closeCreate(bolean) {
+            this.dialogCreate = bolean
+        },
+    },
+    mounted() {
+        this.getRooms()
     },
 }
 </script>

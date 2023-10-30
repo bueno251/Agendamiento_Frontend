@@ -20,6 +20,13 @@
                         </v-list-item-icon>
                         <v-list-item-title>Clientes</v-list-item-title>
                     </v-list-item>
+                    
+                    <v-list-item to="habitaciones">
+                        <v-list-item-icon>
+                            <v-icon>mdi-bed</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>Habitaciones</v-list-item-title>
+                    </v-list-item>
                 </v-list-item-group>
             </v-list>
         </v-navigation-drawer>
