@@ -25,10 +25,10 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
-                                    <v-list-item link>
+                                    <v-list-item link @click="client = row.item, dialogUpdate = true">
                                         <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link>
+                                    <v-list-item link @click="client = row.item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                     </v-list-item>
                                 </v-list>
@@ -43,24 +43,44 @@
                 </template>
             </v-data-table>
         </v-card>
-        <DialogCreate :show="dialogCreate" @close="closeCreate" @create="getClients"></DialogCreate>
+        <DialogCreate :show="dialogCreate" @close="close" @create="getClients"></DialogCreate>
+        <DialogUpdate :show="dialogUpdate" :client="client" @close="close" @update="getClients"></DialogUpdate>
+        <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
+            <v-card>
+                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
+                    <h3>Eliminar al cliente {{ client.fullname }}?</h3>
+                    <div class="buttons">
+                        <v-btn @click="dialogDelete = false" color="error"
+                            class="white--text text--accent-4">cancelar</v-btn>
+                        <v-btn @click="deleted" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                    </div>
+                </v-sheet>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
 
+import Swal from 'sweetalert2'
 import DialogCreate from "./components/DialogCreate";
+import DialogUpdate from "./components/DialogUpdate";
 
 export default {
     name: 'clientApp',
     components: {
         DialogCreate,
+        DialogUpdate,
     },
     data() {
         return {
             search: '',
             loading: false,
+            loadingbtn: false,
             dialogCreate: false,
+            dialogUpdate: false,
+            dialogDelete: false,
+            client: {},
             desserts: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
@@ -75,7 +95,7 @@ export default {
     methods: {
         getClients() {
             this.loading = true
-            this.dialogCreate = false
+            this.close(false)
 
             let url = "client/read"
 
@@ -89,8 +109,29 @@ export default {
                     this.loading = false
                 })
         },
-        closeCreate(bolean) {
+        deleted() {
+            this.loadingbtn = true
+
+            let url = `client/delete/${this.client.id}`
+
+            this.$axios.delete(url)
+                .then(res => {
+                    this.loadingbtn = false
+                    this.dialogDelete = false
+                    this.getClients()
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.data,
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                    this.loadingbtn = false
+                })
+        },
+        close(bolean) {
             this.dialogCreate = bolean
+            this.dialogUpdate = bolean
         },
     },
     mounted() {

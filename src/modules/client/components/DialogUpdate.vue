@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="show" width="90%" persistent>
         <v-card class="pa-5">
-            <v-form ref="form" v-model="valid" @submit.prevent="newClient">
+            <v-form ref="form" v-model="valid" @submit.prevent="updateClient">
                 <v-row>
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
@@ -98,8 +98,8 @@
                         </v-text-field>
                     </v-col>
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number" append-icon="mdi-cellphone"
-                            outlined required>
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
+                            append-icon="mdi-cellphone" outlined required>
                             <template v-slot:label>
                                 Teléfono Celular<span class="red--text">*</span>
                             </template>
@@ -143,7 +143,7 @@
                 </v-row>
                 <div class="buttons">
                     <v-btn @click="close" color="red">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -151,12 +151,14 @@
 </template>
 
 <script>
+
 import Swal from 'sweetalert2'
 
 export default {
-    name: 'DialogCreate',
+    name: 'DialogUpdate',
     props: {
         show: Boolean,
+        client: Object,
     },
     data() {
         return {
@@ -205,9 +207,9 @@ export default {
         }
     },
     methods: {
-        newClient() {
+        updateClient() {
             this.loadingbtn = true
-            let url = "client/create"
+            let url = `client/update/${this.client.id}`
 
             let data = {
                 nombre1: this.nombre1,
@@ -229,11 +231,11 @@ export default {
                 observacion: this.observacion,
             }
 
-            this.$axios.post(url, data)
+            this.$axios.patch(url, data)
                 .then(res => {
                     this.loadingbtn = false
                     this.$refs.form.reset()
-                    this.$emit('create')
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.data,
@@ -294,6 +296,7 @@ export default {
             this.$axios.get(url, config)
                 .then(res => {
                     this.countries = res.data
+                    this.getStates()
                 })
                 .catch(err => {
                     console.log(err);
@@ -312,6 +315,7 @@ export default {
             this.$axios.get(url, config)
                 .then(res => {
                     this.states = res.data
+                    this.getCities()
                     this.loadingState = false
                 })
                 .catch(err => {
@@ -368,9 +372,33 @@ export default {
             }
         },
         close() {
-            this.$refs.form.reset()
             this.$emit('close', false)
         },
+    },
+    watch: {
+        client: {
+            handler(newclient) {
+                this.nombre = newclient.nombre
+                this.tipoDocumento = newclient.tipo_documento_id
+                this.documento = newclient.documento
+                this.nombre1 = newclient.nombre1
+                this.nombre2 = newclient.nombre2
+                this.apellido1 = newclient.apellido1
+                this.apellido2 = newclient.apellido2
+                this.direccion = newclient.direccion
+                this.pais = newclient.pais
+                this.departamento = newclient.departamento
+                this.ciudad = newclient.ciudad
+                this.correo = newclient.correo
+                this.telefono = newclient.telefono
+                this.telefonoAlt = newclient.telefono_alt
+                this.tipoPersona = newclient.tipo_persona_id
+                this.tipoObligacion = newclient.tipo_obligacion_id
+                this.tipoRegimen = newclient.tipo_regimen_id
+                this.observacion = newclient.observacion
+            },
+            immediate: true,
+        }
     },
     mounted() {
         this.getTypes()

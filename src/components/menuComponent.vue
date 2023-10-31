@@ -6,7 +6,7 @@
 
         <v-navigation-drawer v-model="drawer" absolute temporary>
             <v-list nav dense>
-                <v-list-item-group v-model="group" active-class="blue--text text--accent-4"  mandatory>
+                <v-list-item-group v-model="group" active-class="blue--text text--accent-4" mandatory>
                     <v-list-item to="calendario">
                         <v-list-item-icon>
                             <v-icon>mdi-calendar-month</v-icon>
@@ -20,12 +20,26 @@
                         </v-list-item-icon>
                         <v-list-item-title>Clientes</v-list-item-title>
                     </v-list-item>
-                    
+
                     <v-list-item to="habitaciones">
                         <v-list-item-icon>
                             <v-icon>mdi-bed</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>Habitaciones</v-list-item-title>
+                    </v-list-item>
+                    
+                    <v-list-item to="configuracion">
+                        <v-list-item-icon>
+                            <v-icon>mdi-cog</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>configuración</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item link @click="closeSession">
+                        <v-list-item-icon>
+                            <v-icon>mdi-logout-variant</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>cerrar sesión</v-list-item-title>
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
@@ -41,11 +55,18 @@ export default {
             group: null,
         }
     },
+    methods: {
+        closeSession() {
+            this.$token = ''
+            localStorage.clear()
+            this.$router.push({ name: 'login' })
+        }
+    },
 }
 </script>
 
 <style scoped>
-.nav{
+.nav {
     width: 100%;
 }
 </style>

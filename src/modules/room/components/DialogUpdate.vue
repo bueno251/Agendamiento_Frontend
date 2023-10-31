@@ -1,7 +1,7 @@
 <template>
     <v-dialog :value="show" width="90%" max-width="500px" persistent>
         <v-card class="pa-5">
-            <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
+            <v-form ref="form" v-model="valid" @submit.prevent="updateRoom">
                 <v-row>
                     <v-col cols="12" md="6">
                         <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
@@ -40,7 +40,7 @@
                 </v-row>
                 <div class="buttons">
                     <v-btn @click="close" color="red">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">crear</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">Actualizar</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -52,9 +52,10 @@
 import Swal from 'sweetalert2'
 
 export default {
-    name: 'DialogCreate',
+    name: 'DialogUpdate',
     props: {
         show: Boolean,
+        room: Object,
     },
     data() {
         return {
@@ -83,10 +84,10 @@ export default {
         }
     },
     methods: {
-        newRoom() {
+        updateRoom() {
             this.loading = true
 
-            let url = 'room/create'
+            let url = `room/update/${this.room.id}`
 
             let data = {
                 nombre: this.nombre,
@@ -96,10 +97,10 @@ export default {
                 estado: this.estado,
             }
 
-            this.$axios.post(url, data)
+            this.$axios.patch(url, data)
                 .then(res => {
                     this.loading = false
-                    this.$emit('create')
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.data,
@@ -122,9 +123,20 @@ export default {
                 })
         },
         close() {
-            this.$refs.form.reset()
             this.$emit('close', false)
         },
+    },
+    watch: {
+        room: {
+            handler(newRoom) {
+                this.nombre = newRoom.nombre;
+                this.descripcion = newRoom.descripcion;
+                this.tipo = newRoom.tipoId;
+                this.capacidad = newRoom.capacidad;
+                this.estado = newRoom.estado;
+            },
+            immediate: true,
+        }
     },
     mounted() {
         this.getTypes()
