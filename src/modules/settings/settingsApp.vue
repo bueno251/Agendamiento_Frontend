@@ -10,6 +10,11 @@
                         <v-checkbox v-model="tipoPago" :label="tipo" :value="tipo"></v-checkbox>
                     </v-col>
                 </v-row>
+                <div class="buttons">
+                    <v-btn color="primary">
+                        guardar
+                    </v-btn>
+                </div>
             </v-container>
         </v-card>
 
@@ -20,10 +25,17 @@
             <v-container fluid>
                 <v-row>
                     <v-col cols="auto">
-                        <p>Usuario puede reservar?</p>
-                        <v-switch v-model="canReservar" :label="canReservar? 'Si': 'No'" inset></v-switch>
+                        <div class="flex">
+                            Usuario puede reservar?
+                            <v-switch v-model="canReservar" :label="canReservar? 'Si': 'No'" inset></v-switch>
+                        </div>
                     </v-col>
                 </v-row>
+                <div class="buttons">
+                    <v-btn color="primary">
+                        guardar
+                    </v-btn>
+                </div>
             </v-container>
         </v-card>
     </div>
@@ -42,11 +54,25 @@ export default {
             ]
         }
     },
+    methods: {
+        getSettings(){
+            
+        }
+    },
 }
 </script>
 
 <style scoped>
 .content {
+    gap: 10px;
+}
+
+.flex{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 </style>
