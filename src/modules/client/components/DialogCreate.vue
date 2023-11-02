@@ -75,7 +75,7 @@
                     </v-col>
                     <v-col cols="12" md="3">
                         <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
-                            :loading="loadingState" @change="getCities" no-data-text="Espere un momento..." outlined>
+                            :loading="loadingState" @change="getCities" no-data-text="No hay departamentos" outlined>
                             <template v-slot:label>
                                 Departamento<span class="red--text">*</span>
                             </template>
@@ -83,7 +83,7 @@
                     </v-col>
                     <v-col cols="12" md="3">
                         <v-select v-model="ciudad" :items="cities" item-text="city_name" item-value="city_name"
-                            :loading="loadingCity" no-data-text="Espere un momento..." outlined>
+                            :loading="loadingCity" no-data-text="No hay ciudades" outlined>
                             <template v-slot:label>
                                 Ciudad<span class="red--text">*</span>
                             </template>
@@ -98,8 +98,8 @@
                         </v-text-field>
                     </v-col>
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number" append-icon="mdi-cellphone"
-                            outlined required>
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
+                            append-icon="mdi-cellphone" outlined required>
                             <template v-slot:label>
                                 Teléfono Celular<span class="red--text">*</span>
                             </template>
@@ -301,6 +301,8 @@ export default {
         },
         getStates() {
             this.loadingState = true
+            this.departamento = ''
+            this.ciudad = ''
             let url = `https://www.universal-tutorial.com/api/states/${this.pais}`
 
             let config = {
@@ -321,6 +323,7 @@ export default {
         },
         getCities() {
             this.loadingCity = true
+            this.ciudad = ''
             let url = `https://www.universal-tutorial.com/api/cities/${this.departamento}`
 
             let config = {

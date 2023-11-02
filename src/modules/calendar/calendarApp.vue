@@ -13,19 +13,9 @@
             </v-toolbar-title>
         </v-sheet>
         <v-sheet height="600" width="90%">
-            <v-calendar ref="calendar" v-model="value" color="primary" :events="events"
+            <v-calendar ref="calendar" v-model="value" color="primary" :events="events" :locale="'es'"
                 @click:date="openDialog"></v-calendar>
         </v-sheet>
-        <v-dialog v-model="dialogOcupar" width="40%">
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h2>Ocupar dia {{ value }}?</h2>
-                    <v-btn color="primary" @click="ocupar">
-                        Ocupar
-                    </v-btn>
-                </v-sheet>
-            </v-card>
-        </v-dialog>
         <v-dialog v-model="dialogOcupar" width="40%">
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
