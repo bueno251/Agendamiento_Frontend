@@ -17,9 +17,9 @@ const routes = [
 		},
 		children: [
 			{
-				path: 'calendario',
-				name: 'calendario',
-				component: () => import('@/modules/calendar/calendarApp.vue'),
+				path: 'reservas',
+				name: 'reservas',
+				component: () => import('@/modules/calendar/ReservasInterno.vue'),
 			},
 			{
 				path: 'clientes',
@@ -27,9 +27,14 @@ const routes = [
 				component: () => import('@/modules/client/clientApp.vue')
 			},
 			{
-				path: 'habitaciones',
+				path: 'habitaciones/consultar',
 				name: 'habitaciones',
 				component: () => import('@/modules/room/roomApp.vue')
+			},
+			{
+				path: 'habitaciones/configuracion',
+				name: 'habitacionesConfig',
+				component: () => import('@/modules/room/roomSettings.vue')
 			},
 			{
 				path: 'configuracion',
@@ -44,7 +49,7 @@ const routes = [
 		component: () => import('@/modules/auth/loginApp.vue'),
 		beforeEnter: (to, from, next) => {
 			if (localStorage.token) {
-				next({ name: 'calendario' })
+				next({ name: 'reservas' })
 			} else {
 				next()
 			}

@@ -87,6 +87,7 @@ export default {
     watch: {
         tipos: {
             handler(newtipos) {
+                this.tipoPago = []
                 newtipos.forEach(t => {
                     if (t.estado === 0) {
                         this.tipoPago.push(t)

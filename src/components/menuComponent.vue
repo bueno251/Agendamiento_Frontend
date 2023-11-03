@@ -7,28 +7,37 @@
         <v-navigation-drawer v-model="drawer" absolute temporary>
             <v-list nav dense>
                 <v-list-item-group v-model="group" active-class="blue--text text--accent-4" mandatory>
-                    <v-list-item to="calendario">
+                    <v-list-item router :to="{ name: 'reservas' }">
                         <v-list-item-icon>
                             <v-icon>mdi-calendar-month</v-icon>
                         </v-list-item-icon>
-                        <v-list-item-title>Calendario</v-list-item-title>
+                        <v-list-item-title>Reservas</v-list-item-title>
                     </v-list-item>
 
-                    <v-list-item to="clientes">
+                    <v-list-item router :to="{ name: 'clientes' }">
                         <v-list-item-icon>
                             <v-icon>mdi-account-group</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>Clientes</v-list-item-title>
                     </v-list-item>
 
-                    <v-list-item to="habitaciones">
-                        <v-list-item-icon>
-                            <v-icon>mdi-bed</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Habitaciones</v-list-item-title>
-                    </v-list-item>
-                    
-                    <v-list-item to="configuracion">
+                    <v-list-group no-action prepend-icon="mdi-bed" :value="false">
+                        <template v-slot:activator>
+                            <v-list-item-content>
+                                <v-list-item-title>Habitaciones</v-list-item-title>
+                            </v-list-item-content>
+                        </template>
+
+                        <v-list-item router :to="{ name: 'habitaciones' }">
+                            <v-list-item-title>Consultar</v-list-item-title>
+                        </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'habitacionesConfig' }">
+                            <v-list-item-title>Ajustes</v-list-item-title>
+                        </v-list-item>
+                    </v-list-group>
+
+                    <v-list-item router :to="{ name: 'configuracion' }">
                         <v-list-item-icon>
                             <v-icon>mdi-cog</v-icon>
                         </v-list-item-icon>
