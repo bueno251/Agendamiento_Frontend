@@ -1,48 +1,42 @@
 <template>
-    <div class="content">
-        <h1>
-            Consultar Habitaciones
-        </h1>
-        <v-card width="90%" class="my-5">
-            <v-card-title>
-                <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details></v-text-field>
-                <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                    <v-icon>mdi-plus-circle</v-icon> agregar
-                </v-btn>
-            </v-card-title>
-            <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
-                loading-text="Cargando... Por favor espera"
-                :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
-                <template v-slot:item="row">
-                    <tr>
-                        <td>
-                            <v-menu :offset-x="true" transition="scale-transition">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn icon v-bind="attrs" v-on="on">
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item link @click="room = row.item, dialogUpdate = true">
-                                        <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="room = row.item, dialogDelete = true">
-                                        <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </td>
-                        <td>{{ row.item.nombre }}</td>
-                        <td>{{ row.item.descripcion }}</td>
-                        <td>{{ row.item.tipo }}</td>
-                        <td>{{ row.item.capacidad }}</td>
-                        <td>{{ row.item.estado }}</td>
-                    </tr>
-                </template>
-            </v-data-table>
-        </v-card>
+    <v-card class="my-5">
+        <v-card-title>
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details></v-text-field>
+            <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                <v-icon>mdi-plus-circle</v-icon> agregar
+            </v-btn>
+        </v-card-title>
+        <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
+            no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
+            loading-text="Cargando... Por favor espera"
+            :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
+            <template v-slot:item="row">
+                <tr>
+                    <td>
+                        <v-menu :offset-x="true" transition="scale-transition">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon v-bind="attrs" v-on="on">
+                                    <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item link @click="room = row.item, dialogUpdate = true">
+                                    <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item link @click="room = row.item, dialogDelete = true">
+                                    <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </td>
+                    <td>{{ row.item.nombre }}</td>
+                    <td>{{ row.item.descripcion }}</td>
+                    <td>{{ row.item.tipo }}</td>
+                    <td>{{ row.item.capacidad }}</td>
+                    <td>{{ row.item.estado }}</td>
+                </tr>
+            </template>
+        </v-data-table>
         <DialogCreate :show="dialogCreate" @close="close" @create="getRooms"></DialogCreate>
         <DialogUpdate :show="dialogUpdate" :room="room" @close="close" @update="getRooms"></DialogUpdate>
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
@@ -57,14 +51,14 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
-    </div>
+    </v-card>
 </template>
 
 <script>
 
 import Swal from 'sweetalert2'
-import DialogCreate from "./components/DialogCreate";
-import DialogUpdate from "./components/DialogUpdate";
+import DialogCreate from "./DialogCreate.vue";
+import DialogUpdate from "./DialogUpdate.vue";
 
 export default {
     name: 'roomApp',

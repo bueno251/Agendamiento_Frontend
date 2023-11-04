@@ -27,7 +27,7 @@
                     </v-col>
                     <v-col cols="12" md="6">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
-                            :rules="[rules.state]" item-text="estado" item-value="value" outlined>
+                            :rules="[rules.required]" item-text="estado" item-value="id" outlined>
                             <template v-slot:label>
                                 Estado<span class="red--text">*</span>
                             </template>
@@ -67,19 +67,9 @@ export default {
             valid: false,
             loading: false,
             tipos: [],
-            estados: [
-                {
-                    value: 0,
-                    estado: 'Activo'
-                },
-                {
-                    value: 1,
-                    estado: 'Inactivo'
-                }
-            ],
+            estados: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
-                state: value => value !== '' || 'Campo requerido.',
             },
         }
     },
@@ -122,6 +112,17 @@ export default {
                     console.log(err);
                 })
         },
+        getEstados() {
+            let url = 'room/estado'
+
+            this.$axios.get(url)
+                .then(res => {
+                    this.estados = res.data
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        },
         close() {
             this.$emit('close', false)
         },
@@ -133,22 +134,17 @@ export default {
                 this.descripcion = newRoom.descripcion;
                 this.tipo = newRoom.tipoId;
                 this.capacidad = newRoom.capacidad;
-                this.estado = newRoom.estado;
+                this.estado = newRoom.estadoId;
             },
             immediate: true,
         }
     },
     mounted() {
         this.getTypes()
+        this.getEstados()
     },
 }
 </script>
 
 <style scoped>
-.buttons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 15px;
-}
 </style>
