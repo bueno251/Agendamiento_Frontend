@@ -17,7 +17,7 @@ const routes = [
 		},
 		children: [
 			{
-				path: 'reservas',
+				path: 'reservas/interno',
 				name: 'reservas',
 				component: () => import('@/modules/calendar/ReservasInterno.vue'),
 			},
@@ -54,6 +54,11 @@ const routes = [
 				next()
 			}
 		},
+	},
+	{
+		path: '/reservas',
+		name: 'reservasFinal',
+		component: () => import('@/modules/calendar/ReservasFinal.vue'),
 	},
 	{
 		path: '*',

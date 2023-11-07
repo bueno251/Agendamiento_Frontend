@@ -4,16 +4,19 @@
             <v-card-actions class="justify-space-between">
                 <v-btn-toggle v-model="onboarding" mandatory>
                     <v-btn>
-                        <v-icon>mdi-format-align-left</v-icon> Estados
+                        Estados
                     </v-btn>
                     <v-btn>
-                        <v-icon>mdi-format-align-center</v-icon> Tipos
+                        Tipos
                     </v-btn>
                 </v-btn-toggle>
             </v-card-actions>
             <v-window v-model="onboarding" reverse>
-                <v-window-item v-for="n in length" :key="`card-${n}`">
+                <v-window-item>
                     <estadoSettings></estadoSettings>
+                </v-window-item>
+                <v-window-item>
+                    <tipoSettings></tipoSettings>
                 </v-window-item>
             </v-window>
 
@@ -24,10 +27,12 @@
 <script>
 
 import estadoSettings from "./components/estadoSettings";
+import tipoSettings from "./components/tipoSettings";
 
 export default {
     components: {
-        estadoSettings
+        estadoSettings,
+       tipoSettings,
     },
     data() {
         return {

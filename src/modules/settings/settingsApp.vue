@@ -2,7 +2,7 @@
     <div class="content">
         <tipoPagos :tipos="pagos" :id="settings.id" @update="getSettings"></tipoPagos>
 
-        <canReservar></canReservar>
+        <canReservar :bolean="settings.usuario_reserva" :id="settings.id"></canReservar>
     </div>
 </template>
 
@@ -20,7 +20,9 @@ export default {
     data() {
         return {
             pagos: [],
-            settings: {}
+            settings: {
+                usuario_reserva: true
+            }
         }
     },
     methods: {

@@ -20,28 +20,28 @@
                                 </v-btn>
                             </template>
                             <v-list>
-                                <v-list-item link @click="estate = row.item, dialogUpdate = true">
+                                <v-list-item link @click="type = row.item, dialogUpdate = true">
                                     <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                 </v-list-item>
-                                <v-list-item link @click="estate = row.item, dialogDelete = true">
+                                <v-list-item link @click="type = row.item, dialogDelete = true">
                                     <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
-                    <td>{{ row.item.estado }}</td>
+                    <td>{{ row.item.tipo }}</td>
                     <td>{{ row.item.created_at }}</td>
                 </tr>
             </template>
         </v-data-table>
         <v-dialog :value="dialogCreate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form ref="formCreate" v-model="valid" @submit.prevent="newEstado">
+                <v-form ref="formCreate" v-model="valid" @submit.prevent="newTipo">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="tipo" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
-                                    Estado<span class="red--text">*</span>
+                                    Tipo<span class="red--text">*</span>
                                 </template>
                             </v-text-field>
                         </v-col>
@@ -55,12 +55,12 @@
         </v-dialog>
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form ref="formUpdate" v-model="valid" @submit.prevent="updateEstado">
+                <v-form ref="formUpdate" v-model="valid" @submit.prevent="updateTipo">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="tipo" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
-                                    Estado<span class="red--text">*</span>
+                                    Tipo<span class="red--text">*</span>
                                 </template>
                             </v-text-field>
                         </v-col>
@@ -75,7 +75,7 @@
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar el estado {{ estate.estado }}?</h3>
+                    <h3>Eliminar el tipo {{ type.tipo }}?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
@@ -92,11 +92,11 @@
 import Swal from 'sweetalert2'
 
 export default {
-    name: 'estadoSettings',
+    name: 'tipoSettings',
     data() {
         return {
             search: '',
-            estado: '',
+            tipo: '',
             loading: false,
             loadingbtn: false,
             valid: false,
@@ -104,32 +104,32 @@ export default {
             dialogUpdate: false,
             dialogDelete: false,
             desserts: [],
-            estate: {},
+            type: {},
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
             headers: [
                 { text: '', key: 'actions', sortable: false },
-                { text: 'Estado', key: 'estado', value: 'estado' },
+                { text: 'Tipo', key: 'tipo', value: 'tipo' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
         }
     },
     methods: {
-        newEstado() {
+        newTipo() {
             this.loadingbtn = true
 
-            let url = 'room/estado/create'
+            let url = 'room/type/create'
 
             let data = {
-                estado: this.estado,
+                tipo: this.tipo,
             }
 
             this.$axios.post(url, data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getEstados()
+                    this.getTipos()
                     Swal.fire({
                         icon: 'success',
                         text: res.data,
@@ -140,10 +140,10 @@ export default {
                     console.log(err);
                 })
         },
-        getEstados() {
+        getTipos() {
             this.loading = true
 
-            let url = "room/estado"
+            let url = "room/type"
 
             this.$axios.get(url)
                 .then(res => {
@@ -155,20 +155,20 @@ export default {
                     this.loading = false
                 })
         },
-        updateEstado() {
+        updateTipo() {
             this.loadingbtn = true
 
-            let url = `room/estado/update/${this.estate.id}`
+            let url = `room/type/update/${this.type.id}`
 
             let data = {
-                estado: this.estado,
+                tipo: this.tipo,
             }
 
             this.$axios.patch(url, data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getEstados()
+                    this.getTipos()
                     Swal.fire({
                         icon: 'success',
                         text: res.data,
@@ -182,13 +182,13 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            let url = `room/estado/delete/${this.estate.id}`
+            let url = `room/type/delete/${this.type.id}`
 
             this.$axios.delete(url)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getEstados()
+                    this.getTipos()
                     Swal.fire({
                         icon: 'success',
                         text: res.data,
@@ -201,15 +201,15 @@ export default {
         },
     },
     watch: {
-        estate: {
-            handler(newEstate) {
-                this.estado = newEstate.estado;
+        type: {
+            handler(newtype) {
+                this.tipo = newtype.tipo;
             },
             immediate: true,
         }
     },
     mounted() {
-        this.getEstados()
+        this.getTipos()
     },
 }
 </script>

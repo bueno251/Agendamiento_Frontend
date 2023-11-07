@@ -34,8 +34,11 @@
                         </v-select>
                     </v-col>
                     <v-col cols="12">
-                        <v-textarea v-model="descripcion" auto-grow rows="5" dense label="Descripcion"
-                            outlined></v-textarea>
+                        <v-textarea :rules="[rules.required]" v-model="descripcion" auto-grow rows="5" dense outlined>
+                            <template v-slot:label>
+                                Descripción<span class="red--text">*</span>
+                            </template>
+                        </v-textarea>
                     </v-col>
                 </v-row>
                 <div class="buttons">
