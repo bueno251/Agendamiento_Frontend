@@ -90,6 +90,7 @@
 <script>
 
 import Swal from 'sweetalert2'
+import roomService from '../service/roomService'
 
 export default {
     name: 'estadoSettings',
@@ -119,13 +120,11 @@ export default {
         newEstado() {
             this.loadingbtn = true
 
-            let url = 'room/estado/create'
-
             let data = {
                 estado: this.estado,
             }
 
-            this.$axios.post(url, data)
+            roomService.crearRoomEstado(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -143,12 +142,10 @@ export default {
         getEstados() {
             this.loading = true
 
-            let url = "room/estado"
-
-            this.$axios.get(url)
+            roomService.obtenerRoomEstados()
                 .then(res => {
                     this.loading = false
-                    this.desserts = res.data
+                    this.desserts = res
                 })
                 .catch(err => {
                     console.log(err);
@@ -158,13 +155,11 @@ export default {
         updateEstado() {
             this.loadingbtn = true
 
-            let url = `room/estado/update/${this.estate.id}`
-
             let data = {
                 estado: this.estado,
             }
 
-            this.$axios.patch(url, data)
+            roomService.actualizarRoomEstado(data, this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -182,9 +177,7 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            let url = `room/estado/delete/${this.estate.id}`
-
-            this.$axios.delete(url)
+            roomService.eliminarRoomEstado(this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

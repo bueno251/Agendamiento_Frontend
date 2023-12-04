@@ -90,6 +90,7 @@
 <script>
 
 import Swal from 'sweetalert2'
+import roomService from '../service/roomService'
 
 export default {
     name: 'tipoSettings',
@@ -119,72 +120,64 @@ export default {
         newTipo() {
             this.loadingbtn = true
 
-            let url = 'room/type/create'
-
             let data = {
                 tipo: this.tipo,
             }
 
-            this.$axios.post(url, data)
+            roomService.crearRoomTipo(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
                     this.getTipos()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
-                    console.log(err);
+                    console.log(err)
                 })
         },
         getTipos() {
             this.loading = true
 
-            let url = "room/type"
-
-            this.$axios.get(url)
+            roomService.obtenerRoomTipos()
                 .then(res => {
                     this.loading = false
-                    this.desserts = res.data
+                    this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loading = false
+                    console.log(err)
                 })
         },
         updateTipo() {
             this.loadingbtn = true
 
-            let url = `room/type/update/${this.type.id}`
-
             let data = {
                 tipo: this.tipo,
             }
 
-            this.$axios.patch(url, data)
+            roomService.actualizarRoomTipo(data, this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
                     this.getTipos()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
-                    console.log(err);
+                    console.log(err)
                 })
         },
         deleted() {
             this.loadingbtn = true
 
-            let url = `room/type/delete/${this.type.id}`
-
-            this.$axios.delete(url)
+            roomService.eliminarRoomTipo(this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -195,8 +188,8 @@ export default {
                     })
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loadingbtn = false
+                    console.log(err)
                 })
         },
     },

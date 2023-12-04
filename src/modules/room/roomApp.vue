@@ -63,6 +63,7 @@
 <script>
 
 import Swal from 'sweetalert2'
+import roomService from "./service/roomService"
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
 
@@ -95,33 +96,29 @@ export default {
     methods: {
         getRooms() {
             this.loading = true
-            this.close(false)
+            this.close()
 
-            let url = "room/read"
-
-            this.$axios.get(url)
+            roomService.obtenerRooms()
                 .then(res => {
                     this.loading = false
-                    this.desserts = res.data
+                    this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loading = false
+                    console.log(err);
                 })
         },
         deleted() {
             this.loadingbtn = true
 
-            let url = `room/delete/${this.room.id}`
-
-            this.$axios.delete(url)
+            roomService.eliminarRoom(this.room.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
                     this.getRooms()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res,
                     })
                 })
                 .catch(err => {
@@ -129,9 +126,9 @@ export default {
                     this.loadingbtn = false
                 })
         },
-        close(bolean) {
-            this.dialogCreate = bolean
-            this.dialogUpdate = bolean
+        close() {
+            this.dialogCreate = false
+            this.dialogUpdate = false
         },
     },
     mounted() {

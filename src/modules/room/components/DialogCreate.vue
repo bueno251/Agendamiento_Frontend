@@ -3,6 +3,7 @@
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
                 <v-row>
+
                     <v-col cols="12" md="6">
                         <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
@@ -10,6 +11,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="6">
                         <v-text-field v-model="capacidad" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
@@ -17,6 +19,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="6">
                         <v-select v-model="tipo" :items="tipos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined>
@@ -25,6 +28,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="6">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="estado" item-value="id" outlined>
@@ -33,6 +37,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12">
                         <v-textarea :rules="[rules.required]" v-model="descripcion" auto-grow rows="5" dense outlined>
                             <template v-slot:label>
@@ -40,7 +45,9 @@
                             </template>
                         </v-textarea>
                     </v-col>
+
                 </v-row>
+
                 <div class="buttons">
                     <v-btn @click="close" color="red">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">crear</v-btn>
@@ -53,6 +60,7 @@
 <script>
 
 import Swal from 'sweetalert2'
+import roomService from '../service/roomService'
 
 export default {
     name: 'DialogCreate',
@@ -79,8 +87,6 @@ export default {
         newRoom() {
             this.loading = true
 
-            let url = 'room/create'
-
             let data = {
                 nombre: this.nombre,
                 descripcion: this.descripcion,
@@ -89,13 +95,13 @@ export default {
                 estado: this.estado,
             }
 
-            this.$axios.post(url, data)
+            roomService.crearRoom(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('create')
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res,
                     })
                 })
                 .catch(err => {
@@ -104,22 +110,18 @@ export default {
                 })
         },
         getTypes() {
-            let url = 'room/type'
-
-            this.$axios.get(url)
+            roomService.obtenerRoomTipos()
                 .then(res => {
-                    this.tipos = res.data
+                    this.tipos = res
                 })
                 .catch(err => {
                     console.log(err);
                 })
         },
         getEstados() {
-            let url = 'room/estado'
-
-            this.$axios.get(url)
+            roomService.obtenerRoomEstados()
                 .then(res => {
-                    this.estados = res.data
+                    this.estados = res
                 })
                 .catch(err => {
                     console.log(err);
@@ -127,7 +129,7 @@ export default {
         },
         close() {
             this.$refs.form.reset()
-            this.$emit('close', false)
+            this.$emit('close')
         },
     },
     mounted() {

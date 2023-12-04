@@ -3,6 +3,7 @@
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="updateClient">
                 <v-row>
+
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
@@ -11,6 +12,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="6">
                         <v-text-field v-model="documento" :rules="[rules.required, rules.min]" type="number" outlined
                             required append-icon="mdi-magnify" @click:append="searchDocument">
@@ -29,6 +31,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="nombre1" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
@@ -36,6 +39,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="nombre2" outlined>
                             <template v-slot:label>
@@ -43,6 +47,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="apellido1" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
@@ -50,6 +55,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="apellido2" outlined>
                             <template v-slot:label>
@@ -57,6 +63,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="6">
                         <v-text-field v-model="direccion" :rules="[rules.required]" append-icon="mdi-map-marker" outlined
                             required>
@@ -64,6 +71,7 @@
                                 Direccion<span class="red--text">*</span>
                             </template></v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
                             :rules="[rules.required]" @change="getStates" no-data-text="Espere un momento..." outlined
@@ -73,6 +81,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
                             :loading="loadingState" @change="getCities" no-data-text="No hay departamentos" outlined>
@@ -81,6 +90,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-select v-model="ciudad" :items="cities" item-text="city_name" item-value="city_name"
                             :loading="loadingCity" no-data-text="No hay ciudades" outlined>
@@ -89,6 +99,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="correo" :rules="[rules.required, rules.email]" type="email" outlined
                             required>
@@ -97,6 +108,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
                             append-icon="mdi-cellphone" outlined required>
@@ -105,6 +117,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="3">
                         <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" outlined>
                             <template v-slot:label>
@@ -112,6 +125,7 @@
                             </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoPersona" :items="tipoPeople" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
@@ -120,6 +134,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoObligacion" :items="tipoObligations" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
@@ -128,6 +143,7 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoRegimen" :items="tipoRegimens" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
@@ -136,11 +152,14 @@
                             </template>
                         </v-select>
                     </v-col>
+
                     <v-col cols="12">
                         <v-textarea v-model="observacion" auto-grow rows="5" dense label="Observaciones"
                             outlined></v-textarea>
                     </v-col>
+
                 </v-row>
+
                 <div class="buttons">
                     <v-btn @click="close" color="red">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
@@ -153,6 +172,8 @@
 <script>
 
 import Swal from 'sweetalert2'
+import clienteService from '../services/clienteService'
+import UbicacionService from '../services/UbicacionService'
 
 export default {
     name: 'DialogUpdate',
@@ -179,7 +200,6 @@ export default {
             tipoObligacion: '',
             tipoRegimen: '',
             observacion: '',
-            token: '',
             valid: false,
             loadingbtn: false,
             loadingState: false,
@@ -209,7 +229,6 @@ export default {
     methods: {
         updateClient() {
             this.loadingbtn = true
-            let url = `client/update/${this.client.id}`
 
             let data = {
                 nombre1: this.nombre1,
@@ -231,10 +250,9 @@ export default {
                 observacion: this.observacion,
             }
 
-            this.$axios.patch(url, data)
+            clienteService.actualizar(data, this.client.id)
                 .then(res => {
                     this.loadingbtn = false
-                    this.$refs.form.reset()
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',
@@ -251,98 +269,52 @@ export default {
                 })
         },
         getTypes() {
-            let url = 'client/type/all'
-
-            this.$axios.get(url)
+            clienteService.obtenerTipos()
                 .then(res => {
-                    this.tipoDocuments = res.data.documents
-                    this.tipoObligations = res.data.obligations
-                    this.tipoPeople = res.data.people
-                    this.tipoRegimens = res.data.regimens
+                    this.tipoDocuments = res.documents
+                    this.tipoObligations = res.obligations
+                    this.tipoPeople = res.people
+                    this.tipoRegimens = res.regimens
                 })
                 .catch(err => {
-                    console.log(err);
-                })
-        },
-        getToken() {
-            let url = 'https://www.universal-tutorial.com/api/getaccesstoken'
-
-            let config = {
-                headers: {
-                    'api-token': 'QI0MUcpx9szH0xDIPAAtevqD9bEH8NAZfuP1FN4eBkcrjRwG-0IdQqwHvM4f-vbFTuk',
-                    'user-email': 'sr.hadoken777@gmail.com'
-                }
-            }
-
-            this.$axios.get(url, config)
-                .then(res => {
-                    this.token = res.data.auth_token
-                    this.getCountries()
-                })
-                .catch(err => {
-                    console.log(err);
-                    this.getToken()
+                    console.log(err)
                 })
         },
         getCountries() {
-            let url = 'https://www.universal-tutorial.com/api/countries'
-
-            let config = {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                }
-            }
-
-            this.$axios.get(url, config)
+            UbicacionService.paises()
                 .then(res => {
-                    this.countries = res.data
-                    this.getStates()
+                    this.countries = res
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                 })
         },
         getStates() {
             this.loadingState = true
             this.departamento = ''
             this.ciudad = ''
-            let url = `https://www.universal-tutorial.com/api/states/${this.pais}`
 
-            let config = {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                }
-            }
-
-            this.$axios.get(url, config)
+            UbicacionService.departamentos(this.pais)
                 .then(res => {
-                    this.states = res.data
-                    this.getCities()
+                    this.states = res
                     this.loadingState = false
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                     this.loadingState = false
                 })
         },
         getCities() {
             this.loadingCity = true
             this.ciudad = ''
-            let url = `https://www.universal-tutorial.com/api/cities/${this.departamento}`
 
-            let config = {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                }
-            }
-
-            this.$axios.get(url, config)
+            UbicacionService.ciudades(this.departamento)
                 .then(res => {
-                    this.cities = res.data
+                    this.cities = res
                     this.loadingCity = false
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                     this.loadingCity = false
                 })
         },
@@ -352,30 +324,29 @@ export default {
                     icon: 'error',
                     text: 'No hay documento a buscar',
                 })
-            } else {
-                let url = `client/find/document/${this.documento}`
-
-                this.$axios.get(url)
-                    .then(res => {
-                        if (res.data.length) {
-                            Swal.fire({
-                                icon: 'error',
-                                text: 'Ya se encuentra registrado ese número de documento',
-                            })
-                        } else {
-                            Swal.fire({
-                                icon: 'success',
-                                text: 'Documento disponible',
-                            })
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
+                return
             }
+
+            clienteService.encontrarDocumento(this.documento)
+                .then(res => {
+                    if (res.length) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Ya se encuentra registrado ese número de documento',
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            text: 'Documento disponible',
+                        })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         },
         close() {
-            this.$emit('close', false)
+            this.$emit('close')
         },
     },
     watch: {
@@ -399,13 +370,15 @@ export default {
                 this.tipoObligacion = newclient.tipo_obligacion_id
                 this.tipoRegimen = newclient.tipo_regimen_id
                 this.observacion = newclient.observacion
+                this.getStates()
+                this.getCities()
             },
             immediate: true,
         }
     },
     mounted() {
         this.getTypes()
-        this.getToken()
+        this.getCountries()
     },
 }
 </script>

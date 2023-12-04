@@ -65,6 +65,7 @@
 import Swal from 'sweetalert2'
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
+import clienteService from './services/UbicacionService'
 
 export default {
     name: 'clientApp',
@@ -95,33 +96,29 @@ export default {
     methods: {
         getClients() {
             this.loading = true
-            this.close(false)
+            this.close()
 
-            let url = "client/read"
-
-            this.$axios.get(url)
+            clienteService.obtener()
                 .then(res => {
                     this.loading = false
-                    this.desserts = res.data
+                    this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loading = false
+                    console.log(err);
                 })
         },
         deleted() {
             this.loadingbtn = true
 
-            let url = `client/delete/${this.client.id}`
-
-            this.$axios.delete(url)
+            clienteService.eliminar(this.client.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
                     this.getClients()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res,
                     })
                 })
                 .catch(err => {
@@ -129,9 +126,9 @@ export default {
                     this.loadingbtn = false
                 })
         },
-        close(bolean) {
-            this.dialogCreate = bolean
-            this.dialogUpdate = bolean
+        close() {
+            this.dialogCreate = false
+            this.dialogUpdate = false
         },
     },
     mounted() {
