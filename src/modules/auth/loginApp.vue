@@ -27,7 +27,8 @@
 
 <script>
 
-import Swal from 'sweetalert2'
+// import Swal from 'sweetalert2'
+import authService from './service/authService'
 
 export default {
     name: 'loginApp',
@@ -52,27 +53,25 @@ export default {
         login() {
             this.loading = true
 
-            let url = 'login'
-
             let data = {
                 correo: this.correo,
                 password: this.password,
             }
 
-            this.$axios.post(url, data)
+            authService.login(data)
                 .then(res => {
                     this.loading = false
-                    this.$token = res.data.token
-                    localStorage.token = res.data.token
-                    this.$router.push({ name: 'calendario' })
+                    this.$store.dispatch('setToken', res.token)
+                    this.$store.dispatch('setUser', res.user)
+                    this.$router.push({ name: 'reservas' })
                 })
                 .catch(err => {
                     this.loading = false
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: err.response.data,
-                    })
+                    // Swal.fire({
+                    //     icon: 'error',
+                    //     title: 'Oops...',
+                    //     text: err,
+                    // })
                     console.log(err);
                 })
         },

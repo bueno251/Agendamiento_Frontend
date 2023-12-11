@@ -13,7 +13,7 @@
                 </v-col>
             </v-row>
             <div class="buttons">
-                <v-btn @click="save" color="primary">
+                <v-btn @click="save" :loading="loading" color="primary">
                     guardar
                 </v-btn>
             </div>
@@ -22,19 +22,47 @@
 </template>
 
 <script>
+
+import Swal from 'sweetalert2'
+import configService from '../services/configService'
+
 export default {
     props: {
-        bolean: Array,
+        bolean: Boolean,
         id: Number,
     },
     data() {
         return {
             canReservar: true,
+            loading: false,
         }
     },
     methods: {
         save() {
+            this.loading = true
 
+            let data = {
+                configuracionId: this.id,
+                reservar: this.canReservar
+            }
+
+            configService.reservar(data)
+                .then(res => {
+                    this.loading = false
+                    this.$emit('update')
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
+                })
+                .catch(err => {
+                    this.loading = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
+                })
         }
     },
     watch: {

@@ -8,13 +8,13 @@ const routes = [
 		path: '/',
 		component: () => import('@/components/baseApp.vue'),
 		redirect: { name: 'login' },
-		beforeEnter: (to, from, next) => {
-			if (!localStorage.token) {
-				next({ name: 'login' })
-			} else {
-				next()
-			}
-		},
+		// beforeEnter: (to, from, next) => {
+		// 	if (!localStorage.token) {
+		// 		next({ name: 'login' })
+		// 	} else {
+		// 		next()
+		// 	}
+		// },
 		children: [
 			{
 				path: 'reservas/interno',

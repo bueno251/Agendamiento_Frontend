@@ -10,27 +10,27 @@
             no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
-            <template v-slot:item="row">
+            <template v-slot:item="{ item }">
                 <tr>
                     <td>
-                        <v-menu :offset-x="true" transition="scale-transition">
+                        <v-menu v-if="item.created_at" :offset-x="true" transition="scale-transition">
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn icon v-bind="attrs" v-on="on">
                                     <v-icon>mdi-dots-vertical</v-icon>
                                 </v-btn>
                             </template>
                             <v-list>
-                                <v-list-item link @click="estate = row.item, dialogUpdate = true">
+                                <v-list-item link @click="estate = item, dialogUpdate = true">
                                     <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                 </v-list-item>
-                                <v-list-item link @click="estate = row.item, dialogDelete = true">
+                                <v-list-item link @click="estate = item, dialogDelete = true">
                                     <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
-                    <td>{{ row.item.estado }}</td>
-                    <td>{{ row.item.created_at }}</td>
+                    <td>{{ item.estado }}</td>
+                    <td>{{ item.created_at }}</td>
                 </tr>
             </template>
         </v-data-table>
@@ -131,12 +131,16 @@ export default {
                     this.getEstados()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
-                    console.log(err);
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         getEstados() {
@@ -148,7 +152,7 @@ export default {
                     this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                     this.loading = false
                 })
         },
@@ -166,12 +170,16 @@ export default {
                     this.getEstados()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
-                    console.log(err);
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         deleted() {
@@ -184,12 +192,16 @@ export default {
                     this.getEstados()
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
     },

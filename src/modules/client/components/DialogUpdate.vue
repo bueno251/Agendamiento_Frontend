@@ -256,16 +256,16 @@ export default {
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
-                    console.log(err);
                     Swal.fire({
                         icon: 'error',
-                        text: 'Ocurrio un error codigo de error: ' + err.response.status,
+                        text: err.response.data.message,
                     })
+                    console.log(err)
                 })
         },
         getTypes() {
@@ -293,6 +293,7 @@ export default {
             this.loadingState = true
             this.departamento = ''
             this.ciudad = ''
+            this.cities = []
 
             UbicacionService.departamentos(this.pais)
                 .then(res => {
@@ -361,8 +362,6 @@ export default {
                 this.apellido2 = newclient.apellido2
                 this.direccion = newclient.direccion
                 this.pais = newclient.pais
-                this.departamento = newclient.departamento
-                this.ciudad = newclient.ciudad
                 this.correo = newclient.correo
                 this.telefono = newclient.telefono
                 this.telefonoAlt = newclient.telefono_alt
@@ -370,8 +369,12 @@ export default {
                 this.tipoObligacion = newclient.tipo_obligacion_id
                 this.tipoRegimen = newclient.tipo_regimen_id
                 this.observacion = newclient.observacion
-                this.getStates()
-                this.getCities()
+                if (newclient.id) {
+                    this.getStates()
+                    this.departamento = newclient.departamento
+                    this.getCities()
+                    this.ciudad = newclient.ciudad
+                }
             },
             immediate: true,
         }

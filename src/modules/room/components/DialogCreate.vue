@@ -101,12 +101,16 @@ export default {
                     this.$emit('create')
                     Swal.fire({
                         icon: 'success',
-                        text: res,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err);
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         getTypes() {
@@ -115,7 +119,7 @@ export default {
                     this.tipos = res
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                 })
         },
         getEstados() {
@@ -124,7 +128,7 @@ export default {
                     this.estados = res
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                 })
         },
         close() {

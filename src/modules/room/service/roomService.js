@@ -85,7 +85,7 @@ const roomService = {
     },
 
     obtenerRoomTipos() {
-        let url = 'room/type/read'
+        let url = 'room/type'
 
         return new Promise((resolve, reject) => {
             local.api.get(url)
@@ -140,7 +140,7 @@ const roomService = {
     },
 
     obtenerRoomEstados() {
-        let url = 'room/estado/read'
+        let url = 'room/estado'
 
         return new Promise((resolve, reject) => {
             local.api.get(url)

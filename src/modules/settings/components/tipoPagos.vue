@@ -5,8 +5,7 @@
         </v-card-title>
         <template v-if="loadingcard">
             <div class="text-center my-5 w-100">
-                <v-progress-circular class="text-center" color="primary"
-                    indeterminate></v-progress-circular>
+                <v-progress-circular class="text-center" color="primary" indeterminate></v-progress-circular>
             </div>
         </template>
         <v-container fluid v-else>
@@ -27,6 +26,7 @@
 <script>
 
 import Swal from 'sweetalert2'
+import configService from '../services/configService'
 
 export default {
     props: {
@@ -43,25 +43,28 @@ export default {
     methods: {
         save() {
             this.loading = true
-            let url = 'settings/pagos'
 
             let data = {
                 configuracionId: this.id,
                 pagos: this.pagos(),
             }
 
-            this.$axios.post(url, data)
+            configService.pagos(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',
-                        text: res.data,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loading = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         pagos() {
@@ -71,11 +74,11 @@ export default {
                 let newT = {
                     id: t.id,
                     tipo: t.tipo,
-                    estado: 1,
+                    estado: 0,
                 }
 
                 if (this.tipoPago.includes(t)) {
-                    newT.estado = 0
+                    newT.estado = 1
                 }
 
                 pagos.push(newT)
@@ -89,14 +92,13 @@ export default {
             handler(newtipos) {
                 this.tipoPago = []
                 newtipos.forEach(t => {
-                    if (t.estado === 0) {
+                    if (t.estado === 1) {
                         this.tipoPago.push(t)
                     }
                 });
-                if(newtipos.length){
+                if (newtipos.length) {
                     this.loadingcard = false
                 }
-                
             },
             immediate: true,
         }

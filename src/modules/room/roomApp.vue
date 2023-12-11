@@ -15,7 +15,7 @@
                 no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
-                <template v-slot:item="row">
+                <template v-slot:item="{ item }">
                     <tr>
                         <td>
                             <v-menu :offset-x="true" transition="scale-transition">
@@ -25,20 +25,20 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
-                                    <v-list-item link @click="room = row.item, dialogUpdate = true">
+                                    <v-list-item link @click="room = item, dialogUpdate = true">
                                         <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="room = row.item, dialogDelete = true">
+                                    <v-list-item link @click="room = item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                     </v-list-item>
                                 </v-list>
                             </v-menu>
                         </td>
-                        <td>{{ row.item.nombre }}</td>
-                        <td>{{ row.item.descripcion }}</td>
-                        <td>{{ row.item.tipo }}</td>
-                        <td>{{ row.item.capacidad }}</td>
-                        <td>{{ row.item.estado }}</td>
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.descripcion }}</td>
+                        <td>{{ item.tipo }}</td>
+                        <td>{{ item.capacidad }}</td>
+                        <td>{{ item.estado }}</td>
                     </tr>
                 </template>
             </v-data-table>
@@ -105,7 +105,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err);
+                    console.log(err)
                 })
         },
         deleted() {
@@ -118,12 +118,16 @@ export default {
                     this.getRooms()
                     Swal.fire({
                         icon: 'success',
-                        text: res,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         close() {

@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Swal from 'sweetalert2'
+// import Swal from 'sweetalert2'
 
 export default {
     name: 'ReservasFinal',
@@ -44,47 +44,30 @@ export default {
     }),
     methods: {
         ocupar() {
-            let url = 'days/create'
 
             let data = {
                 dia: this.value
             }
 
-            this.$axios.post(url, data)
-                .then(res => {
-                    this.dialogOcupar = false
-                    this.getOcupados()
-                    Swal.fire({
-                        icon: 'success',
-                        text: res.data,
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    Swal.fire({
-                        icon: 'error',
-                        text: 'A ocurrido un error',
-                    })
-                })
+            data
         },
         getOcupados() {
-            let url = 'days/read'
 
             this.events = []
-            this.$axios.get(url)
-                .then(res => {
-                    res.data.forEach(obj => {
-                        this.events.push({
-                            name: 'Ocupado',
-                            start: new Date(obj.dia + 'T12:00:00'),
-                            color: 'red',
-                        })
-                        this.dates = res.data
-                    });
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+            // this.$axios.get(url)
+            //     .then(res => {
+            //         res.data.forEach(obj => {
+            //             this.events.push({
+            //                 name: 'Ocupado',
+            //                 start: new Date(obj.dia + 'T12:00:00'),
+            //                 color: 'red',
+            //             })
+            //             this.dates = res.data
+            //         });
+            //     })
+            //     .catch(err => {
+            //         console.log(err)
+            //     })
         }
     },
     mounted() {
@@ -93,5 +76,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

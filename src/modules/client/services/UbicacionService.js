@@ -27,7 +27,7 @@ const local = {
     }
 }
 
-const ubicacionService = {
+const UbicacionService = {
 
     paises() {
         let url = `countries`
@@ -75,4 +75,4 @@ const ubicacionService = {
 local.Axios()
 await local.getToken()
 
-export default ubicacionService
+export default UbicacionService

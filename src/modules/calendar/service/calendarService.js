@@ -1,20 +1,23 @@
 import axios from "axios";
+import vuex from "@/store";
 
 const local = {
     Axios() {
         local.api = axios.create({
             baseURL: process.env.VUE_APP_URL_BASE,
+            headers: {
+                Authorization: `Bearer ${vuex.state.token}`
+            },
         })
     }
 }
 
-const authService = {
-
-    login(data) {
-        let url = 'login'
+const calendarService = {
+    obtenerRooms() {
+        let url = 'room/read'
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            local.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -23,9 +26,8 @@ const authService = {
                 })
         })
     },
-
 }
 
 local.Axios()
 
-export default authService
+export default calendarService

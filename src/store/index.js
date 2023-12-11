@@ -6,37 +6,48 @@ const ls = new SecureLS({ isCompression: false });
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
     plugins: [
-        // Configuración del plugin de persistencia
         createPersistedState({
             storage: {
-                getItem: (key) => ls.get(key), // Obtener datos del almacenamiento local
-                setItem: (key, value) => ls.set(key, value), // Establecer datos del almacenamiento local
-                removeItem: (key) => ls.remove(key), // Eliminar datos del almacenamiento local
+                getItem: (key) => ls.get(key),
+                setItem: (key, value) => ls.set(key, value),
+                removeItem: (key) => ls.remove(key),
             },
         }),
     ],
 
     state: {
-        // Estado inicial de la aplicación
-        token: null, // Token de autenticación
-        user: {}, // Información del user
+        token: null,
+        user: {},
     },
 
     mutations: {
-        // Mutaciones para actualizar el estado
-        token(state, value) {
+        SET_TOKEN(state, value) {
             state.token = value;
         },
-        user(state, value) {
+        SET_USER(state, value) {
             state.user = value;
         },
-        cerrarSesion(state) {
+        LOGOUT(state) {
             state.token = null;
             state.user = {};
         },
     },
 
+    actions: {
+        setToken({ commit }, newToken) {
+            commit('SET_TOKEN', newToken);
+        },
+        setUser({ commit }, newUser) {
+            commit('SET_USER', newUser);
+        },
+        logout({ commit }) {
+            commit('LOGOUT');
+        },
+    },
+
     modules: {},
 });
+
+export default store

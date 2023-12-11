@@ -65,7 +65,7 @@
 import Swal from 'sweetalert2'
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
-import clienteService from './services/UbicacionService'
+import clienteService from './services/clienteService'
 
 export default {
     name: 'clientApp',
@@ -118,12 +118,16 @@ export default {
                     this.getClients()
                     Swal.fire({
                         icon: 'success',
-                        text: res,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
-                    console.log(err);
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
                 })
         },
         close() {

@@ -112,7 +112,7 @@
 
                     <v-col cols="12" md="3">
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
-                            append-icon="mdi-cellphone" outlined required>
+                            append-icon="mdi-cellphone" hide-spin-buttons outlined required>
                             <template v-slot:label>
                                 Teléfono Celular<span class="red--text">*</span>
                             </template>
@@ -120,7 +120,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" outlined>
+                        <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" hide-spin-buttons outlined>
                             <template v-slot:label>
                                 Teléfono Alternativo
                             </template>
@@ -129,7 +129,7 @@
 
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoPersona" :items="tipoPeople" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
                                 Tipo de Persona<span class="red--text">*</span>
                             </template>
@@ -138,7 +138,7 @@
 
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoObligacion" :items="tipoObligations" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
                                 Tipo de Obligación<span class="red--text">*</span>
                             </template>
@@ -147,7 +147,7 @@
 
                     <v-col cols="12" md="4">
                         <v-select v-model="tipoRegimen" :items="tipoRegimens" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
                                 Tipo de Régimen<span class="red--text">*</span>
                             </template>
@@ -257,11 +257,15 @@ export default {
                     this.$emit('create')
                     Swal.fire({
                         icon: 'success',
-                        text: res,
+                        text: res.message,
                     })
                 })
                 .catch(err => {
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
                     console.log(err)
                 })
         },
@@ -290,6 +294,7 @@ export default {
             this.loadingState = true
             this.departamento = ''
             this.ciudad = ''
+            this.cities = []
 
             UbicacionService.departamentos(this.pais)
                 .then(res => {

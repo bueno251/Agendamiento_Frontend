@@ -1,8 +1,10 @@
 <template>
     <div class="content">
-        <tipoPagos :tipos="pagos" :id="settings.id" @update="getSettings"></tipoPagos>
+        <tipoPagos :tipos="pagos" :id="id" @update="getSettings"></tipoPagos>
 
-        <canReservar :bolean="settings.usuario_reserva" :id="settings.id"></canReservar>
+        <canReservar :bolean="usuario_reserva" :id="id" @update="getSettings"></canReservar>
+
+        <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings"></EmpresaComponent>
     </div>
 </template>
 
@@ -10,32 +12,35 @@
 
 import tipoPagos from './components/tipoPagos'
 import canReservar from './components/canReservar'
+import EmpresaComponent from './components/empresaComponent'
+import configService from './services/configService'
 
 export default {
     name: 'settingsApp',
     components: {
         tipoPagos,
         canReservar,
+        EmpresaComponent,
     },
     data() {
         return {
+            id: 0,
+            usuario_reserva: true,
             pagos: [],
-            settings: {
-                usuario_reserva: true
-            }
+            empresa: null,
         }
     },
     methods: {
         getSettings() {
-            let url = 'settings/read'
-
-            this.$axios.get(url)
+            configService.obtener()
                 .then(res => {
-                    this.pagos = res.data.pagos
-                    this.settings = res.data.settings
+                    this.pagos = res.pagos
+                    this.empresa = res.empresa
+                    this.usuario_reserva = res.usuario_reserva
+                    this.id = res.id
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(err)
                 })
         }
     },
@@ -48,5 +53,6 @@ export default {
 <style scoped>
 .content {
     gap: 10px;
+    padding-bottom: 20px;
 }
 </style>
