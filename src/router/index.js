@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import vuex from "@/store";
 import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
@@ -8,13 +9,13 @@ const routes = [
 		path: '/',
 		component: () => import('@/components/baseApp.vue'),
 		redirect: { name: 'login' },
-		// beforeEnter: (to, from, next) => {
-		// 	if (!localStorage.token) {
-		// 		next({ name: 'login' })
-		// 	} else {
-		// 		next()
-		// 	}
-		// },
+		beforeEnter: (to, from, next) => {
+			if (!vuex.state.token) {
+				next({ name: 'reservasFinal' })
+			} else {
+				next()
+			}
+		},
 		children: [
 			{
 				path: 'reservas/interno',
@@ -48,7 +49,7 @@ const routes = [
 		name: 'login',
 		component: () => import('@/modules/auth/loginApp.vue'),
 		beforeEnter: (to, from, next) => {
-			if (localStorage.token) {
+			if (vuex.state.token) {
 				next({ name: 'reservas' })
 			} else {
 				next()
@@ -63,7 +64,7 @@ const routes = [
 	{
 		path: '*',
 		name: '',
-		redirect: { name: 'login' }
+		redirect: { name: 'reservasFinal' }
 	}
 ]
 

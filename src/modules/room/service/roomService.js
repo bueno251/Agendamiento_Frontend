@@ -180,6 +180,20 @@ const roomService = {
                 })
         })
     },
+
+    bitacora(id){
+        let url = `room/bitacora/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()

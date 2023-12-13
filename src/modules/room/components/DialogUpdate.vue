@@ -59,6 +59,7 @@
 
 <script>
 
+import vuex from "@/store"
 import Swal from 'sweetalert2'
 import roomService from '../service/roomService'
 
@@ -89,11 +90,13 @@ export default {
             this.loading = true
 
             let data = {
+                user: vuex.state.user.id,
                 nombre: this.nombre,
                 descripcion: this.descripcion,
                 roomTipo: this.tipo,
                 capacidad: this.capacidad,
                 estado: this.estado,
+                estadoAntiguo: this.room.estadoId,
             }
 
             roomService.actualizarRoom(data, this.room.id)

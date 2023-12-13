@@ -28,6 +28,9 @@
                                     <v-list-item link @click="room = item, dialogUpdate = true">
                                         <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                     </v-list-item>
+                                    <v-list-item link @click="room = item, dialogBitacora = true">
+                                        <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
+                                    </v-list-item>
                                     <v-list-item link @click="room = item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                     </v-list-item>
@@ -57,6 +60,7 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
+        <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
     </div>
 </template>
 
@@ -64,12 +68,14 @@
 
 import Swal from 'sweetalert2'
 import roomService from "./service/roomService"
+import estadosRoom from "./components/estadosRoom"
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
 
 export default {
     name: 'roomApp',
     components: {
+        estadosRoom,
         DialogCreate,
         DialogUpdate,
     },
@@ -81,6 +87,7 @@ export default {
             dialogCreate: false,
             dialogUpdate: false,
             dialogDelete: false,
+            dialogBitacora: false,
             room: {},
             desserts: [],
             headers: [
@@ -96,6 +103,7 @@ export default {
     methods: {
         getRooms() {
             this.loading = true
+            this.room = {}
             this.close()
 
             roomService.obtenerRooms()

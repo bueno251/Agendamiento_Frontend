@@ -66,8 +66,7 @@ export default {
     },
     methods: {
         closeSession() {
-            this.$token = ''
-            localStorage.clear()
+            this.$store.dispatch('logout')
             this.$router.push({ name: 'login' })
         }
     },
