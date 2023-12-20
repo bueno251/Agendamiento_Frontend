@@ -44,13 +44,27 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
+                        <label>Correo <span v-if="empresa === null" class="red--text">*</span></label>
+                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" :disabled="empresa !== null" type="email" outlined dense
+                            required>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3">
                         <label>Telefono <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="telefono" :rules="[rules.required]" :disabled="empresa !== null" outlined
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" :disabled="empresa !== null" type="number" hide-spin-buttons outlined
                             dense required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="3">
+                        <label>Impuesto <span v-if="empresa === null" class="red--text">*</span></label>
+                        <v-text-field v-model="impuesto" :rules="[rules.required]" :disabled="empresa !== null" outlined
+                            dense required>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3">
                         <label>Dirección <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-text-field v-model="direccion" :rules="[rules.required]" :disabled="empresa !== null"
                             prepend-inner-icon="mdi-map-marker" outlined dense required>
@@ -82,18 +96,11 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="4">
                         <label>Idioma <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="lenguaje" :items="idiomas" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" outlined dense required>
                         </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4">
-                        <label>Impuesto <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="impuesto" :rules="[rules.required]" :disabled="empresa !== null" outlined
-                            dense required>
-                        </v-text-field>
                     </v-col>
 
                     <v-col cols="12" md="4">
@@ -170,6 +177,7 @@ export default {
             dv: '',
             registro: '',
             direccion: '',
+            correo: '',
             telefono: '',
             impuesto: '',
             lenguaje: '',
@@ -198,6 +206,14 @@ export default {
             ],
             rules: {
                 required: value => !!value || 'Campo requerido.',
+                email: value => {
+                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                    return pattern.test(value) || 'Correo inválido.'
+                },
+                phone: value => {
+                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
+                    return pattern.test(value) || 'Número de teléfono inválido.'
+                },
             },
         }
     },
@@ -211,6 +227,7 @@ export default {
                     this.dv = newitem.dv
                     this.registro = newitem.registro
                     this.direccion = newitem.direccion
+                    this.correo = newitem.correo
                     this.telefono = newitem.telefono
                     this.lenguaje = newitem.lenguaje
                     this.impuesto = newitem.impuesto
@@ -248,6 +265,7 @@ export default {
                 departamento: this.departamento,
                 municipio: this.municipio,
                 direccion: this.direccion,
+                correo: this.correo,
                 telefono: this.telefono,
                 lenguaje: this.lenguaje,
                 impuesto: this.impuesto,

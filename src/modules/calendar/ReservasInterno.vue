@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <v-sheet tile height="54" class="d-flex">
+        <v-sheet tile height="54" class="d-flex justify-center align-center">
             <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
                 <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
@@ -26,7 +26,7 @@
                 </v-toolbar>
                 <v-row class="pa-5">
                     <template v-for="room in rooms">
-                        <v-col cols="12" md="6" v-if="room.habilitada" :key="room.id">
+                        <v-col cols="12" md="6" :key="room.id">
                             <v-card height="100%" outlined>
                                 <v-card-title>{{ room.nombre }}</v-card-title>
                                 <v-card-text>
@@ -63,14 +63,12 @@ export default {
     name: 'ReservasInterno',
 
     data: () => ({
-        mode: 'stack',
         value: '',
         rooms: [],
         dialog: false,
     }),
     methods: {
         getRooms() {
-            this.events = []
             calendarService.obtenerRooms()
                 .then(res => {
                     this.rooms = res

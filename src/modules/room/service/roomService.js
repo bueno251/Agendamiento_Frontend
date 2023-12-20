@@ -41,7 +41,7 @@ const roomService = {
                 })
         })
     },
-    
+
     actualizarRoom(data, id) {
         let url = `room/update/${id}`
 
@@ -69,7 +69,7 @@ const roomService = {
                 })
         })
     },
-    
+
     crearRoomTipo(data) {
         let url = 'room/type/create'
 
@@ -97,7 +97,7 @@ const roomService = {
                 })
         })
     },
-    
+
     actualizarRoomTipo(data, id) {
         let url = `room/type/update/${id}`
 
@@ -152,7 +152,7 @@ const roomService = {
                 })
         })
     },
-    
+
     actualizarRoomEstado(data, id) {
         let url = `room/estado/update/${id}`
 
@@ -181,8 +181,36 @@ const roomService = {
         })
     },
 
-    bitacora(id){
+    bitacora(id) {
         let url = `room/bitacora/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    savePrecios(data, id) {
+        let url = `room/precios/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+    
+    getPrecios(id) {
+        let url = `room/precios/${id}`
 
         return new Promise((resolve, reject) => {
             local.api.get(url)

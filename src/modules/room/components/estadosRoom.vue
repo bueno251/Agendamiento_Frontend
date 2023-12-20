@@ -35,7 +35,7 @@ export default {
     watch: {
         id: {
             handler(newId) {
-                if (newId) {
+                if (newId && this.show) {
                     this.bitacora = []
                     this.obtener()
                 }

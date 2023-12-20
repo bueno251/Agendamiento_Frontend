@@ -5,13 +5,19 @@
         </h1>
         <v-card width="90%" class="my-5">
             <v-card-title>
-                <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details></v-text-field>
-                <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                    <v-icon>mdi-plus-circle</v-icon> agregar
-                </v-btn>
+                <v-row>
+                    <v-col cols="12" md="10">
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                            hide-details></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="2">
+                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                            <v-icon>mdi-plus-circle</v-icon> agregar
+                        </v-btn>
+                    </v-col>
+                </v-row>
             </v-card-title>
-            <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
+            <v-data-table :headers="headers" :items="rooms" :search="search" :loading="loading"
                 no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
@@ -30,6 +36,9 @@
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogBitacora = true">
                                         <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item link @click="room = item, dialogPrecios = true">
+                                        <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
@@ -61,6 +70,7 @@
             </v-card>
         </v-dialog>
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
+        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"></PreciosRoom>
     </div>
 </template>
 
@@ -68,6 +78,7 @@
 
 import Swal from 'sweetalert2'
 import roomService from "./service/roomService"
+import PreciosRoom from './components/PreciosRoom';
 import estadosRoom from "./components/estadosRoom"
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
@@ -76,6 +87,7 @@ export default {
     name: 'roomApp',
     components: {
         estadosRoom,
+        PreciosRoom,
         DialogCreate,
         DialogUpdate,
     },
@@ -88,8 +100,9 @@ export default {
             dialogUpdate: false,
             dialogDelete: false,
             dialogBitacora: false,
+            dialogPrecios: false,
             room: {},
-            desserts: [],
+            rooms: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
@@ -109,7 +122,7 @@ export default {
             roomService.obtenerRooms()
                 .then(res => {
                     this.loading = false
-                    this.desserts = res
+                    this.rooms = res
                 })
                 .catch(err => {
                     this.loading = false
