@@ -208,12 +208,124 @@ const roomService = {
                 })
         })
     },
-    
+
     getPrecios(id) {
         let url = `room/precios/${id}`
 
         return new Promise((resolve, reject) => {
             local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    crearDesayuno(data) {
+        let url = 'desayunos/create'
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerDesayunos() {
+        let url = 'desayunos/read'
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarDesayuno(data, id) {
+        let url = `desayunos/update/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarDesayuno(id) {
+        let url = `desayunos/delete/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.delete(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    crearDecoracion(data) {
+        let url = 'decoraciones/create'
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerDecoraciones() {
+        let url = 'decoraciones/read'
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarDecoracion(data, id) {
+        let url = `decoraciones/update/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarDecoracion(id) {
+        let url = `decoraciones/delete/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.delete(url)
                 .then((res) => {
                     resolve(res.data)
                 })

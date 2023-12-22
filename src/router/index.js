@@ -42,6 +42,16 @@ const routes = [
 				name: 'configuracion',
 				component: () => import('@/modules/settings/settingsApp.vue')
 			},
+			{
+				path: 'desayunos',
+				name: 'desayunos',
+				component: () => import('@/modules/room/desayunosApp.vue')
+			},
+			{
+				path: 'decoraciones',
+				name: 'decoraciones',
+				component: () => import('@/modules/room/decoracionesApp.vue')
+			},
 		]
 	},
 	{

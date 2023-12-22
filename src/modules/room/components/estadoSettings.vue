@@ -36,38 +36,38 @@
         </v-data-table>
         <v-dialog :value="dialogCreate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form ref="formCreate" v-model="valid" @submit.prevent="newEstado">
+                <v-form ref="formCreate" v-model="validCreate" @submit.prevent="newEstado">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="newestado" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
-                                    Estado<span class="red--text">*</span>
+                                    Estado <span class="red--text">*</span>
                                 </template>
                             </v-text-field>
                         </v-col>
                     </v-row>
                     <div class="buttons">
                         <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="red">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
+                        <v-btn :disabled="!validCreate" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
                     </div>
                 </v-form>
             </v-card>
         </v-dialog>
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form ref="formUpdate" v-model="valid" @submit.prevent="updateEstado">
+                <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="updateEstado">
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
-                                    Estado<span class="red--text">*</span>
+                                    Estado <span class="red--text">*</span>
                                 </template>
                             </v-text-field>
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false, $refs.formUpdate.reset()" color="red">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
+                        <v-btn @click="dialogUpdate = false" color="red">cancelar</v-btn>
+                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -97,10 +97,12 @@ export default {
     data() {
         return {
             search: '',
+            newestado: '',
             estado: '',
             loading: false,
             loadingbtn: false,
-            valid: false,
+            validCreate: false,
+            validUpdate: false,
             dialogCreate: false,
             dialogUpdate: false,
             dialogDelete: false,
@@ -121,7 +123,7 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                estado: this.estado,
+                estado: this.newestado,
             }
 
             roomService.crearRoomEstado(data)
@@ -129,6 +131,7 @@ export default {
                     this.loadingbtn = false
                     this.dialogCreate = false
                     this.getEstados()
+                    this.$refs.formCreate.reset()
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
