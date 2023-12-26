@@ -8,10 +8,9 @@ const routes = [
 	{
 		path: '/',
 		component: () => import('@/components/baseApp.vue'),
-		redirect: { name: 'login' },
 		beforeEnter: (to, from, next) => {
 			if (!vuex.state.token) {
-				next({ name: 'reservasFinal' })
+				next({ name: 'viewRooms' })
 			} else {
 				next()
 			}
@@ -67,14 +66,19 @@ const routes = [
 		},
 	},
 	{
-		path: '/reservas',
-		name: 'reservasFinal',
-		component: () => import('@/modules/calendar/ReservasFinal.vue'),
+		path: '/rooms',
+		name: 'viewRooms',
+		component: () => import('@/modules/calendar/ViewRooms.vue'),
+	},
+	{
+		path: '/room/:id(\\d+)',
+		name: 'room',
+		component: () => import('@/modules/calendar/RoomInfo.vue'),
 	},
 	{
 		path: '*',
 		name: '',
-		redirect: { name: 'reservasFinal' }
+		redirect: { name: 'viewRooms' }
 	}
 ]
 

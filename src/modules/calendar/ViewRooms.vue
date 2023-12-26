@@ -17,7 +17,7 @@
                             </p>
                         </v-card-text>
                         <v-card-actions>
-                            <v-btn @click="dialogAgendar = true" outlined>
+                            <v-btn @click="goToRoom(room.id)" outlined>
                                 reservar
                             </v-btn>
                         </v-card-actions>
@@ -107,6 +107,9 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
+        },
+        goToRoom(id) {
+            this.$router.push({ name: 'room', params: { id } })
         },
     },
     mounted() {

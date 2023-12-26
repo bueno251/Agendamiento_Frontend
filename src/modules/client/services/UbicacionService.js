@@ -1,4 +1,5 @@
 import axios from "axios";
+import vuex from "@/store";
 
 const local = {
     Axios() {
@@ -8,22 +9,28 @@ const local = {
     },
 
     async getToken() {
-        let url = 'https://www.universal-tutorial.com/api/getaccesstoken'
+        if (!vuex.state.tokenUbicacion) {
+            let url = 'https://www.universal-tutorial.com/api/getaccesstoken'
 
-        let config = {
-            headers: {
-                'api-token': process.env.VUE_APP_API_TOKEN_UBICACION,
-                'user-email': process.env.VUE_APP_EMAIL_UBICACION,
+            let config = {
+                headers: {
+                    'api-token': process.env.VUE_APP_API_TOKEN_UBICACION,
+                    'user-email': process.env.VUE_APP_EMAIL_UBICACION,
+                }
             }
-        }
 
-        await axios.get(url, config)
-            .then(res => {
-                local.api.defaults.headers.common['Authorization'] = `Bearer ${res.data.auth_token}`
-            })
-            .catch(err => {
-                console.log(err);
-            })
+            await axios.get(url, config)
+                .then(res => {
+                    local.api.defaults.headers.common['Authorization'] = `Bearer ${res.data.auth_token}`
+                    vuex.dispatch('setToken', res.data.auth_token)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+                
+        } else {
+            local.api.defaults.headers.common['Authorization'] = `Bearer ${vuex.state.tokenUbicacion}`
+        }
     }
 }
 

@@ -19,12 +19,16 @@ const store = new Vuex.Store({
 
     state: {
         token: null,
+        tokenUbicacion: null,
         user: {},
     },
 
     mutations: {
         SET_TOKEN(state, value) {
             state.token = value;
+        },
+        SET_TOKEN_UBICACION(state, value) {
+            state.tokenUbicacion = value;
         },
         SET_USER(state, value) {
             state.user = value;
@@ -38,6 +42,9 @@ const store = new Vuex.Store({
     actions: {
         setToken({ commit }, newToken) {
             commit('SET_TOKEN', newToken);
+        },
+        setTokenUbicacion({ commit }, newToken) {
+            commit('SET_TOKEN_UBICACION', newToken);
         },
         setUser({ commit }, newUser) {
             commit('SET_USER', newUser);

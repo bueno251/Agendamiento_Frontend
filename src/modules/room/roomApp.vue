@@ -47,7 +47,11 @@
                             </v-menu>
                         </td>
                         <td>{{ item.nombre }}</td>
-                        <td>{{ item.descripcion }}</td>
+                        <td class="max-width">
+                            <p class="descripcion">
+                                {{ item.descripcion }}
+                            </p>
+                        </td>
                         <td>{{ item.tipo }}</td>
                         <td>{{ item.capacidad }}</td>
                         <td>{{ item.estado }}</td>
@@ -162,4 +166,16 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.max-width {
+    max-width: 500px;
+}
+
+.descripcion {
+    margin: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: calc(1.2em * 2);
+    line-height: 1.2em;
+}
+</style>
