@@ -3,17 +3,17 @@
         <v-row class="pa-5 w-100">
             <template v-for="room in rooms">
                 <v-col cols="12" md="4" :key="room.id">
-                    <v-card height="100%" max-height="300px" outlined>
+                    <v-card height="100%" max-height="300px" elevation="5" outlined>
                         <v-card-title>{{ room.nombre }}</v-card-title>
                         <v-card-text>
                             <p class="text-truncate">
                                 {{ room.descripcion }}
                             </p>
                             <p class="my-5">
-                                Capacidad: {{ room.capacidad }}
+                                {{ room.capacidad }} {{ room.capacidad > 1 ? 'Personas' : 'Persona' }}
                             </p>
                             <p>
-                                Tipo: {{ room.tipo }} {{ room.estado !== 'Activo' ? ` - ${room.estado}` : '' }}
+                                {{ room.tipo }} {{ room.estado !== 'Activo' ? room.estado : '' }}
                             </p>
                         </v-card-text>
                         <v-card-actions>
@@ -109,7 +109,7 @@ export default {
                 })
         },
         goToRoom(id) {
-            this.$router.push({ name: 'room', params: { id } })
+            this.$router.push({ name: 'room', params: { id: id } })
         },
     },
     mounted() {

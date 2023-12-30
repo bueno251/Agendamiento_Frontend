@@ -74,6 +74,7 @@ const routes = [
 		path: '/room/:id(\\d+)',
 		name: 'room',
 		component: () => import('@/modules/calendar/RoomInfo.vue'),
+		props: true,
 	},
 	{
 		path: '*',

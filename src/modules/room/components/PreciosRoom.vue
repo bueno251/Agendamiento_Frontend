@@ -55,14 +55,15 @@ export default {
             valid: false,
             loading: false,
             week: [
+                { name: 'Domingo', normal: '', festivo: '' },
                 { name: 'Lunes', normal: '', festivo: '' },
                 { name: 'Martes', normal: '', festivo: '' },
-                { name: 'Miercoles', normal: '', festivo: '' },
+                { name: 'Miércoles', normal: '', festivo: '' },
                 { name: 'Jueves', normal: '', festivo: '' },
                 { name: 'Viernes', normal: '', festivo: '' },
-                { name: 'Sabado', normal: '', festivo: '' },
-                { name: 'Domingo', normal: '', festivo: '' },
+                { name: 'Sábado', normal: '', festivo: '' },
             ],
+            
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },

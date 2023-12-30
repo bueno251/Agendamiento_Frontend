@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "colombia-holidays": "^0.0.1",
     "core-js": "^3.8.3",
     "secure-ls": "^1.2.6",
     "sweetalert2": "^11.9.0",
