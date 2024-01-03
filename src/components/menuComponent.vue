@@ -7,12 +7,20 @@
         <v-navigation-drawer v-model="drawer" absolute temporary>
             <v-list nav dense>
                 <v-list-item-group v-model="group" active-class="blue--text text--accent-4" mandatory>
-                    <v-list-item router :to="{ name: 'reservas' }">
-                        <v-list-item-icon>
-                            <v-icon>mdi-calendar-month</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Reservas</v-list-item-title>
-                    </v-list-item>
+
+                    <v-list-group no-action prepend-icon="mdi-calendar-month" :value="false">
+                        <template v-slot:activator>
+                            <v-list-item-title>Reservas</v-list-item-title>
+                        </template>
+
+                        <v-list-item router :to="{ name: 'reservas' }">
+                            <v-list-item-title>Hacer Reserva</v-list-item-title>
+                        </v-list-item>
+
+                        <v-list-item router :to="{ name: 'reservasApp' }">
+                            <v-list-item-title>Consultar Reservas</v-list-item-title>
+                        </v-list-item>
+                    </v-list-group>
 
                     <v-list-item router :to="{ name: 'clientes' }">
                         <v-list-item-icon>
@@ -31,15 +39,15 @@
                         <v-list-item router :to="{ name: 'habitaciones' }">
                             <v-list-item-title>Consultar</v-list-item-title>
                         </v-list-item>
-                        
+
                         <v-list-item router :to="{ name: 'habitacionesConfig' }">
                             <v-list-item-title>Ajustes</v-list-item-title>
                         </v-list-item>
-                        
+
                         <v-list-item router :to="{ name: 'desayunos' }">
                             <v-list-item-title>Desayunos</v-list-item-title>
                         </v-list-item>
-                        
+
                         <v-list-item router :to="{ name: 'decoraciones' }">
                             <v-list-item-title>Decoraciones</v-list-item-title>
                         </v-list-item>

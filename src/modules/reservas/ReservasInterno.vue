@@ -25,29 +25,27 @@
                     <v-btn icon class="ml-3" @click="dialog = false"><v-icon>mdi-close-box</v-icon></v-btn>
                 </v-toolbar>
                 <v-row class="pa-5">
-                    <template v-for="room in rooms">
-                        <v-col cols="12" md="6" :key="room.id">
-                            <v-card height="100%" outlined>
-                                <v-card-title>{{ room.nombre }}</v-card-title>
-                                <v-card-text>
-                                    <div>
-                                        {{ room.descripcion }}
-                                    </div>
-                                    <div class="my-5">
-                                        Capacidad: {{ room.capacidad }}
-                                    </div>
-                                    <div>
-                                        Tipo: {{ room.tipo }}{{ room.estado !== 'Activo' ? ` - ${room.estado}` : '' }}
-                                    </div>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-btn outlined>
-                                        reservar
-                                    </v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-col>
-                    </template>
+                    <v-col cols="12" md="6" v-for="room in rooms" :key="room.id">
+                        <v-card height="100%" outlined>
+                            <v-card-title>{{ room.nombre }}</v-card-title>
+                            <v-card-text>
+                                <div>
+                                    {{ room.descripcion }}
+                                </div>
+                                <div class="my-5">
+                                    Capacidad: {{ room.capacidad }}
+                                </div>
+                                <div>
+                                    Tipo: {{ room.tipo }}{{ room.estado !== 'Activo' ? ` - ${room.estado}` : '' }}
+                                </div>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn outlined>
+                                    reservar
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
                 </v-row>
             </v-card>
         </v-dialog>
@@ -57,7 +55,7 @@
 <script>
 
 // import Swal from 'sweetalert2'
-import calendarService from './service/calendarService'
+import reservaService from './service/reservaService'
 
 export default {
     name: 'ReservasInterno',
@@ -69,7 +67,7 @@ export default {
     }),
     methods: {
         getRooms() {
-            calendarService.obtenerRooms()
+            reservaService.obtenerRooms()
                 .then(res => {
                     this.rooms = res
                 })

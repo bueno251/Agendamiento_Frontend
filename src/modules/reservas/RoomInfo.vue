@@ -142,9 +142,9 @@
             </v-form>
         </div>
 
-        <v-dialog :value="showFormasPago" width="90%" max-width="500px">
+        <v-dialog :value="showFormasPago" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form v-model="validPagos">
+                <v-form ref="formPagos" v-model="validPagos" @submit.prevent="pagar()">
                     <v-row>
                         <v-col cols="12">
                             <label>Selecciona un método de pago <span class="red--text">*</span></label>
@@ -152,15 +152,24 @@
                                 :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                             </v-select>
                         </v-col>
-                        
-                        <v-col cols="12" v-if="metodoPago == '1'">
-                            <label>Selecciona un método de pago <span class="red--text">*</span></label>
-                            
-                        </v-col>
+
+                        <template v-if="metodoPago == '1'">
+                            <v-col cols="12">
+                                <label>Número para transacciones: 123456789</label>
+
+                            </v-col>
+
+                            <v-col cols="12">
+                                <label>Comprobante de pago <span class="red--text">*</span></label>
+                                <v-file-input v-model="file" :rules="[rules.file]" :clearable="false" accept="image/*,.pdf"
+                                    truncate-length="15" chips outlined dense required></v-file-input>
+                            </v-col>
+                        </template>
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn :disabled="!validPagos" color="light-green" type="submit">
+                        <v-btn @click="showFormasPago = false" color="red">cancelar</v-btn>
+                        <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
                             pagar
                         </v-btn>
                     </div>
@@ -175,7 +184,7 @@
 import vuex from "@/store";
 import Swal from "sweetalert2"
 import colombiaHolidays from 'colombia-holidays'
-import calendarService from './service/calendarService'
+import reservaService from './service/reservaService'
 
 export default {
     name: 'RoomInfo',
@@ -187,10 +196,14 @@ export default {
             maxDate: '',
             adultos: 1,
             niños: 0,
+            abono: 0,
             menu: false,
             valid: false,
             validPagos: false,
             showFormasPago: false,
+            verificacion_pago: false,
+            loading: false,
+            file: null,
             dates: [],
             formasPago: [],
             festivos: [],
@@ -204,6 +217,20 @@ export default {
             },
             rules: {
                 required: value => !!value || 'Campo requerido.',
+                file: file => {
+                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
+
+                    if (!file) {
+                        return 'Campo requerido.'
+                    }
+
+                    if (!allowedFormats.includes(file.type) && !allowedExtensions.includes(file.name.slice(-4).toLowerCase())) {
+                        return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
+                    }
+
+                    return true;
+                }
             },
         }
     },
@@ -257,7 +284,7 @@ export default {
         getRoom() {
             let id = this.$route.params.id
 
-            calendarService.obtenerRoom(id)
+            reservaService.obtenerRoom(id)
                 .then(res => {
                     this.room = res[0]
                 })
@@ -276,6 +303,37 @@ export default {
             }
 
             this.showFormasPago = true
+        },
+        pagar() {
+            this.loading = true
+
+            let data = new FormData()
+
+            data.append('dateIn', this.fechaLlegada)
+            data.append('dateOut', this.fechaSalida)
+            data.append('room', this.room.id)
+            data.append('user', vuex.state.user.id)
+            data.append('huespedes', this.huespedes)
+            data.append('adultos', this.adultos)
+            data.append('niños', this.niños)
+            data.append('precio', this.precio)
+            data.append('abono', this.abono)
+            data.append('comprobante', this.file)
+            data.append('verificacion_pago', this.verificacion_pago ? 1 : 0)
+
+            reservaService.reservar(data)
+                .then(res => {
+                    this.loading = false
+                    this.showFormasPago = false
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    this.loading = false
+                })
         },
         comaEnMiles(numero) {
             let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
@@ -303,7 +361,7 @@ export default {
             this.festivos = festivos.concat(festivos2)
         },
         getFormasPago() {
-            calendarService.obtenerFormasPago()
+            reservaService.obtenerFormasPago()
                 .then(res => {
                     this.formasPago = res
                 })

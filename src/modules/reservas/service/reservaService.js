@@ -12,7 +12,7 @@ const local = {
     }
 }
 
-const calendarService = {
+const reservaService = {
     obtenerRooms() {
         let url = 'room/read'
 
@@ -26,7 +26,7 @@ const calendarService = {
                 })
         })
     },
-    
+
     obtenerRoom(id) {
         let url = `room/find/${id}`
 
@@ -82,8 +82,70 @@ const calendarService = {
                 })
         })
     },
+
+    reservar(data) {
+        let url = 'reserva/create'
+
+        let config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data, config)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerReservas() {
+        let url = 'reserva/read'
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    aprobarReserva(id) {
+        let url = `reserva/approve/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.patch(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    rechazarReserva(id) {
+        let url = `reserva/reject/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.patch(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()
 
-export default calendarService
+export default reservaService

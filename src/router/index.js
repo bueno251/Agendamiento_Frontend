@@ -19,7 +19,12 @@ const routes = [
 			{
 				path: 'reservas/interno',
 				name: 'reservas',
-				component: () => import('@/modules/calendar/ReservasInterno.vue'),
+				component: () => import('@/modules/reservas/ReservasInterno.vue'),
+			},
+			{
+				path: 'reservas/app',
+				name: 'reservasApp',
+				component: () => import('@/modules/reservas/ReservasApp.vue'),
 			},
 			{
 				path: 'clientes',
@@ -68,12 +73,12 @@ const routes = [
 	{
 		path: '/rooms',
 		name: 'viewRooms',
-		component: () => import('@/modules/calendar/ViewRooms.vue'),
+		component: () => import('@/modules/reservas/ViewRooms.vue'),
 	},
 	{
 		path: '/room/:id(\\d+)',
 		name: 'room',
-		component: () => import('@/modules/calendar/RoomInfo.vue'),
+		component: () => import('@/modules/reservas/RoomInfo.vue'),
 		props: true,
 	},
 	{
