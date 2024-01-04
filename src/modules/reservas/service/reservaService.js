@@ -84,7 +84,7 @@ const reservaService = {
     },
 
     reservar(data) {
-        let url = 'reserva/create'
+        let url = 'reserva/temporal/create'
 
         let config = {
             headers: {

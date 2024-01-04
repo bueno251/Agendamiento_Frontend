@@ -74,6 +74,20 @@
                             </v-text-field>
                         </v-col>
 
+                        <v-col cols="6">
+                            <label>Desayunos<span class="red--text">*</span></label>
+                            <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
+                                :rules="[rules.required]" item-text="desayuno" item-value="id" dense outlined>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <label>Decoraciones<span class="red--text">*</span></label>
+                            <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
+                                :rules="[rules.required]" item-text="decoracion" item-value="id" dense outlined>
+                            </v-select>
+                        </v-col>
+
                     </v-row>
 
                     <div class="buttons mt-5">
@@ -193,6 +207,8 @@ export default {
             cedula: '',
             telefono: '',
             metodoPago: '',
+            desayuno: '',
+            decoracion: '',
             maxDate: '',
             adultos: 1,
             niños: 0,
@@ -207,6 +223,8 @@ export default {
             dates: [],
             formasPago: [],
             festivos: [],
+            desayunos: [],
+            decoraciones: [],
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             room: {
                 nombre: '',
@@ -313,6 +331,8 @@ export default {
             data.append('dateOut', this.fechaSalida)
             data.append('room', this.room.id)
             data.append('user', vuex.state.user.id)
+            data.append('desayuno', this.desayuno)
+            data.append('decoracion', this.decoracion)
             data.append('huespedes', this.huespedes)
             data.append('adultos', this.adultos)
             data.append('niños', this.niños)
@@ -369,11 +389,31 @@ export default {
                     console.log(err)
                 })
         },
+        getDesayunos() {
+            reservaService.obtenerDesayunos()
+                .then(res => {
+                    this.desayunos = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getDecoraciones() {
+            reservaService.obtenerDecoraciones()
+                .then(res => {
+                    this.decoraciones = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
     },
     mounted() {
         this.getRoom()
         this.getFestivos()
         this.getFormasPago()
+        this.getDesayunos()
+        this.getDecoraciones()
     },
 }
 </script>
