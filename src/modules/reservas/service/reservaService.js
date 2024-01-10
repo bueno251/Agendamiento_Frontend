@@ -84,7 +84,21 @@ const reservaService = {
     },
 
     reservar(data) {
-        let url = 'reserva/temporal/create'
+        let url = 'reserva/create'
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    pagar(data) {
+        let url = 'reserva/pagar'
 
         let config = {
             headers: {
@@ -136,6 +150,20 @@ const reservaService = {
 
         return new Promise((resolve, reject) => {
             local.api.patch(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    getFechasRoom(id) {
+        let url = `reserva/room/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })

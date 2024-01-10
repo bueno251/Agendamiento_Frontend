@@ -6,11 +6,12 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		path: '/',
+		path: '/admin',
 		component: () => import('@/components/baseApp.vue'),
+		redirect: { name: 'reservasApp' },
 		beforeEnter: (to, from, next) => {
 			if (!vuex.state.token) {
-				next({ name: 'viewRooms' })
+				next({ name: 'login' })
 			} else {
 				next()
 			}
@@ -59,6 +60,24 @@ const routes = [
 		]
 	},
 	{
+		path: '/',
+		component: () => import('@/components/baseUser.vue'),
+		redirect: { name: 'viewRooms' },
+		children: [
+			{
+				path: '/rooms',
+				name: 'viewRooms',
+				component: () => import('@/modules/reservas/ViewRooms.vue'),
+			},
+			{
+				path: '/room/:id(\\d+)',
+				name: 'room',
+				component: () => import('@/modules/reservas/RoomInfo.vue'),
+				props: true,
+			},
+		],
+	},
+	{
 		path: '/login',
 		name: 'login',
 		component: () => import('@/modules/auth/loginApp.vue'),
@@ -69,17 +88,6 @@ const routes = [
 				next()
 			}
 		},
-	},
-	{
-		path: '/rooms',
-		name: 'viewRooms',
-		component: () => import('@/modules/reservas/ViewRooms.vue'),
-	},
-	{
-		path: '/room/:id(\\d+)',
-		name: 'room',
-		component: () => import('@/modules/reservas/RoomInfo.vue'),
-		props: true,
 	},
 	{
 		path: '*',

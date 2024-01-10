@@ -50,27 +50,28 @@
 
         </div>
         <div class="calendar pa-5">
-            <v-form v-model="valid" @submit.prevent="agendar">
+            <v-form v-model="valid" ref="formReservar" @submit.prevent="agendar">
                 <v-card class="pa-5 sticky" elevation="5">
                     <v-row>
 
                         <v-col cols="12">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
-                                event-color="red lighten-1" locale="es" full-width range no-title scrollable>
+                                :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
+                                no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
                         <v-col cols="6">
                             <label>Fecha De LLegada <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaLlegada" :rules="[rules.required]" prepend-inner-icon="mdi-calendar"
-                                readonly dense outlined required>
+                            <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
+                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
                         <v-col cols="6">
                             <label>Fecha De Salida <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaSalida" :rules="[rules.required]" prepend-inner-icon="mdi-calendar"
-                                readonly dense outlined required>
+                            <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
+                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
@@ -220,11 +221,14 @@ export default {
             verificacion_pago: false,
             loading: false,
             file: null,
+            reservaId: null,
             dates: [],
+            datesInvalid: [],
             formasPago: [],
             festivos: [],
             desayunos: [],
             decoraciones: [],
+            reservaTemporal: null,
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             room: {
                 nombre: '',
@@ -235,6 +239,19 @@ export default {
             },
             rules: {
                 required: value => !!value || 'Campo requerido.',
+                date: () => {
+                    for (let dates of this.datesInvalid) {
+                        if (
+                            (this.dates[0] >= dates.fecha_entrada && this.dates[0] <= dates.fecha_salida) ||
+                            (this.dates[1] >= dates.fecha_entrada && this.dates[1] <= dates.fecha_salida) ||
+                            (this.dates[0] <= dates.fecha_entrada && this.dates[1] >= dates.fecha_salida)
+                        ) {
+                            return 'Fecha No Valida'
+                        }
+                    }
+
+                    return true
+                },
                 file: file => {
                     const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
                     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
@@ -320,28 +337,52 @@ export default {
                 return
             }
 
-            this.showFormasPago = true
+            let data = {
+                dateIn: this.fechaLlegada,
+                dateOut: this.fechaSalida,
+                room: this.room.id,
+                user: vuex.state.user.id,
+                desayuno: this.desayuno,
+                decoracion: this.decoracion,
+                huespedes: this.huespedes,
+                adultos: this.adultos,
+                niños: this.niños,
+                precio: this.precio,
+                verificacion_pago: this.verificacion_pago ? 1 : 0,
+            }
+
+            reservaService.reservar(data)
+                .then(res => {
+                    this.reservaId = res.reserva
+                    Swal.fire({
+                        text: res.message,
+                        icon: "success"
+                    })
+                    .then(this.showFormasPago = true)
+                })
+                .catch(err => {
+                    Swal.fire({
+                        text: err.response.data.message,
+                        icon: "error"
+                    })
+                })
+
         },
         pagar() {
             this.loading = true
 
+            if (this.metodoPago == 1) {
+                this.verificacion_pago = true
+            }
+
             let data = new FormData()
 
-            data.append('dateIn', this.fechaLlegada)
-            data.append('dateOut', this.fechaSalida)
-            data.append('room', this.room.id)
-            data.append('user', vuex.state.user.id)
-            data.append('desayuno', this.desayuno)
-            data.append('decoracion', this.decoracion)
-            data.append('huespedes', this.huespedes)
-            data.append('adultos', this.adultos)
-            data.append('niños', this.niños)
-            data.append('precio', this.precio)
+            data.append('reserva', this.reservaId)
             data.append('abono', this.abono)
             data.append('comprobante', this.file)
             data.append('verificacion_pago', this.verificacion_pago ? 1 : 0)
 
-            reservaService.reservar(data)
+            reservaService.pagar(data)
                 .then(res => {
                     this.loading = false
                     this.showFormasPago = false
@@ -380,7 +421,23 @@ export default {
 
             this.festivos = festivos.concat(festivos2)
         },
-        getFormasPago() {
+        allowedDates(value) {
+            for (let dates of this.datesInvalid) {
+                return value < dates.fecha_entrada || value > dates.fecha_salida
+            }
+        },
+        getDates() {
+            let id = this.$route.params.id
+
+            reservaService.getFechasRoom(id)
+                .then(res => {
+                    this.datesInvalid = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getDatos() {
             reservaService.obtenerFormasPago()
                 .then(res => {
                     this.formasPago = res
@@ -388,8 +445,7 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
-        },
-        getDesayunos() {
+
             reservaService.obtenerDesayunos()
                 .then(res => {
                     this.desayunos = res
@@ -397,8 +453,7 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
-        },
-        getDecoraciones() {
+
             reservaService.obtenerDecoraciones()
                 .then(res => {
                     this.decoraciones = res
@@ -410,10 +465,9 @@ export default {
     },
     mounted() {
         this.getRoom()
+        this.getDates()
+        this.getDatos()
         this.getFestivos()
-        this.getFormasPago()
-        this.getDesayunos()
-        this.getDecoraciones()
     },
 }
 </script>
@@ -423,7 +477,7 @@ export default {
     position: relative;
     display: flex;
     justify-content: center;
-    gap: 100px;
+    gap: 1%;
     height: 100%;
 }
 
@@ -439,7 +493,7 @@ export default {
 }
 
 .calendar {
-    width: 30%;
+    width: max(30%, 500px);
     height: 100%;
     position: relative;
 }
