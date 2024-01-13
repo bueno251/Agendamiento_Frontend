@@ -29,12 +29,14 @@
                                         @click="reserva = item, dialogComprobante = true">
                                         <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="reserva = item, dialogAprobar = true">
-                                        <v-list-item-title v-text="'Aprobar'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="reserva = item, dialogRechazar = true">
-                                        <v-list-item-title v-text="'Rechazar'"></v-list-item-title>
-                                    </v-list-item>
+                                    <template v-if="item.estado == 'Pendiente'">
+                                        <v-list-item link @click="reserva = item, dialogAprobar = true">
+                                            <v-list-item-title v-text="'Aprobar'"></v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item link @click="reserva = item, dialogRechazar = true">
+                                            <v-list-item-title v-text="'Rechazar'"></v-list-item-title>
+                                        </v-list-item>
+                                    </template>
                                     <v-list-item link @click="reserva = item">
                                         <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
                                     </v-list-item>
@@ -43,9 +45,30 @@
                         </td>
                         <td>{{ item.fechaEntrada }}</td>
                         <td>{{ item.fechaSalida }}</td>
-                        <td>{{ item.huespedes }}</td>
-                        <td>{{ item.adultos }}</td>
-                        <td>{{ item.niños }}</td>
+                        <td>
+                            <v-row class="ma-0">
+                                <span class="mr-5">
+                                    {{ item.huespedes }}
+                                </span>
+                                <v-tooltip right v-if="item.huespedes > 1">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on">
+                                            <v-icon size="20px">mdi-help-circle</v-icon>
+                                        </span>
+                                    </template>
+                                    <v-row>
+                                        <v-col cols="12">
+                                            Adultos: {{ item.adultos }}
+                                        </v-col>
+                                        <v-col cols="12">
+                                            Niños: {{ item.niños }}
+                                        </v-col>
+                                    </v-row>
+                                </v-tooltip>
+                            </v-row>
+                        </td>
+                        <td>{{ item.desayuno }}</td>
+                        <td>{{ item.decoracion }}</td>
                         <td>$ {{ comaEnMiles(item.precio) }} COP</td>
                         <td>{{ item.estado }}</td>
                     </tr>
@@ -126,8 +149,8 @@ export default {
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
-                { text: 'Adultos', key: 'adultos', value: 'adultos' },
-                { text: 'Niños', key: 'niños', value: 'niños' },
+                { text: 'Desayuno', key: 'desayuno', value: 'desayuno' },
+                { text: 'Cómoda', key: 'decoracion', value: 'decoracion' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
@@ -159,6 +182,7 @@ export default {
             reservaService.aprobarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
+                    this.dialogAprobar = false
                     this.getReservas()
                     console.log(res)
                 })
@@ -173,6 +197,7 @@ export default {
             reservaService.rechazarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
+                    this.dialogRechazar = false
                     this.getReservas()
                     console.log(res)
                 })

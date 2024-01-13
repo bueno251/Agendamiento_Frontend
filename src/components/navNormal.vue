@@ -1,5 +1,5 @@
 <template>
-    <nav class="nav blue lighten-5">
+    <nav class="nav blue text--accent-4">
 
         <div>
             Logo
@@ -30,6 +30,9 @@
                     </v-list-item>
                 </v-list>
                 <v-list v-else>
+                    <v-list-item link :to="{ name: 'myReservas' }">
+                        <v-list-item-title v-text="'Mis Reservas'"></v-list-item-title>
+                    </v-list-item>
                     <v-list-item link @click="logout">
                         <v-list-item-title v-text="'Cerrar Sesión'"></v-list-item-title>
                     </v-list-item>
@@ -69,6 +72,7 @@
 <script>
 
 import vuex from "@/store";
+import Swal from "sweetalert2";
 import authService from '@/modules/auth/service/authService'
 
 export default {
@@ -107,19 +111,23 @@ export default {
                     this.dialogLogin = false
                     this.$store.dispatch('setToken', res.token)
                     this.$store.dispatch('setUser', res.user)
+                    Swal.fire({
+                        icon: 'success',
+                        text: 'Inicio De Sesión Exitoso',
+                    })
                 })
                 .catch(err => {
                     this.loading = false
-                    // Swal.fire({
-                    //     icon: 'error',
-                    //     title: 'Oops...',
-                    //     text: err,
-                    // })
-                    console.log(err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: err.response.data,
+                    })
                 })
         },
         logout() {
             this.$store.dispatch('logout')
+            this.$router.push({name: 'viewRooms'})
         }
     },
 }

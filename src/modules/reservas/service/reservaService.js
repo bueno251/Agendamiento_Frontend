@@ -172,6 +172,20 @@ const reservaService = {
                 })
         })
     },
+    
+    getReservaTemporal(id, user) {
+        let url = `reserva/room/${id}/${user}`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()

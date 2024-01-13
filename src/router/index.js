@@ -78,6 +78,25 @@ const routes = [
 		],
 	},
 	{
+		path: '/user',
+		component: () => import('@/components/baseUser.vue'),
+		redirect: { name: 'viewRooms' },
+		beforeEnter: (to, from, next) => {
+			if (!vuex.state.token) {
+				next({ name: 'login' })
+			} else {
+				next()
+			}
+		},
+		children: [
+			{
+				path: '/reservas',
+				name: 'myReservas',
+				component: () => import('@/modules/user/myReservasApp.vue'),
+			},
+		],
+	},
+	{
 		path: '/login',
 		name: 'login',
 		component: () => import('@/modules/auth/loginApp.vue'),

@@ -56,8 +56,8 @@
 
                         <v-col cols="12">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
-                                :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
-                                no-title scrollable>
+                                :allowed-dates="allowedDates" :readonly="needPayment || verificacion_pago"
+                                event-color="red lighten-1" locale="es" full-width range no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
@@ -78,14 +78,16 @@
                         <v-col cols="6">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :rules="[rules.required]" item-text="desayuno" item-value="id" dense outlined>
+                                :rules="[rules.required]" :readonly="needPayment" item-text="desayuno" item-value="id" dense
+                                outlined>
                             </v-select>
                         </v-col>
 
                         <v-col cols="6">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :rules="[rules.required]" item-text="decoracion" item-value="id" dense outlined>
+                                :rules="[rules.required]" :readonly="needPayment" item-text="decoracion" item-value="id"
+                                dense outlined>
                             </v-select>
                         </v-col>
 
@@ -108,7 +110,8 @@
                                             <div class="d-flex justify-space-between align-center">
                                                 <label>Adultos</label>
                                                 <div>
-                                                    <v-btn icon @click="adultos--" :disabled="adultos <= 1">
+                                                    <v-btn icon @click="adultos--"
+                                                        :disabled="adultos <= 1 || needPayment || verificacion_pago">
                                                         <v-icon>
                                                             mdi-minus-circle
                                                         </v-icon>
@@ -116,7 +119,8 @@
                                                     <span>
                                                         {{ adultos }}
                                                     </span>
-                                                    <v-btn icon @click="adultos++" :disabled="huespedes == room.capacidad">
+                                                    <v-btn icon @click="adultos++"
+                                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
                                                         <v-icon>
                                                             mdi-plus-circle
                                                         </v-icon>
@@ -129,13 +133,15 @@
                                             <div class="d-flex justify-space-between align-center">
                                                 <label>Niños</label>
                                                 <div>
-                                                    <v-btn icon @click="niños--" :disabled="niños <= 0">
+                                                    <v-btn icon @click="niños--"
+                                                        :disabled="niños <= 0 || needPayment || verificacion_pago">
                                                         <v-icon>
                                                             mdi-minus-circle
                                                         </v-icon>
                                                     </v-btn>
                                                     {{ niños }}
-                                                    <v-btn icon @click="niños++" :disabled="huespedes == room.capacidad">
+                                                    <v-btn icon @click="niños++"
+                                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
                                                         <v-icon>
                                                             mdi-plus-circle
                                                         </v-icon>
@@ -149,8 +155,9 @@
                             </v-card>
                         </v-menu>
 
-                        <v-btn :disabled="!valid" color="primary" type="submit">
-                            reservar
+                        <v-btn v-if="!verificacion_pago" :disabled="!valid" :color="needPayment ? 'light-green' : 'primary'"
+                            type="submit">
+                            {{ needPayment ? 'Pagar' : 'Reservar' }}
                         </v-btn>
                     </div>
                 </v-card>
@@ -163,7 +170,7 @@
                     <v-row>
                         <v-col cols="12">
                             <label>Selecciona un método de pago <span class="red--text">*</span></label>
-                            <v-select v-model="metodoPago" :items="formasPago" no-data-text="Espere un momento..."
+                            <v-select v-model="metodoPago" :items="formasPago" no-data-text="No hay formas de pago validas"
                                 :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                             </v-select>
                         </v-col>
@@ -220,6 +227,7 @@ export default {
             showFormasPago: false,
             verificacion_pago: false,
             loading: false,
+            needPayment: false,
             file: null,
             reservaId: null,
             dates: [],
@@ -329,6 +337,12 @@ export default {
                 })
         },
         agendar() {
+
+            if (this.needPayment) {
+                this.showFormasPago = true
+                return
+            }
+
             if (!vuex.state.token) {
                 Swal.fire({
                     text: "Se necesita iniciar sesión",
@@ -354,11 +368,12 @@ export default {
             reservaService.reservar(data)
                 .then(res => {
                     this.reservaId = res.reserva
+                    this.needPayment = true
                     Swal.fire({
                         text: res.message,
                         icon: "success"
                     })
-                    .then(this.showFormasPago = true)
+                        .then(this.showFormasPago = true)
                 })
                 .catch(err => {
                     Swal.fire({
@@ -423,8 +438,12 @@ export default {
         },
         allowedDates(value) {
             for (let dates of this.datesInvalid) {
-                return value < dates.fecha_entrada || value > dates.fecha_salida
+                if (value >= dates.fecha_entrada && value <= dates.fecha_salida) {
+                    return false
+                }
             }
+
+            return true
         },
         getDates() {
             let id = this.$route.params.id
@@ -432,6 +451,37 @@ export default {
             reservaService.getFechasRoom(id)
                 .then(res => {
                     this.datesInvalid = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getReserva() {
+            if (!vuex.state.token) {
+                return
+            }
+
+            let room = this.$route.params.id
+            let user = vuex.state.user.id
+
+            reservaService.getReservaTemporal(room, user)
+                .then(res => {
+                    if (res.length != 0) {
+                        let array = [
+                            res[0].fecha_entrada,
+                            res[0].fecha_salida
+                        ]
+                        this.dates = array
+                        this.desayuno = res[0].desayuno_id
+                        this.decoracion = res[0].decoracion_id
+                        this.adultos = res[0].adultos
+                        this.niños = res[0].niños
+                        this.reservaId = res[0].id
+                        this.verificacion_pago = res[0].verificacion_pago
+                        if (!this.verificacion_pago) {
+                            this.needPayment = true
+                        }
+                    }
                 })
                 .catch(err => {
                     console.log(err)
@@ -465,6 +515,7 @@ export default {
     },
     mounted() {
         this.getRoom()
+        this.getReserva()
         this.getDates()
         this.getDatos()
         this.getFestivos()

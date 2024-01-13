@@ -1,6 +1,6 @@
 <template>
     <v-row class="pt-5 ma-0 w-100">
-        <v-col cols="12" md="4" v-for="room in rooms" :key="room.id">
+        <v-col cols="12" lg="4" md="6" v-for="room in rooms" :key="room.id">
             <v-card height="100%" max-height="300px" elevation="5" outlined>
                 <v-card-title>{{ room.nombre }}</v-card-title>
                 <v-card-text>
