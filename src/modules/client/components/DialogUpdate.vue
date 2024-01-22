@@ -369,7 +369,7 @@ export default {
                 this.tipoObligacion = newclient.tipo_obligacion_id
                 this.tipoRegimen = newclient.tipo_regimen_id
                 this.observacion = newclient.observacion
-                if (newclient.id) {
+                if (newclient.pais) {
                     this.getStates()
                     this.departamento = newclient.departamento
                     this.getCities()

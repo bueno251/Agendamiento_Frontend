@@ -16,7 +16,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="goToRoom(room.id)" outlined>
-                        reservar
+                        Disponibilidad
                     </v-btn>
                 </v-card-actions>
             </v-card>

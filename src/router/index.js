@@ -65,7 +65,7 @@ const routes = [
 		redirect: { name: 'viewRooms' },
 		children: [
 			{
-				path: '/rooms',
+				path: '/reservas_clientes',
 				name: 'viewRooms',
 				component: () => import('@/modules/reservas/ViewRooms.vue'),
 			},
@@ -93,6 +93,11 @@ const routes = [
 				path: '/reservas',
 				name: 'myReservas',
 				component: () => import('@/modules/user/myReservasApp.vue'),
+			},
+			{
+				path: '/profile',
+				name: 'profile',
+				component: () => import('@/modules/user/ProfileInfo.vue'),
 			},
 		],
 	},

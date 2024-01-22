@@ -25,11 +25,14 @@
                     <v-list-item link @click="dialogLogin = true">
                         <v-list-item-title v-text="'Iniciar Sesión'"></v-list-item-title>
                     </v-list-item>
-                    <v-list-item link>
+                    <v-list-item link @click="dialogRegister = true">
                         <v-list-item-title v-text="'Registrarse'"></v-list-item-title>
                     </v-list-item>
                 </v-list>
                 <v-list v-else>
+                    <v-list-item link :to="{ name: 'profile' }">
+                        <v-list-item-title v-text="'Perfil'"></v-list-item-title>
+                    </v-list-item>
                     <v-list-item link :to="{ name: 'myReservas' }">
                         <v-list-item-title v-text="'Mis Reservas'"></v-list-item-title>
                     </v-list-item>
@@ -42,7 +45,7 @@
 
         <v-dialog :value="dialogLogin" max-width="500px" persistent>
             <v-card class="pa-5">
-                <v-form v-model="valid" @submit.prevent="login()">
+                <v-form v-model="valid1" @submit.prevent="login()">
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="correo" label="Correo" :rules="[rules.required, rules.email]"
@@ -59,8 +62,81 @@
                     </v-row>
                     <div class="buttons">
                         <v-btn @click="dialogLogin = false" color="red">cancelar</v-btn>
-                        <v-btn :disabled="!valid" :loading="loading" color="light-green" type="submit">
+                        <v-btn :disabled="!valid1" :loading="loading" color="light-green" type="submit">
                             Iniciar sesión
+                        </v-btn>
+                    </div>
+                </v-form>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog max-width="800px" :value="dialogRegister" persistent>
+            <v-card class="pa-5">
+                <v-form v-model="valid2" @submit.prevent="login()">
+                    <v-row>
+                        <v-col cols="12" md="3">
+                            <v-text-field v-model="nombre1" :rules="[rules.required]" outlined required>
+                                <template v-slot:label>
+                                    Primer Nombre <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="3">
+                            <v-text-field v-model="nombre2" label="Segundo Nombre" outlined>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="3">
+                            <v-text-field v-model="apellido1" :rules="[rules.required]" outlined required>
+                                <template v-slot:label>
+                                    Primer Apellido <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="3">
+                            <v-text-field v-model="apellido2" label="Segundo Apellido" outlined>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="username" :rules="[rules.required]" prepend-inner-icon="mdi-account"
+                                outlined required>
+                                <template v-slot:label>
+                                    Username <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="correo" :rules="[rules.required, rules.email]"
+                                prepend-inner-icon="mdi-email-outline" outlined required>
+                                <template v-slot:label>
+                                    Correo <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="telefono1" :rules="[rules.required]" prepend-inner-icon="mdi-phone"
+                                outlined required>
+                                <template v-slot:label>
+                                    Teléfono <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="telefono2" label="Teléfono Secundario" prepend-inner-icon="mdi-phone"
+                                outlined required>
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <div class="buttons">
+                        <v-btn @click="dialogRegister = false" color="red">cancelar</v-btn>
+                        <v-btn :disabled="!valid2" :loading="loading" color="light-green" type="submit">
+                            Resgistrarse
                         </v-btn>
                     </div>
                 </v-form>
@@ -79,11 +155,20 @@ export default {
     name: 'navNormal',
     data() {
         return {
+            nombre1: '',
+            nombre2: '',
+            apellido1: '',
+            apellido2: '',
+            username: '',
+            telefono1: '',
+            telefono2: '',
             correo: '',
             password: '',
-            valid: false,
+            valid1: false,
+            valid2: false,
             loading: false,
             dialogLogin: false,
+            dialogRegister: false,
             show: false,
             rules: {
                 required: value => !!value || 'Campo requerido.',
@@ -127,7 +212,7 @@ export default {
         },
         logout() {
             this.$store.dispatch('logout')
-            this.$router.push({name: 'viewRooms'})
+            this.$router.push({ name: 'viewRooms' }).catch({})
         }
     },
 }

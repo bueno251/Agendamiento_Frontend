@@ -26,6 +26,76 @@ const UserService = {
                 })
         })
     },
+
+    getClienteInfo(id) {
+        let url = `client/find/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+    
+    obtenerTipos() {
+        let url = 'client/type/all'
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+    
+    savePersonal(data, cliente){
+        let url = `client/personal/${cliente}`
+    
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    saveContacto(data, cliente){
+        let url = `client/contacto/${cliente}`
+    
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    saveLegal(data, cliente){
+        let url = `client/legal/${cliente}`
+    
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()
