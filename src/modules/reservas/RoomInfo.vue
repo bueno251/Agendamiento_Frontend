@@ -34,15 +34,15 @@
                                 Normal
                             </th>
                             <th>
-                                Festivos <v-icon class="red--text text-caption">mdi-circle</v-icon>
+                                Jornada
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="day in room.precios" :key="day.name">
                             <td>{{ day.name }}</td>
-                            <td>$ {{ comaEnMiles(day.normal) }} COP</td>
-                            <td>$ {{ comaEnMiles(day.festivo) }} COP</td>
+                            <td>$ {{ comaEnMiles(day.precio) }} COP</td>
+                            <td>{{ day.jornada }}</td>
                         </tr>
                     </tbody>
                 </template>
@@ -50,7 +50,7 @@
 
         </div>
         <div class="calendar pa-5">
-            <v-form v-model="valid" ref="formReservar" @submit.prevent="agendar">
+            <v-form v-model="valid" ref="formReservar">
                 <v-card class="pa-5 sticky" elevation="5">
                     <v-row>
 
@@ -78,86 +78,66 @@
                         <v-col cols="6">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :rules="[rules.required]" :readonly="needPayment" item-text="desayuno" item-value="id" dense
-                                outlined>
+                                :readonly="needPayment" item-text="desayuno" item-value="id" dense outlined>
                             </v-select>
                         </v-col>
 
                         <v-col cols="6">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :rules="[rules.required]" :readonly="needPayment" item-text="decoracion" item-value="id"
-                                dense outlined>
+                                :readonly="needPayment" item-text="decoracion" item-value="id" dense outlined>
                             </v-select>
                         </v-col>
 
+                        <v-col cols="6">
+                            <div class="d-flex justify-space-between align-center">
+                                <label>Adultos</label>
+                                <div>
+                                    <v-btn icon @click="adultos--"
+                                        :disabled="adultos <= 1 || needPayment || verificacion_pago">
+                                        <v-icon>
+                                            mdi-minus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                    <span>
+                                        {{ adultos }}
+                                    </span>
+                                    <v-btn icon @click="adultos++"
+                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
+                                        <v-icon>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                </div>
+                            </div>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <div class="d-flex justify-space-between align-center">
+                                <label>Niños</label>
+                                <div>
+                                    <v-btn icon @click="niños--" :disabled="niños <= 0 || needPayment || verificacion_pago">
+                                        <v-icon>
+                                            mdi-minus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                    {{ niños }}
+                                    <v-btn icon @click="niños++"
+                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
+                                        <v-icon>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                </div>
+                            </div>
+                        </v-col>
                     </v-row>
 
                     <div class="buttons mt-5">
-
-                        <v-menu v-model="menu" :close-on-content-click="false" transition="fade-transition" left offset-y
-                            min-width="auto">
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn color="primary" v-bind="attrs" v-on="on">
-                                    Huespedes
-                                </v-btn>
-                            </template>
-                            <v-card class="pa-5">
-                                <v-form ref="form" v-model="valid" @submit.prevent="crear">
-                                    <v-row>
-
-                                        <v-col cols="12">
-                                            <div class="d-flex justify-space-between align-center">
-                                                <label>Adultos</label>
-                                                <div>
-                                                    <v-btn icon @click="adultos--"
-                                                        :disabled="adultos <= 1 || needPayment || verificacion_pago">
-                                                        <v-icon>
-                                                            mdi-minus-circle
-                                                        </v-icon>
-                                                    </v-btn>
-                                                    <span>
-                                                        {{ adultos }}
-                                                    </span>
-                                                    <v-btn icon @click="adultos++"
-                                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
-                                                        <v-icon>
-                                                            mdi-plus-circle
-                                                        </v-icon>
-                                                    </v-btn>
-                                                </div>
-                                            </div>
-                                        </v-col>
-
-                                        <v-col cols="12">
-                                            <div class="d-flex justify-space-between align-center">
-                                                <label>Niños</label>
-                                                <div>
-                                                    <v-btn icon @click="niños--"
-                                                        :disabled="niños <= 0 || needPayment || verificacion_pago">
-                                                        <v-icon>
-                                                            mdi-minus-circle
-                                                        </v-icon>
-                                                    </v-btn>
-                                                    {{ niños }}
-                                                    <v-btn icon @click="niños++"
-                                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
-                                                        <v-icon>
-                                                            mdi-plus-circle
-                                                        </v-icon>
-                                                    </v-btn>
-                                                </div>
-                                            </div>
-                                        </v-col>
-
-                                    </v-row>
-                                </v-form>
-                            </v-card>
-                        </v-menu>
-
                         <v-btn v-if="!verificacion_pago" :disabled="!valid" :color="needPayment ? 'light-green' : 'primary'"
                             type="submit">
-                            {{ needPayment ? 'Pagar' : 'Reservar' }}
+                            <!-- {{ needPayment ? 'Pagar' : 'siguiente' }} -->
+                            siguiente
                         </v-btn>
                     </div>
                 </v-card>
@@ -178,7 +158,6 @@
                         <template v-if="metodoPago == '1'">
                             <v-col cols="12">
                                 <label>Número para transacciones: 123456789</label>
-
                             </v-col>
 
                             <v-col cols="12">
@@ -215,8 +194,8 @@ export default {
             cedula: '',
             telefono: '',
             metodoPago: '',
-            desayuno: '',
-            decoracion: '',
+            desayuno: null,
+            decoracion: null,
             maxDate: '',
             adultos: 1,
             niños: 0,
@@ -234,8 +213,18 @@ export default {
             datesInvalid: [],
             formasPago: [],
             festivos: [],
-            desayunos: [],
-            decoraciones: [],
+            desayunos: [
+                {
+                    id: null,
+                    desayuno: 'Ninguno'
+                }
+            ],
+            decoraciones: [
+                {
+                    id: null,
+                    decoracion: 'Ninguna'
+                }
+            ],
             reservaTemporal: null,
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             room: {
@@ -295,9 +284,9 @@ export default {
 
                 while (fechaActual <= new Date(this.dates[1].replace(/-/g, '/'))) {
                     if (this.festivos.includes(fechaActual.toISOString().slice(0, 10))) {
-                        precio += this.room.precios[fechaActual.getDay()].festivo
+                        precio += this.room.precios[fechaActual.getDay()].precio
                     } else {
-                        precio += this.room.precios[fechaActual.getDay()].normal
+                        precio += this.room.precios[fechaActual.getDay()].precio
                     }
 
                     fechaActual.setDate(fechaActual.getDate() + 1);
@@ -351,36 +340,36 @@ export default {
                 return
             }
 
-            let data = {
-                dateIn: this.fechaLlegada,
-                dateOut: this.fechaSalida,
-                room: this.room.id,
-                user: vuex.state.user.id,
-                desayuno: this.desayuno,
-                decoracion: this.decoracion,
-                huespedes: this.huespedes,
-                adultos: this.adultos,
-                niños: this.niños,
-                precio: this.precio,
-                verificacion_pago: this.verificacion_pago ? 1 : 0,
-            }
+            // let data = {
+            //     dateIn: this.fechaLlegada,
+            //     dateOut: this.fechaSalida,
+            //     room: this.room.id,
+            //     user: vuex.state.user.id,
+            //     desayuno: this.desayuno,
+            //     decoracion: this.decoracion,
+            //     huespedes: this.huespedes,
+            //     adultos: this.adultos,
+            //     niños: this.niños,
+            //     precio: this.precio,
+            //     verificacion_pago: this.verificacion_pago ? 1 : 0,
+            // }
 
-            reservaService.reservar(data)
-                .then(res => {
-                    this.reservaId = res.reserva
-                    this.needPayment = true
-                    Swal.fire({
-                        text: res.message,
-                        icon: "success"
-                    })
-                        .then(this.showFormasPago = true)
-                })
-                .catch(err => {
-                    Swal.fire({
-                        text: err.response.data.message,
-                        icon: "error"
-                    })
-                })
+            // reservaService.reservar(data)
+            //     .then(res => {
+            //         this.reservaId = res.reserva
+            //         this.needPayment = true
+            //         Swal.fire({
+            //             text: res.message,
+            //             icon: "success"
+            //         })
+            //             .then(this.showFormasPago = true)
+            //     })
+            //     .catch(err => {
+            //         Swal.fire({
+            //             text: err.response.data.message,
+            //             icon: "error"
+            //         })
+            //     })
 
         },
         pagar() {
@@ -498,7 +487,7 @@ export default {
 
             reservaService.obtenerDesayunos()
                 .then(res => {
-                    this.desayunos = res
+                    this.desayunos = [...this.desayunos, ...res]
                 })
                 .catch(err => {
                     console.log(err)
@@ -506,7 +495,7 @@ export default {
 
             reservaService.obtenerDecoraciones()
                 .then(res => {
-                    this.decoraciones = res
+                    this.decoraciones = [...this.decoraciones, ...res]
                 })
                 .catch(err => {
                     console.log(err)

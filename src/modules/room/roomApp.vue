@@ -34,11 +34,14 @@
                                     <v-list-item link @click="room = item, dialogUpdate = true">
                                         <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="room = item, dialogBitacora = true">
-                                        <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
+                                    <v-list-item link @click="room = item, dialogImg = true">
+                                        <v-list-item-title v-text="'Imagenes'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogPrecios = true">
                                         <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item link @click="room = item, dialogBitacora = true">
+                                        <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
@@ -75,6 +78,8 @@
         </v-dialog>
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
         <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"></PreciosRoom>
+        <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false">
+        </DialogImg>
     </div>
 </template>
 
@@ -86,6 +91,7 @@ import PreciosRoom from './components/PreciosRoom';
 import estadosRoom from "./components/estadosRoom"
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
+import DialogImg from './components/DialogImg.vue';
 
 export default {
     name: 'roomApp',
@@ -94,6 +100,7 @@ export default {
         PreciosRoom,
         DialogCreate,
         DialogUpdate,
+        DialogImg,
     },
     data() {
         return {
@@ -105,6 +112,7 @@ export default {
             dialogDelete: false,
             dialogBitacora: false,
             dialogPrecios: false,
+            dialogImg: false,
             room: {},
             rooms: [],
             headers: [
@@ -126,6 +134,9 @@ export default {
             roomService.obtenerRooms()
                 .then(res => {
                     this.loading = false
+                    res.forEach(room => {
+                        room.imgs = JSON.parse(room.imgs)
+                    });
                     this.rooms = res
                 })
                 .catch(err => {

@@ -17,8 +17,14 @@ const roomService = {
     crearRoom(data) {
         let url = 'room/create'
 
+        let config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }
+
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            local.api.post(url, data, config)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -326,6 +332,40 @@ const roomService = {
 
         return new Promise((resolve, reject) => {
             local.api.delete(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    getJornadas() {
+        let url = 'jornadas/read'
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarRoomImg(data, id) {
+        let url = `room/img/${id}`
+
+        let config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data, config)
                 .then((res) => {
                     resolve(res.data)
                 })

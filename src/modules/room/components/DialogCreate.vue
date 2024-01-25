@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="show" width="90%" max-width="500px" persistent>
+    <v-dialog :value="show" width="90%" persistent>
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
                 <v-row>
@@ -46,6 +46,31 @@
                         </v-textarea>
                     </v-col>
 
+                    <v-col cols="12">
+                        <v-file-input v-model="imgs" :rules="[rules.file]" @change="handleFileChange" label="Imagenes"
+                            accept="image/*" prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input
+                            outlined required></v-file-input>
+
+                        <span class="red--text">{{ error }}</span>
+
+                        <div class="grid my-5">
+                            <template v-for="(img, index) in imgs">
+                                <v-menu :key="index" offset-y style="max-width: 600px">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-card class="portrait" :img="img.preview" height="300" width="600" v-bind="attrs"
+                                            v-on="on"></v-card>
+                                    </template>
+
+                                    <v-list>
+                                        <v-list-item link @click="imgs.splice(index, 1)">
+                                            <v-list-item-title>Eliminar</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                            </template>
+                        </div>
+                    </v-col>
+
                 </v-row>
 
                 <div class="buttons">
@@ -74,12 +99,34 @@ export default {
             tipo: '',
             capacidad: '',
             estado: '',
+            error: '',
+            imgs: [],
             valid: false,
             loading: false,
             tipos: [],
             estados: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
+                file: imgs => {
+
+                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif'];
+                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+
+                    if (!imgs.length) {
+                        this.error = 'Se necesita una imagen.'
+                        return false
+                    }
+
+                    for (let i = 0; i < imgs.length; i++) {
+                        if (!allowedFormats.includes(imgs[i].type) && !allowedExtensions.includes(imgs[i].name.slice(-4).toLowerCase())) {
+                            this.error = 'Los archivos deben ser imagenes (JPEG, PNG, GIF)'
+                            return false
+                        }
+                    }
+
+                    this.error = ''
+                    return true;
+                }
             },
         }
     },
@@ -87,12 +134,19 @@ export default {
         newRoom() {
             this.loading = true
 
-            let data = {
-                nombre: this.nombre,
-                descripcion: this.descripcion,
-                roomTipo: this.tipo,
-                capacidad: this.capacidad,
-                estado: this.estado,
+            let data = new FormData()
+
+            data.append('nombre', this.nombre)
+            data.append('descripcion', this.descripcion)
+            data.append('roomTipo', this.tipo)
+            data.append('capacidad', this.capacidad)
+            data.append('estado', this.estado)
+
+            const imgsForUpload = this.imgs;
+            if (imgsForUpload.length) {
+                imgsForUpload.map(img => {
+                    data.append('imgs[]', img);
+                });
             }
 
             roomService.crearRoom(data)
@@ -112,6 +166,12 @@ export default {
                     })
                     console.log(err)
                 })
+        },
+        handleFileChange() {
+            this.imgs.forEach((file) => {
+                // Actualizar la propiedad 'preview' con la URL de la vista previa
+                file.preview = URL.createObjectURL(file)
+            });
         },
         getTypes() {
             roomService.obtenerRoomTipos()
@@ -149,5 +209,11 @@ export default {
     align-items: center;
     justify-content: flex-end;
     gap: 15px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
 }
 </style>
