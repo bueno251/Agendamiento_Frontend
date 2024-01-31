@@ -59,7 +59,7 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="red">cancelar</v-btn>
+                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
                             color="light-green">crear</v-btn>
                     </div>
@@ -79,7 +79,7 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="red">cancelar</v-btn>
+                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
                             color="light-green">actualizar</v-btn>
                     </div>

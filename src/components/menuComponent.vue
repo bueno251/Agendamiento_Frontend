@@ -51,6 +51,10 @@
                         <v-list-item router :to="{ name: 'decoraciones' }">
                             <v-list-item-title>Decoraciones</v-list-item-title>
                         </v-list-item>
+
+                        <v-list-item router :to="{ name: 'caracteristicas' }">
+                            <v-list-item-title>Caracteristicas</v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
 
                     <v-list-item router :to="{ name: 'configuracion' }">

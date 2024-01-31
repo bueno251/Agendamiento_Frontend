@@ -374,6 +374,62 @@ const roomService = {
                 })
         })
     },
+
+    crearCaracteristica(data) {
+        let url = `room/caracteristicas/create`
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerCaracteristicas() {
+        let url = `room/caracteristicas/read`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarCaracteristica(data, id) {
+        let url = `room/caracteristicas/update/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarCaracteristica(id) {
+        let url = `room/caracteristicas/delete/${id}`
+
+        return new Promise((resolve, reject) => {
+            local.api.delete(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()

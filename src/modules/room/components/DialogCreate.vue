@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="show" width="90%" persistent>
+    <v-dialog :value="show" width="90%" max-width="600px" persistent>
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
                 <v-row>
@@ -47,6 +47,37 @@
                     </v-col>
 
                     <v-col cols="12">
+                        <p>Seleccione las características de la habitación</p>
+                        <v-item-group v-model="selectedCaracteristicas" multiple>
+                            <div class="caracteristics">
+                                <div v-for="(item, index) in caracteristicas" :key="`caracteris${index}`">
+                                    <v-item v-slot="{ active, toggle }" :value="item.id">
+                                        <v-card class="caracteristic" @click="toggle">
+                                            <v-avatar :color="active ? 'blue' : 'grey lighten-1'">
+                                                <v-icon dark>
+                                                    mdi-{{ item.icon }}
+                                                </v-icon>
+                                            </v-avatar>
+                                            <p>
+                                                {{ item.nombre }}
+                                            </p>
+                                        </v-card>
+                                    </v-item>
+                                </div>
+                                <v-card class="caracteristic" @click="dialogCreate = true">
+                                    <v-avatar color="blue">
+                                        <v-icon dark>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-avatar>
+                                    <p>Añadir</p>
+                                </v-card>
+                            </div>
+                        </v-item-group>
+                    </v-col>
+
+                    <v-col cols="12">
+
                         <v-file-input v-model="imgs" :rules="[rules.file]" @change="handleFileChange" label="Imagenes"
                             accept="image/*" prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input
                             outlined required></v-file-input>
@@ -55,9 +86,9 @@
 
                         <div class="grid my-5">
                             <template v-for="(img, index) in imgs">
-                                <v-menu :key="index" offset-y style="max-width: 600px">
+                                <v-menu :key="index" offset-y style="width: 100%">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-card class="portrait" :img="img.preview" height="300" width="600" v-bind="attrs"
+                                        <v-card class="portrait" :img="img.preview" height="150" width="100%" v-bind="attrs"
                                             v-on="on"></v-card>
                                     </template>
 
@@ -74,11 +105,14 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="red">cancelar</v-btn>
+                    <v-btn @click="close" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">crear</v-btn>
                 </div>
             </v-form>
         </v-card>
+        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
+            @create="getCaracteristicas(), dialogCreate = false">
+        </CreateCaracteristicRoom>
     </v-dialog>
 </template>
 
@@ -86,11 +120,15 @@
 
 import Swal from 'sweetalert2'
 import roomService from '../service/roomService'
+import CreateCaracteristicRoom from './CreateCaracteristicRoom.vue'
 
 export default {
     name: 'DialogCreate',
     props: {
         show: Boolean,
+    },
+    components: {
+        CreateCaracteristicRoom,
     },
     data() {
         return {
@@ -103,8 +141,11 @@ export default {
             imgs: [],
             valid: false,
             loading: false,
+            dialogCreate: false,
             tipos: [],
             estados: [],
+            caracteristicas: [],
+            selectedCaracteristicas: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 file: imgs => {
@@ -149,6 +190,12 @@ export default {
                 });
             }
 
+            if (this.selectedCaracteristicas.length) {
+                this.selectedCaracteristicas.map(caracteristic => {
+                    data.append('caracteristic[]', caracteristic)
+                })
+            }
+
             roomService.crearRoom(data)
                 .then(res => {
                     this.loading = false
@@ -173,7 +220,7 @@ export default {
                 file.preview = URL.createObjectURL(file)
             });
         },
-        getTypes() {
+        getDatos() {
             roomService.obtenerRoomTipos()
                 .then(res => {
                     this.tipos = res
@@ -181,11 +228,19 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
-        },
-        getEstados() {
+
             roomService.obtenerRoomEstados()
                 .then(res => {
                     this.estados = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getCaracteristicas() {
+            roomService.obtenerCaracteristicas()
+                .then(res => {
+                    this.caracteristicas = res
                 })
                 .catch(err => {
                     console.log(err)
@@ -197,8 +252,8 @@ export default {
         },
     },
     mounted() {
-        this.getTypes()
-        this.getEstados()
+        this.getDatos()
+        this.getCaracteristicas()
     },
 }
 </script>
@@ -213,7 +268,28 @@ export default {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
+}
+
+.caracteristics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.caracteristic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.caracteristic p {
+    margin: 0;
+    text-align: center;
 }
 </style>

@@ -169,7 +169,7 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="showFormasPago = false" color="red">cancelar</v-btn>
+                        <v-btn @click="showFormasPago = false" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
                             pagar
                         </v-btn>

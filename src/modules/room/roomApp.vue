@@ -77,7 +77,7 @@
             </v-card>
         </v-dialog>
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
-        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"></PreciosRoom>
+        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false" @update="getRooms(), dialogPrecios = false"></PreciosRoom>
         <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false">
         </DialogImg>
     </div>
@@ -134,9 +134,6 @@ export default {
             roomService.obtenerRooms()
                 .then(res => {
                     this.loading = false
-                    res.forEach(room => {
-                        room.imgs = JSON.parse(room.imgs)
-                    });
                     this.rooms = res
                 })
                 .catch(err => {

@@ -162,7 +162,7 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="red">cancelar</v-btn>
+                    <v-btn @click="close" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
                 </div>
             </v-form>

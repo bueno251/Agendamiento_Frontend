@@ -61,7 +61,7 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogLogin = false" color="red">cancelar</v-btn>
+                        <v-btn @click="dialogLogin = false" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!valid1" :loading="loading" color="light-green" type="submit">
                             Iniciar sesión
                         </v-btn>
@@ -134,7 +134,7 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogRegister = false" color="red">cancelar</v-btn>
+                        <v-btn @click="dialogRegister = false" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!valid2" :loading="loading" color="light-green" type="submit">
                             Resgistrarse
                         </v-btn>

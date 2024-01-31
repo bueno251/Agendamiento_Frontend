@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <h1>
-            Decoraciones
+            Caracteristicas
         </h1>
         <v-card width="90%" class="my-5">
             <v-card-title>
@@ -18,7 +18,7 @@
                 </v-row>
             </v-card-title>
             <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ninguna decoración que coincida" no-data-text="No hay decoraciones"
+                no-results-text="No hay ninguna caraccteristica que coincida" no-data-text="No hay caracteristicas"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                 <template v-slot:item="{ item }">
@@ -31,51 +31,71 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
-                                    <v-list-item link @click="decoration = item, dialogUpdate = true">
+                                    <v-list-item link @click="caracteristica = item, dialogUpdate = true">
                                         <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="decoration = item, dialogDelete = true">
+                                    <v-list-item link @click="caracteristica = item, dialogDelete = true">
                                         <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                     </v-list-item>
                                 </v-list>
                             </v-menu>
                         </td>
-                        <td>{{ item.decoracion }}</td>
+                        <td>
+                            <v-avatar color="indigo" size="36">
+                                <v-icon dark>
+                                    mdi-{{ item.icon }}
+                                </v-icon>
+                            </v-avatar>
+                        </td>
+                        <td>{{ item.nombre }}</td>
+                        <td>{{ item.descripcion }}</td>
+                        <td>{{ item.estado }}</td>
                         <td>{{ item.created_at }}</td>
                     </tr>
                 </template>
             </v-data-table>
         </v-card>
-        <v-dialog :value="dialogCreate" width="90%" max-width="500px" persistent>
-            <v-card class="pa-5">
-                <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
-                    <v-row>
-                        <v-col cols="12">
-                            <v-text-field v-model="newDeco" :rules="[rules.required]" outlined required>
-                                <template v-slot:label>
-                                    Nombre <span class="red--text">*</span>
-                                </template>
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <div class="buttons">
-                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
-                            color="light-green">crear</v-btn>
-                    </div>
-                </v-form>
-            </v-card>
-        </v-dialog>
+        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
+            @create="getCaracteristicas(), dialogCreate = false">
+        </CreateCaracteristicRoom>
+
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="actualizar">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="decoracion" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
                             </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
+                                append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" outlined required>
+                                <template v-slot:label>
+                                    Icono <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
+                                :rules="[rules.required]" item-text="estado" item-value="id" outlined>
+                                <template v-slot:label>
+                                    Estado <span class="red--text">*</span>
+                                </template>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-textarea v-model="descripcion" :rules="[rules.required]" auto-grow rows="5" dense outlined
+                                required>
+                                <template v-slot:label>
+                                    Descripción <span class="red--text">*</span>
+                                </template>
+                            </v-textarea>
                         </v-col>
                     </v-row>
                     <div class="buttons">
@@ -86,10 +106,11 @@
                 </v-form>
             </v-card>
         </v-dialog>
+
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar la decoración {{ decoration.decoracion }}?</h3>
+                    <h3>Eliminar la decoración {{ caracteristica.nombre }}?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
@@ -105,16 +126,20 @@
 
 import Swal from 'sweetalert2'
 import roomService from "./service/roomService"
+import CreateCaracteristicRoom from './components/CreateCaracteristicRoom.vue'
 
 export default {
-    name: 'DecoracionesApp',
+    name: 'CaracteristicasApp',
     components: {
+        CreateCaracteristicRoom,
     },
     data() {
         return {
             search: '',
-            newDeco: '',
-            decoracion: '',
+            nombre: '',
+            descripcion: '',
+            icon: '',
+            estado: '',
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
@@ -122,11 +147,24 @@ export default {
             dialogDelete: false,
             validCreate: false,
             validUpdate: false,
-            decoration: {},
+            caracteristica: {},
             desserts: [],
+            estados: [
+                {
+                    id: 1,
+                    estado: 'Activo',
+                },
+                {
+                    id: 2,
+                    estado: 'Inactivo',
+                },
+            ],
             headers: [
                 { text: '', key: 'actions', sortable: false },
-                { text: 'Decoración', key: 'decoracion', value: 'decoracion' },
+                { text: 'Icono', key: 'icon', sortable: false },
+                { text: 'Nombre', key: 'nombre', value: 'nombre' },
+                { text: 'Descripcion', key: 'descripcion', value: 'descripcion' },
+                { text: 'Estado', key: 'estado', value: 'estado' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
             rules: {
@@ -135,9 +173,14 @@ export default {
         }
     },
     watch: {
-        decoration: {
+        caracteristica: {
             handler(newitem) {
-                this.decoracion = newitem.decoracion;
+                if (newitem.id) {
+                    this.nombre = newitem.nombre
+                    this.icon = newitem.icon
+                    this.descripcion = newitem.descripcion
+                    this.estado = newitem.estado_id
+                }
             },
             immediate: true,
         }
@@ -147,14 +190,17 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                decoracion: this.newDeco,
+                nombre: this.nombre,
+                descripcion: this.descripcion,
+                icon: this.icon,
+                estado: this.estado,
             }
 
-            roomService.crearDecoracion(data)
+            roomService.crearCaracteristica(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getDe()
+                    this.getCaracteristicas()
                     this.$refs.formCreate.reset()
                     Swal.fire({
                         icon: 'success',
@@ -170,12 +216,11 @@ export default {
                     console.log(err)
                 })
         },
-        getDe() {
+        getCaracteristicas() {
             this.loading = true
-            this.decoration = {}
-            this.close()
+            this.caracteristica = {}
 
-            roomService.obtenerDecoraciones()
+            roomService.obtenerCaracteristicas()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
@@ -189,14 +234,17 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                decoracion: this.decoracion,
+                nombre: this.nombre,
+                descripcion: this.descripcion,
+                icon: this.icon,
+                estado: this.estado,
             }
 
-            roomService.actualizarDecoracion(data, this.decoration.id)
+            roomService.actualizarCaracteristica(data, this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getDe()
+                    this.getCaracteristicas()
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -214,11 +262,11 @@ export default {
         eliminar() {
             this.loadingbtn = true
 
-            roomService.eliminarDecoracion(this.decoration.id)
+            roomService.eliminarCaracteristica(this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getDe()
+                    this.getCaracteristicas()
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -233,13 +281,12 @@ export default {
                     console.log(err)
                 })
         },
-        close() {
-            this.dialogCreate = false
-            this.dialogUpdate = false
-        },
+        toIcons() {
+            window.open('https://pictogrammers.com/library/mdi/', '_blank');
+        }
     },
     mounted() {
-        this.getDe()
+        this.getCaracteristicas()
     },
 }
 </script>

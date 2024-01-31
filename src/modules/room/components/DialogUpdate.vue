@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="show" width="90%" max-width="500px" persistent>
+    <v-dialog :value="show" width="90%" max-width="600px" persistent>
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="updateRoom">
                 <v-row>
@@ -46,14 +46,47 @@
                         </v-textarea>
                     </v-col>
 
+                    <v-col cols="12">
+                        <p>Seleccione las características de la habitación</p>
+                        <v-item-group v-model="selectedCaracteristicas" multiple>
+                            <div class="caracteristics">
+                                <div v-for="(item, index) in caracteristicas" :key="`caracteris${index}`">
+                                    <v-item v-slot="{ active, toggle }" :value="item.id">
+                                        <v-card class="caracteristic" @click="toggle">
+                                            <v-avatar :color="active ? 'blue' : 'grey lighten-1'">
+                                                <v-icon dark>
+                                                    mdi-{{ item.icon }}
+                                                </v-icon>
+                                            </v-avatar>
+                                            <p>
+                                                {{ item.nombre }}
+                                            </p>
+                                        </v-card>
+                                    </v-item>
+                                </div>
+                                <v-card class="caracteristic" @click="dialogCreate = true">
+                                    <v-avatar color="blue">
+                                        <v-icon dark>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-avatar>
+                                    <p>Añadir</p>
+                                </v-card>
+                            </div>
+                        </v-item-group>
+                    </v-col>
+
                 </v-row>
 
-                <div class="buttons">
-                    <v-btn @click="close" color="red">cancelar</v-btn>
+                <div class="buttons pt-5">
+                    <v-btn @click="close" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">Actualizar</v-btn>
                 </div>
             </v-form>
         </v-card>
+        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
+            @create="getCaracteristicas(), dialogCreate = false">
+        </CreateCaracteristicRoom>
     </v-dialog>
 </template>
 
@@ -62,12 +95,16 @@
 import vuex from "@/store"
 import Swal from 'sweetalert2'
 import roomService from '../service/roomService'
+import CreateCaracteristicRoom from './CreateCaracteristicRoom.vue'
 
 export default {
     name: 'DialogUpdate',
     props: {
         show: Boolean,
         room: Object,
+    },
+    components: {
+        CreateCaracteristicRoom,
     },
     data() {
         return {
@@ -78,16 +115,52 @@ export default {
             estado: '',
             valid: false,
             loading: false,
+            dialogCreate: false,
             tipos: [],
             estados: [],
+            caracteristicas: [],
+            selectedCaracteristicas: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
         }
     },
+    computed: {
+        noSelectedCaracteristicas() {
+            if ("id" in this.room) {
+                return this.caracteristicas.filter(caracteristica => !this.selectedCaracteristicas.includes(caracteristica.id))
+            } else {
+                return false
+            }
+        }
+    },
+    watch: {
+        room: {
+            handler(newRoom) {
+                if ("id" in newRoom) {
+                    this.nombre = newRoom.nombre;
+                    this.descripcion = newRoom.descripcion;
+                    this.tipo = newRoom.tipoId;
+                    this.capacidad = newRoom.capacidad;
+                    this.estado = newRoom.estadoId;
+                    this.selectedCaracteristicas = Array.from(newRoom.caracteristics)
+                }
+                this.getCaracteristicas()
+            },
+            immediate: true,
+        }
+    },
     methods: {
         updateRoom() {
             this.loading = true
+
+            let noSelected = []
+
+            if (this.noSelectedCaracteristicas.length) {
+                this.noSelectedCaracteristicas.map(caracteristic => {
+                    noSelected.push(caracteristic.id)
+                })
+            }
 
             let data = {
                 user: vuex.state.user.id,
@@ -97,6 +170,8 @@ export default {
                 capacidad: this.capacidad,
                 estado: this.estado,
                 estadoAntiguo: this.room.estadoId,
+                activar: this.selectedCaracteristicas,
+                desactivar: noSelected,
             }
 
             roomService.actualizarRoom(data, this.room.id)
@@ -117,7 +192,7 @@ export default {
                     console.log(err)
                 })
         },
-        getTypes() {
+        getDatos() {
             roomService.obtenerRoomTipos()
                 .then(res => {
                     this.tipos = res
@@ -125,11 +200,19 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
-        },
-        getEstados() {
+
             roomService.obtenerRoomEstados()
                 .then(res => {
                     this.estados = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getCaracteristicas() {
+            roomService.obtenerCaracteristicas()
+                .then(res => {
+                    this.caracteristicas = res
                 })
                 .catch(err => {
                     console.log(err)
@@ -139,23 +222,32 @@ export default {
             this.$emit('close')
         },
     },
-    watch: {
-        room: {
-            handler(newRoom) {
-                this.nombre = newRoom.nombre;
-                this.descripcion = newRoom.descripcion;
-                this.tipo = newRoom.tipoId;
-                this.capacidad = newRoom.capacidad;
-                this.estado = newRoom.estadoId;
-            },
-            immediate: true,
-        }
-    },
     mounted() {
-        this.getTypes()
-        this.getEstados()
+        this.getDatos()
+        this.getCaracteristicas()
     },
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.caracteristics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.caracteristic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.caracteristic p {
+    margin: 0;
+    text-align: center;
+}
+</style>

@@ -26,8 +26,8 @@
                 </div>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="red">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="primary">guardar</v-btn>
+                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -85,7 +85,7 @@ export default {
             roomService.savePrecios(data, this.id)
                 .then(res => {
                     this.loading = false
-                    this.$emit('create')
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.message,

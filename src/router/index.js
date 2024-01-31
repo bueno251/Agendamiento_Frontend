@@ -57,6 +57,11 @@ const routes = [
 				name: 'decoraciones',
 				component: () => import('@/modules/room/decoracionesApp.vue')
 			},
+			{
+				path: 'caracteristicas',
+				name: 'caracteristicas',
+				component: () => import('@/modules/room/caracteristicasApp.vue')
+			},
 		]
 	},
 	{
