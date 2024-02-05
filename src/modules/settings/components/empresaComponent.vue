@@ -45,15 +45,15 @@
 
                     <v-col cols="12" md="3">
                         <label>Correo <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" :disabled="empresa !== null" type="email" outlined dense
-                            required>
+                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" :disabled="empresa !== null"
+                            type="email" outlined dense required>
                         </v-text-field>
                     </v-col>
 
                     <v-col cols="12" md="3">
                         <label>Telefono <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" :disabled="empresa !== null" type="number" hide-spin-buttons outlined
-                            dense required>
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" :disabled="empresa !== null"
+                            type="number" hide-spin-buttons outlined dense required>
                         </v-text-field>
                     </v-col>
 

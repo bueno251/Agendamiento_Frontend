@@ -1,6 +1,6 @@
 <template>
     <div class="contenido">
-        <div class="room pa-5">
+        <section class="room pa-5">
 
             <article class="room-info pa-5">
                 <h1 class="mb-5">
@@ -9,6 +9,15 @@
                 <span>
                     {{ room.tipo }}
                 </span>
+
+                <v-carousel v-model="model" cycle show-arrows-on-hover hide-delimiter-background>
+                    <v-carousel-item v-for="img in room.imgs" :key="img.id">
+                        <v-sheet height="100%" tile>
+                            <v-card class="portrait" :img="rootBackend + img.url" height="100%" width="auto"></v-card>
+                        </v-sheet>
+                    </v-carousel-item>
+                </v-carousel>
+
                 <p class="my-10">
                     {{ room.descripcion }}
                 </p>
@@ -21,7 +30,7 @@
                 </h2>
             </article>
 
-            <v-divider></v-divider>
+            <v-divider />
 
             <v-simple-table>
                 <template v-slot:default>
@@ -39,62 +48,90 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="day in room.precios" :key="day.name">
-                            <td>{{ day.name }}</td>
-                            <td>$ {{ comaEnMiles(day.precio) }} COP</td>
-                            <td>{{ day.jornada }}</td>
+                        <tr v-for="(day, i) in room.precios" :key="day.name">
+                            <template v-if="i < 7">
+                                <td>{{ day.name }}</td>
+                                <td>$ {{ comaEnMiles(day.precio) }} COP</td>
+                                <td>{{ day.jornada }}</td>
+                            </template>
                         </tr>
                     </tbody>
                 </template>
             </v-simple-table>
 
-        </div>
-        <div class="calendar pa-5">
-            <v-form v-model="valid" ref="formReservar">
-                <v-card class="pa-5 sticky" elevation="5">
+            <article>
+                <h2>
+                    Caracteristicas De La Habitación
+                </h2>
+
+                <div class="caracteristics">
+                    <template v-for="(item, index) in caracteristicas">
+                        <div v-if="includeCaracteristic(item, room)" class="caracteristic"
+                            :key="`room${room.index}caracteris${index}`">
+                            <v-avatar color="blue">
+                                <v-icon dark>
+                                    mdi-{{ item.icon }}
+                                </v-icon>
+                            </v-avatar>
+                            <div class="infoCaracteristic">
+                                <h4>
+                                    {{ item.nombre }}
+                                </h4>
+                                <p>
+                                    {{ item.descripcion }}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </article>
+        </section>
+
+        <section class="calendar pa-5">
+            <v-card class="pa-5 sticky" elevation="5">
+                <v-form v-model="valid" ref="fechas">
                     <v-row>
 
                         <v-col cols="12">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
-                                :allowed-dates="allowedDates" :readonly="needPayment || verificacion_pago"
-                                event-color="red lighten-1" locale="es" full-width range no-title scrollable>
+                                :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
+                                no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6">
                             <label>Fecha De LLegada <span class="red--text">*</span></label>
                             <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
                                 prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6">
                             <label>Fecha De Salida <span class="red--text">*</span></label>
                             <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
                                 prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6" v-if="room.has_desayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :readonly="needPayment" item-text="desayuno" item-value="id" dense outlined>
+                                item-text="desayuno" item-value="id" dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6" v-if="room.has_decoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :readonly="needPayment" item-text="decoracion" item-value="id" dense outlined>
+                                item-text="decoracion" item-value="id" dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6">
                             <div class="d-flex justify-space-between align-center">
                                 <label>Adultos</label>
                                 <div>
-                                    <v-btn icon @click="adultos--"
-                                        :disabled="adultos <= 1 || needPayment || verificacion_pago">
+                                    <v-btn icon @click="adultos--" :disabled="adultos <= 1">
                                         <v-icon>
                                             mdi-minus-circle
                                         </v-icon>
@@ -102,8 +139,7 @@
                                     <span>
                                         {{ adultos }}
                                     </span>
-                                    <v-btn icon @click="adultos++"
-                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
+                                    <v-btn icon @click="adultos++" :disabled="huespedes == room.capacidad">
                                         <v-icon>
                                             mdi-plus-circle
                                         </v-icon>
@@ -112,18 +148,17 @@
                             </div>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12" md="6">
                             <div class="d-flex justify-space-between align-center">
                                 <label>Niños</label>
                                 <div>
-                                    <v-btn icon @click="niños--" :disabled="niños <= 0 || needPayment || verificacion_pago">
+                                    <v-btn icon @click="niños--" :disabled="niños <= 0">
                                         <v-icon>
                                             mdi-minus-circle
                                         </v-icon>
                                     </v-btn>
                                     {{ niños }}
-                                    <v-btn icon @click="niños++"
-                                        :disabled="huespedes == room.capacidad || needPayment || verificacion_pago">
+                                    <v-btn icon @click="niños++" :disabled="huespedes == room.capacidad">
                                         <v-icon>
                                             mdi-plus-circle
                                         </v-icon>
@@ -134,15 +169,13 @@
                     </v-row>
 
                     <div class="buttons mt-5">
-                        <v-btn v-if="!verificacion_pago" :disabled="!valid" :color="needPayment ? 'light-green' : 'primary'"
-                            type="submit">
-                            <!-- {{ needPayment ? 'Pagar' : 'siguiente' }} -->
+                        <v-btn @click="datosCliente = true" :disabled="!valid" color="light-green">
                             siguiente
                         </v-btn>
                     </div>
-                </v-card>
-            </v-form>
-        </div>
+                </v-form>
+            </v-card>
+        </section>
 
         <v-dialog :value="showFormasPago" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
@@ -177,6 +210,32 @@
                 </v-form>
             </v-card>
         </v-dialog>
+
+        <v-dialog :value="datosCliente" width="90%" max-width="500px" persistent>
+            <v-card class="pa-5 sticky" elevation="5">
+                <v-form v-model="validDatosCliente" ref="fechas" @submit.prevent="agendar">
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="cedula" :rules="[rules.required]" label="Cedula" type="number"
+                                hide-spin-buttons dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" label="Telefono" dense
+                                outlined required>
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <div class="buttons mt-5">
+                        <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
+                        <v-btn :disabled="!validDatosCliente" :loading="loadingbtn" color="light-green" type="submit">
+                            siguiente
+                        </v-btn>
+                    </div>
+                </v-form>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -200,19 +259,23 @@ export default {
             adultos: 1,
             niños: 0,
             abono: 0,
-            menu: false,
+            model: 0,
             valid: false,
             validPagos: false,
+            validDatosCliente: false,
             showFormasPago: false,
             verificacion_pago: false,
             loading: false,
+            loadingbtn: false,
             needPayment: false,
+            datosCliente: false,
             file: null,
             reservaId: null,
             dates: [],
             datesInvalid: [],
             formasPago: [],
             festivos: [],
+            caracteristicas: [],
             desayunos: [
                 {
                     id: null,
@@ -262,8 +325,13 @@ export default {
                     }
 
                     return true;
-                }
+                },
+                phone: value => {
+                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
+                    return pattern.test(value) || 'Número de teléfono inválido.'
+                },
             },
+            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
         }
     },
     computed: {
@@ -327,50 +395,39 @@ export default {
         },
         agendar() {
 
-            if (this.needPayment) {
-                this.showFormasPago = true
-                return
+            this.loadingbtn = true
+
+            let data = {
+                cedula: this.cedula,
+                telefono: this.telefono,
+                dateIn: this.fechaLlegada,
+                dateOut: this.fechaSalida,
+                room: this.room.id,
+                desayuno: this.desayuno,
+                decoracion: this.decoracion,
+                huespedes: this.huespedes,
+                adultos: this.adultos,
+                niños: this.niños,
+                precio: this.precio,
+                verificacion_pago: this.verificacion_pago ? 1 : 0,
             }
 
-            if (!vuex.state.token) {
-                Swal.fire({
-                    text: "Se necesita iniciar sesión",
-                    icon: "warning"
+            reservaService.reservar(data)
+                .then(res => {
+                    this.loadingbtn = false
+                    Swal.fire({
+                        text: res.message,
+                        icon: "success"
+                    })
+                        .then(this.$router.push({ name: 'pagar' }))
                 })
-                return
-            }
-
-            // let data = {
-            //     dateIn: this.fechaLlegada,
-            //     dateOut: this.fechaSalida,
-            //     room: this.room.id,
-            //     user: vuex.state.user.id,
-            //     desayuno: this.desayuno,
-            //     decoracion: this.decoracion,
-            //     huespedes: this.huespedes,
-            //     adultos: this.adultos,
-            //     niños: this.niños,
-            //     precio: this.precio,
-            //     verificacion_pago: this.verificacion_pago ? 1 : 0,
-            // }
-
-            // reservaService.reservar(data)
-            //     .then(res => {
-            //         this.reservaId = res.reserva
-            //         this.needPayment = true
-            //         Swal.fire({
-            //             text: res.message,
-            //             icon: "success"
-            //         })
-            //             .then(this.showFormasPago = true)
-            //     })
-            //     .catch(err => {
-            //         Swal.fire({
-            //             text: err.response.data.message,
-            //             icon: "error"
-            //         })
-            //     })
-
+                .catch(err => {
+                    this.loadingbtn = false
+                    Swal.fire({
+                        text: err.response.data.message,
+                        icon: "error"
+                    })
+                })
         },
         pagar() {
             this.loading = true
@@ -476,6 +533,9 @@ export default {
                     console.log(err)
                 })
         },
+        includeCaracteristic(caracteris, room) {
+            return room.caracteristics.includes(caracteris.id)
+        },
         getDatos() {
             reservaService.obtenerFormasPago()
                 .then(res => {
@@ -500,6 +560,14 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
+
+            reservaService.obtenerCaracteristicas()
+                .then(res => {
+                    this.caracteristicas = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         },
     },
     mounted() {
@@ -514,18 +582,29 @@ export default {
 
 <style scoped>
 .contenido {
-    position: relative;
     display: flex;
+    margin: 0;
+    padding: 0;
+    width: 100%;
     justify-content: center;
     gap: 1%;
-    height: 100%;
 }
 
 .room {
-    width: 60%;
-    max-width: 850px;
+    width: min(95%, 800px);
     display: flex;
     flex-direction: column;
+    gap: 30px;
+}
+
+.room h1 {
+    font-size: 2rem;
+}
+
+h1,
+h2 {
+    text-wrap: balance;
+
 }
 
 .room p {
@@ -533,7 +612,7 @@ export default {
 }
 
 .calendar {
-    width: max(30%, 500px);
+    width: min(95%, 500px);
     height: 100%;
     position: relative;
 }
@@ -541,5 +620,32 @@ export default {
 .sticky {
     position: sticky;
     top: 20px;
+}
+
+.caracteristics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.caracteristic {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.caracteristic p {
+    margin: 0;
+    text-align: center;
+}
+
+@media only screen and (max-width: 800px) {
+    .contenido{
+        flex-direction: column;
+        align-items: center;
+    }
 }
 </style>

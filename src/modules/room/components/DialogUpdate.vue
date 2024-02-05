@@ -38,6 +38,22 @@
                         </v-select>
                     </v-col>
 
+                    <v-col cols="12" md="6">
+                        <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" outlined>
+                            <template v-slot:label>
+                                Desayuno <span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="6">
+                        <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" outlined>
+                            <template v-slot:label>
+                                Decoración <span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
                     <v-col cols="12">
                         <v-textarea v-model="descripcion" :rules="[rules.required]" auto-grow rows="5" dense outlined>
                             <template v-slot:label>
@@ -113,6 +129,8 @@ export default {
             tipo: '',
             capacidad: '',
             estado: '',
+            desayuno: 0,
+            decoracion: 0,
             valid: false,
             loading: false,
             dialogCreate: false,
@@ -120,6 +138,16 @@ export default {
             estados: [],
             caracteristicas: [],
             selectedCaracteristicas: [],
+            yesNo: [
+                {
+                    value: 1,
+                    text: 'Si',
+                },
+                {
+                    value: 0,
+                    text: 'No',
+                }
+            ],
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
@@ -144,8 +172,10 @@ export default {
                     this.capacidad = newRoom.capacidad;
                     this.estado = newRoom.estadoId;
                     this.selectedCaracteristicas = Array.from(newRoom.caracteristics)
+                    this.desayuno = newRoom.has_desayuno
+                    this.decoracion = newRoom.has_decoracion
+                    this.getCaracteristicas()
                 }
-                this.getCaracteristicas()
             },
             immediate: true,
         }
@@ -168,10 +198,13 @@ export default {
                 descripcion: this.descripcion,
                 roomTipo: this.tipo,
                 capacidad: this.capacidad,
+                cantidad: this.room.cantidad,
                 estado: this.estado,
                 estadoAntiguo: this.room.estadoId,
                 activar: this.selectedCaracteristicas,
                 desactivar: noSelected,
+                desayuno: this.desayuno,
+                decoracion: this.decoracion,
             }
 
             roomService.actualizarRoom(data, this.room.id)

@@ -7,7 +7,7 @@
                     <v-col cols="12" md="6">
                         <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
-                                Nombre<span class="red--text">*</span>
+                                Nombre <span class="red--text">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
@@ -15,7 +15,7 @@
                     <v-col cols="12" md="6">
                         <v-text-field v-model="capacidad" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
-                                Capacidad<span class="red--text">*</span>
+                                Capacidad <span class="red--text">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
@@ -24,7 +24,7 @@
                         <v-select v-model="tipo" :items="tipos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined>
                             <template v-slot:label>
-                                Tipo<span class="red--text">*</span>
+                                Tipo <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
@@ -33,7 +33,33 @@
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="estado" item-value="id" outlined>
                             <template v-slot:label>
-                                Estado<span class="red--text">*</span>
+                                Estado <span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-text-field v-model="cantidad" :rules="[rules.required]" outlined required>
+                            <template v-slot:label>
+                                Cantidad <span class="red--text">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-select v-model="desayuno" :items="yesNo" item-text="text"
+                            item-value="value" outlined>
+                            <template v-slot:label>
+                                Desayuno <span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-select v-model="decoracion" :items="yesNo" item-text="text"
+                            item-value="value" outlined>
+                            <template v-slot:label>
+                                Decoración <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
@@ -41,7 +67,7 @@
                     <v-col cols="12">
                         <v-textarea :rules="[rules.required]" v-model="descripcion" auto-grow rows="5" dense outlined>
                             <template v-slot:label>
-                                Descripción<span class="red--text">*</span>
+                                Descripción <span class="red--text">*</span>
                             </template>
                         </v-textarea>
                     </v-col>
@@ -137,6 +163,9 @@ export default {
             tipo: '',
             capacidad: '',
             estado: '',
+            cantidad: '',
+            desayuno: 0,
+            decoracion: 0,
             error: '',
             imgs: [],
             valid: false,
@@ -146,6 +175,16 @@ export default {
             estados: [],
             caracteristicas: [],
             selectedCaracteristicas: [],
+            yesNo: [
+                {
+                    value: 1,
+                    text: 'Si',
+                },
+                {
+                    value: 0,
+                    text: 'No',
+                }
+            ],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 file: imgs => {
@@ -182,6 +221,9 @@ export default {
             data.append('roomTipo', this.tipo)
             data.append('capacidad', this.capacidad)
             data.append('estado', this.estado)
+            data.append('cantidad', this.cantidad)
+            data.append('desayuno', this.desayuno)
+            data.append('decoracion', this.decoracion)
 
             const imgsForUpload = this.imgs;
             if (imgsForUpload.length) {

@@ -20,10 +20,10 @@
                     <v-divider class="my-2" />
 
                     <template v-for="(precios, jornada, index) in room.precios">
-                        <h1 :key="`${jornada}${index}`" class="blue--text text-center w-100">
+                        <h1 v-if="index < 2" :key="`${jornada}${index}`" class="blue--text text-center w-100">
                             $ {{ comaEnMiles(precios[0].precio) }} COP
                         </h1>
-                        <p :key="`${jornada} - ${index}`" class="text-center w-100">
+                        <p v-if="index < 2" :key="`${jornada} - ${index}`" class="text-center w-100">
                             De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
                         </p>
                     </template>

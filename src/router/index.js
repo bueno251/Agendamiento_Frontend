@@ -75,34 +75,15 @@ const routes = [
 				component: () => import('@/modules/reservas/ViewRooms.vue'),
 			},
 			{
-				path: '/room/:id(\\d+)',
+				path: '/reservas_clientes/:id(\\d+)',
 				name: 'room',
 				component: () => import('@/modules/reservas/RoomInfo.vue'),
 				props: true,
 			},
-		],
-	},
-	{
-		path: '/user',
-		component: () => import('@/components/baseUser.vue'),
-		redirect: { name: 'viewRooms' },
-		beforeEnter: (to, from, next) => {
-			if (!vuex.state.token) {
-				next({ name: 'login' })
-			} else {
-				next()
-			}
-		},
-		children: [
 			{
-				path: '/reservas',
-				name: 'myReservas',
-				component: () => import('@/modules/user/myReservasApp.vue'),
-			},
-			{
-				path: '/profile',
-				name: 'profile',
-				component: () => import('@/modules/user/ProfileInfo.vue'),
+				path: '/pagar',
+				name: 'pagar',
+				component: () => import('@/modules/reservas/PagarReserva.vue'),
 			},
 		],
 	},

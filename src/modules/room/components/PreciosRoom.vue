@@ -5,22 +5,24 @@
                 <div class="grid">
 
                     <template v-for="weekday in week">
-                        <v-col cols="12" v-bind:key="weekday.nombre">
-                            <div class="flex">
-                                <label>{{ weekday.name }}</label>
-                                <v-select class="ma-0" v-model="weekday.jornada_id" :items="jornadas"
-                                    no-data-text="Espere un momento..." :rules="[rules.required]" label="Jornada"
-                                    item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }" dense
-                                    outlined>
-                                </v-select>
-                            </div>
-                        </v-col>
+                        <div class="day" v-bind:key="weekday.nombre">
+                            <v-col cols="12">
+                                <div class="flex">
+                                    <label>{{ weekday.name }}</label>
+                                    <v-select class="ma-0" v-model="weekday.jornada_id" :items="jornadas"
+                                        no-data-text="Espere un momento..." :rules="[rules.required]" label="Jornada"
+                                        item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }" dense
+                                        outlined>
+                                    </v-select>
+                                </div>
+                            </v-col>
 
-                        <v-col cols="12" v-bind:key="weekday.nombre">
-                            <v-text-field v-model="weekday.precio" :rules="[rules.required]" @input="formatNumber(weekday)"
-                                label="Precio" type="number" hide-spin-buttons dense outlined required>
-                            </v-text-field>
-                        </v-col>
+                            <v-col cols="12">
+                                <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
+                                    @input="formatNumber(weekday)" label="Precio" hide-spin-buttons dense outlined required>
+                                </v-text-field>
+                            </v-col>
+                        </div>
                     </template>
 
                 </div>
@@ -61,6 +63,7 @@ export default {
             jornadas: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
+                numerico: value => /^[0-9.]+$/.test(value) || "Solo se admiten números y puntos."
             },
         }
     },
@@ -78,8 +81,19 @@ export default {
         save() {
             this.loading = true
 
+            let week = []
+
+            this.week.map(({ name, precio, jornada_id }) => {
+                let dia = {
+                    name: name,
+                    precio: parseInt(precio.replace(/\./g, '')),
+                    jornada_id: jornada_id
+                }
+                week.push(dia);
+            })
+
             let data = {
-                weekdays: this.week
+                weekdays: week
             }
 
             roomService.savePrecios(data, this.id)
@@ -100,16 +114,14 @@ export default {
                     console.log(err)
                 })
         },
-        // comaEnMiles(numero) {
-        //     let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-        //     let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
-        //     return numero.toString().replace(exp, rep)
-        // },
+        comaEnMiles(numero) {
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
+            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            return numero.toString().replace(exp, rep)
+        },
         formatNumber(day) {
-            //     let formattedNumber = day.precio.replace(/\D/g, '');
-            //     formattedNumber = this.comaEnMiles(formattedNumber);
-            //     day.precio = formattedNumber;
-            day
+            let formattedNumber = day.precio.replace(/\D/g, '')
+            day.precio = this.comaEnMiles(formattedNumber);
         },
         getPrecios() {
             roomService.getPrecios(this.id)
@@ -129,6 +141,10 @@ export default {
 
                         return
                     }
+
+                    res.map(day => {
+                        day.precio = this.comaEnMiles(day.precio)
+                    })
 
                     this.week = res
                 })
@@ -167,22 +183,7 @@ export default {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-areas:
-        'label'
-        'input1';
-}
-
-.grid> :nth-child(2n-1) {
-    grid-area: label;
-    grid-column: span 1;
-    /* Ocupa una columna */
-}
-
-.grid> :nth-child(2n-2) {
-    grid-area: input1;
-    grid-column: span 1;
-    /* Ocupa una columna */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .buttons {

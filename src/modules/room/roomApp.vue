@@ -37,8 +37,14 @@
                                     <v-list-item link @click="room = item, dialogImg = true">
                                         <v-list-item-title v-text="'Imagenes'"></v-list-item-title>
                                     </v-list-item>
+                                    <v-list-item link @click="room = item, dialogRooms = true">
+                                        <v-list-item-title v-text="'Habitaciones'"></v-list-item-title>
+                                    </v-list-item>
                                     <v-list-item link @click="room = item, dialogPrecios = true">
                                         <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item link @click="room = item, dialogTarifasExtra = true">
+                                        <v-list-item-title v-text="'Tarifas Adicionales'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogBitacora = true">
                                         <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
@@ -77,9 +83,34 @@
             </v-card>
         </v-dialog>
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
-        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false" @update="getRooms(), dialogPrecios = false"></PreciosRoom>
+        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"
+            @update="getRooms(), dialogPrecios = false"></PreciosRoom>
         <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false">
         </DialogImg>
+        <v-dialog :value="dialogTarifasExtra" width="90%" max-width="500px" persistent>
+            <v-card class="pa-5">
+                <v-form v-model="valid" @submit.prevent="saveTarifasExtra">
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="Adicional" label="Tarifa Personal"
+                                :rules="[rules.required, rules.numerico]" @input="formatNumber('Adicional', Adicional)"
+                                outlined required>
+                            </v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-text-field v-model="Niños" label="Tarifa Niños" :rules="[rules.required, rules.numerico]"
+                                @input="formatNumber('Niños', Niños)" outlined required>
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <div class="buttons pt-5">
+                        <v-btn @click="dialogTarifasExtra = false" color="blue">cancelar</v-btn>
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">guardar</v-btn>
+                    </div>
+                </v-form>
+            </v-card>
+        </v-dialog>
+        <SimilarRooms :show="dialogRooms" :room="room" @close="dialogRooms = false" @update="getRooms(), dialogRooms = false"/>
     </div>
 </template>
 
@@ -92,6 +123,7 @@ import estadosRoom from "./components/estadosRoom"
 import DialogCreate from "./components/DialogCreate";
 import DialogUpdate from "./components/DialogUpdate";
 import DialogImg from './components/DialogImg.vue';
+import SimilarRooms from './components/SimilarRooms.vue';
 
 export default {
     name: 'roomApp',
@@ -101,10 +133,30 @@ export default {
         DialogCreate,
         DialogUpdate,
         DialogImg,
+        SimilarRooms
+    },
+    watch: {
+        room: {
+            handler(newRoom) {
+                if ("precios" in newRoom) {
+                    newRoom.precios.map((day) => {
+                        if (day.name == 'Adicional' || day.name == 'Niños') {
+                            this[day.name] = this.comaEnMiles(day.precio)
+                        } else {
+                            this.Adicional = 0
+                            this.Niños = 0
+                        }
+                    })
+                }
+            },
+            immediate: true,
+        }
     },
     data() {
         return {
             search: '',
+            Adicional: '',
+            Niños: '',
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
@@ -112,7 +164,10 @@ export default {
             dialogDelete: false,
             dialogBitacora: false,
             dialogPrecios: false,
+            dialogTarifasExtra: false,
             dialogImg: false,
+            dialogRooms: false,
+            valid: false,
             room: {},
             rooms: [],
             headers: [
@@ -123,6 +178,10 @@ export default {
                 { text: 'Capacidad', key: 'capacidad', value: 'capacidad' },
                 { text: 'estado', key: 'estado', value: 'estado' },
             ],
+            rules: {
+                required: value => !!value || 'Campo requerido.',
+                numerico: value => /^[0-9.]+$/.test(value) || "Solo se admiten números y puntos."
+            },
         }
     },
     methods: {
@@ -162,6 +221,53 @@ export default {
                     })
                     console.log(err)
                 })
+        },
+        saveTarifasExtra() {
+            this.loadingbtn = true
+
+            let week = [
+                {
+                    name: 'Adicional',
+                    precio: parseInt(this.Adicional.replace(/\./g, '')),
+                    jornada_id: null,
+                },
+                {
+                    name: 'Niños',
+                    precio: parseInt(this.Niños.replace(/\./g, '')),
+                    jornada_id: null,
+                },
+            ]
+
+            let data = {
+                weekdays: week
+            }
+
+            roomService.savePrecios(data, this.room.id)
+                .then(res => {
+                    this.loadingbtn = false
+                    this.dialogTarifasExtra = false
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
+                })
+                .catch(err => {
+                    this.loading = false
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    console.log(err)
+                })
+        },
+        comaEnMiles(numero) {
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
+            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            return numero.toString().replace(exp, rep)
+        },
+        formatNumber(campo, precio) {
+            let formattedNumber = precio.replace(/\D/g, '');
+            this[campo] = this.comaEnMiles(formattedNumber);
         },
         close() {
             this.dialogCreate = false

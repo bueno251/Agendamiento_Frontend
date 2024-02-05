@@ -34,7 +34,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="nombre1" :rules="[rules.required]" outlined required>
+                        <v-text-field v-model="nombre1" :rules="[rules.required, rules.textOnly]" outlined required>
                             <template v-slot:label>
                                 Primer Nombre<span class="red--text">*</span>
                             </template>
@@ -42,7 +42,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="nombre2" outlined>
+                        <v-text-field v-model="nombre2" :rules="[rules.textOnly]" outlined>
                             <template v-slot:label>
                                 Segundo Nombre
                             </template>
@@ -50,7 +50,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="apellido1" :rules="[rules.required]" outlined required>
+                        <v-text-field v-model="apellido1" :rules="[rules.required, rules.textOnly]" outlined required>
                             <template v-slot:label>
                                 Primer Apellido<span class="red--text">*</span>
                             </template>
@@ -58,7 +58,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="apellido2" outlined>
+                        <v-text-field v-model="apellido2" :rules="[rules.textOnly]" outlined>
                             <template v-slot:label>
                                 Segundo Apellido
                             </template>
@@ -120,7 +120,8 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" hide-spin-buttons outlined>
+                        <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" hide-spin-buttons
+                            outlined>
                             <template v-slot:label>
                                 Teléfono Alternativo
                             </template>
@@ -222,6 +223,10 @@ export default {
                 phone: value => {
                     const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
                     return pattern.test(value) || 'Número de teléfono inválido.'
+                },
+                textOnly: value => {
+                    const pattern = /^[a-zA-Z]+$/;
+                    return pattern.test(value) || 'Ingrese solo texto, sin números.'
                 },
             },
         }
