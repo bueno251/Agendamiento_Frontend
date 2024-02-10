@@ -21,6 +21,7 @@ const store = new Vuex.Store({
         token: null,
         tokenUbicacion: null,
         user: {},
+        reserva: {},
     },
 
     mutations: {
@@ -32,6 +33,9 @@ const store = new Vuex.Store({
         },
         SET_USER(state, value) {
             state.user = value;
+        },
+        SET_RESERVA(state, value){
+            state.reserva = value;
         },
         LOGOUT(state) {
             state.token = null;
@@ -48,6 +52,9 @@ const store = new Vuex.Store({
         },
         setUser({ commit }, newUser) {
             commit('SET_USER', newUser);
+        },
+        setReserva({ commit }, newReserva) {
+            commit('SET_RESERVA', newReserva);
         },
         logout({ commit }) {
             commit('LOGOUT');

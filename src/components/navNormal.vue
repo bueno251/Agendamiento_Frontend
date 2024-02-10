@@ -1,5 +1,5 @@
 <template>
-    <nav class="nav blue text--accent-4">
+    <nav class="nav blue text--accent-4 mb-5">
 
         <div>
             Logo

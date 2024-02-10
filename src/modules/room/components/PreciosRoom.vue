@@ -4,8 +4,8 @@
             <v-form ref="form" v-model="valid" @submit.prevent="save()">
                 <div class="grid">
 
-                    <template v-for="weekday in week">
-                        <div class="day" v-bind:key="weekday.nombre">
+                    <template v-for="(weekday, i) in week">
+                        <div v-if="i < 7" class="day" v-bind:key="weekday.nombre">
                             <v-col cols="12">
                                 <div class="flex">
                                     <label>{{ weekday.name }}</label>
@@ -19,7 +19,7 @@
 
                             <v-col cols="12">
                                 <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
-                                    @input="formatNumber(weekday)" label="Precio" hide-spin-buttons dense outlined required>
+                                    label="Precio" v-price hide-spin-buttons dense outlined required>
                                 </v-text-field>
                             </v-col>
                         </div>
@@ -164,6 +164,20 @@ export default {
         close() {
             this.$refs.form.resetValidation()
             this.$emit('close')
+        },
+    },
+    directives: {
+        'price': {
+            bind(el) {
+                el.addEventListener('input', (event) => {
+                    const newValue = event.target.value.replace(/\D/g, '')
+
+                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
+                    let rep = '$1.'
+
+                    event.target.value = newValue.toString().replace(exp, rep)
+                })
+            }
         },
     },
     mounted() {

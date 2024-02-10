@@ -1,6 +1,6 @@
 <template>
     <div class="contenido">
-        <section class="room pa-5">
+        <section class="room">
 
             <article class="room-info pa-5">
                 <h1 class="mb-5">
@@ -22,15 +22,10 @@
                     {{ room.descripcion }}
                 </p>
                 <span>
-                    {{ room.capacidad }} {{ room.capacidad > 1 ? 'Personas' : 'Persona' }}
+                    Capacidad Maxima: {{ room.capacidad }} {{ room.capacidad > 1 ? 'Personas' : 'Persona' }}
                 </span>
 
-                <h2>
-                    $ {{ comaEnMiles(precio) }} COP
-                </h2>
             </article>
-
-            <v-divider />
 
             <v-simple-table>
                 <template v-slot:default>
@@ -60,7 +55,7 @@
             </v-simple-table>
 
             <article>
-                <h2>
+                <h2 class="text-center">
                     Caracteristicas De La Habitación
                 </h2>
 
@@ -128,6 +123,12 @@
                         </v-col>
 
                         <v-col cols="12" md="6">
+                            <label>Habitaciones<span class="red--text">*</span></label>
+                            <v-select v-model="cantidadRooms" :items="rooms" no-data-text="No hay desayunos" dense outlined>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
                             <div class="d-flex justify-space-between align-center">
                                 <label>Adultos</label>
                                 <div>
@@ -168,7 +169,13 @@
                         </v-col>
                     </v-row>
 
+                    <h2>
+                        $ {{ comaEnMiles(precio) }} COP
+                    </h2>
+
+
                     <div class="buttons mt-5">
+                        <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
                         <v-btn @click="datosCliente = true" :disabled="!valid" color="light-green">
                             siguiente
                         </v-btn>
@@ -176,40 +183,6 @@
                 </v-form>
             </v-card>
         </section>
-
-        <v-dialog :value="showFormasPago" width="90%" max-width="500px" persistent>
-            <v-card class="pa-5">
-                <v-form ref="formPagos" v-model="validPagos" @submit.prevent="pagar()">
-                    <v-row>
-                        <v-col cols="12">
-                            <label>Selecciona un método de pago <span class="red--text">*</span></label>
-                            <v-select v-model="metodoPago" :items="formasPago" no-data-text="No hay formas de pago validas"
-                                :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
-
-                        <template v-if="metodoPago == '1'">
-                            <v-col cols="12">
-                                <label>Número para transacciones: 123456789</label>
-                            </v-col>
-
-                            <v-col cols="12">
-                                <label>Comprobante de pago <span class="red--text">*</span></label>
-                                <v-file-input v-model="file" :rules="[rules.file]" :clearable="false" accept="image/*,.pdf"
-                                    truncate-length="15" chips outlined dense required></v-file-input>
-                            </v-col>
-                        </template>
-                    </v-row>
-
-                    <div class="buttons">
-                        <v-btn @click="showFormasPago = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
-                            pagar
-                        </v-btn>
-                    </div>
-                </v-form>
-            </v-card>
-        </v-dialog>
 
         <v-dialog :value="datosCliente" width="90%" max-width="500px" persistent>
             <v-card class="pa-5 sticky" elevation="5">
@@ -241,8 +214,7 @@
 
 <script>
 
-import vuex from "@/store";
-import Swal from "sweetalert2"
+// import Swal from "sweetalert2"
 import colombiaHolidays from 'colombia-holidays'
 import reservaService from './service/reservaService'
 
@@ -252,28 +224,21 @@ export default {
         return {
             cedula: '',
             telefono: '',
-            metodoPago: '',
             desayuno: null,
             decoracion: null,
             maxDate: '',
+            cantidadRooms: 1,
             adultos: 1,
             niños: 0,
-            abono: 0,
             model: 0,
             valid: false,
-            validPagos: false,
             validDatosCliente: false,
-            showFormasPago: false,
-            verificacion_pago: false,
             loading: false,
             loadingbtn: false,
-            needPayment: false,
             datosCliente: false,
             file: null,
-            reservaId: null,
             dates: [],
             datesInvalid: [],
-            formasPago: [],
             festivos: [],
             caracteristicas: [],
             desayunos: [
@@ -288,7 +253,6 @@ export default {
                     decoracion: 'Ninguna'
                 }
             ],
-            reservaTemporal: null,
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             room: {
                 nombre: '',
@@ -362,6 +326,15 @@ export default {
             }
 
             return precio
+        },
+        rooms() {
+            let rooms = []
+
+            for (let i = 0; i < this.room.rooms; i++) {
+                rooms.push(i + 1)
+            }
+
+            return rooms
         }
     },
     watch: {
@@ -398,64 +371,28 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                cedula: this.cedula,
-                telefono: this.telefono,
                 dateIn: this.fechaLlegada,
                 dateOut: this.fechaSalida,
-                room: this.room.id,
-                desayuno: this.desayuno,
-                decoracion: this.decoracion,
-                huespedes: this.huespedes,
+                room: this.room,
                 adultos: this.adultos,
                 niños: this.niños,
                 precio: this.precio,
-                verificacion_pago: this.verificacion_pago ? 1 : 0,
+                cedula: this.cedula,
+                telefono: this.telefono,
+                cantidad_rooms: this.cantidadRooms,
             }
 
-            reservaService.reservar(data)
-                .then(res => {
-                    this.loadingbtn = false
-                    Swal.fire({
-                        text: res.message,
-                        icon: "success"
-                    })
-                        .then(this.$router.push({ name: 'pagar' }))
-                })
-                .catch(err => {
-                    this.loadingbtn = false
-                    Swal.fire({
-                        text: err.response.data.message,
-                        icon: "error"
-                    })
-                })
-        },
-        pagar() {
-            this.loading = true
-
-            if (this.metodoPago == 1) {
-                this.verificacion_pago = true
+            if (this.desayuno) {
+                data.desayuno = this.desayuno
             }
 
-            let data = new FormData()
+            if (this.decoracion) {
+                data.decoracion = this.decoracion
+            }
 
-            data.append('reserva', this.reservaId)
-            data.append('abono', this.abono)
-            data.append('comprobante', this.file)
-            data.append('verificacion_pago', this.verificacion_pago ? 1 : 0)
+            this.$store.dispatch('setReserva', data)
 
-            reservaService.pagar(data)
-                .then(res => {
-                    this.loading = false
-                    this.showFormasPago = false
-                    Swal.fire({
-                        icon: 'success',
-                        text: res.message,
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    this.loading = false
-                })
+            this.$router.push({ name: 'pagar' })
         },
         comaEnMiles(numero) {
             let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
@@ -502,48 +439,10 @@ export default {
                     console.log(err)
                 })
         },
-        getReserva() {
-            if (!vuex.state.token) {
-                return
-            }
-
-            let room = this.$route.params.id
-            let user = vuex.state.user.id
-
-            reservaService.getReservaTemporal(room, user)
-                .then(res => {
-                    if (res.length != 0) {
-                        let array = [
-                            res[0].fecha_entrada,
-                            res[0].fecha_salida
-                        ]
-                        this.dates = array
-                        this.desayuno = res[0].desayuno_id
-                        this.decoracion = res[0].decoracion_id
-                        this.adultos = res[0].adultos
-                        this.niños = res[0].niños
-                        this.reservaId = res[0].id
-                        this.verificacion_pago = res[0].verificacion_pago
-                        if (!this.verificacion_pago) {
-                            this.needPayment = true
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        },
         includeCaracteristic(caracteris, room) {
             return room.caracteristics.includes(caracteris.id)
         },
         getDatos() {
-            reservaService.obtenerFormasPago()
-                .then(res => {
-                    this.formasPago = res
-                })
-                .catch(err => {
-                    console.log(err)
-                })
 
             reservaService.obtenerDesayunos()
                 .then(res => {
@@ -572,7 +471,6 @@ export default {
     },
     mounted() {
         this.getRoom()
-        this.getReserva()
         this.getDates()
         this.getDatos()
         this.getFestivos()
@@ -591,7 +489,7 @@ export default {
 }
 
 .room {
-    width: min(95%, 800px);
+    width: min(100%, 800px);
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -643,7 +541,7 @@ h2 {
 }
 
 @media only screen and (max-width: 800px) {
-    .contenido{
+    .contenido {
         flex-direction: column;
         align-items: center;
     }
