@@ -212,6 +212,7 @@ export default {
             countries: [],
             cities: [],
             states: [],
+            default: {},
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 max: value => (value && value.length <= 20) || 'Maximo 20 caracteres',
@@ -274,13 +275,30 @@ export default {
                     console.log(err)
                 })
         },
-        getTypes() {
+        getDatos() {
             clienteService.obtenerTipos()
                 .then(res => {
                     this.tipoDocuments = res.documents
                     this.tipoObligations = res.obligations
                     this.tipoPeople = res.people
                     this.tipoRegimens = res.regimens
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+
+            clienteService.obtenerValoresDefault()
+                .then(res => {
+                    this.default = res
+                    this.pais = res.pais
+                    this.getStates()
+                    this.departamento = res.departamento
+                    this.getCities()
+                    this.ciudad = res.ciudad
+                    this.tipoDocumento = res.tipo_documento
+                    this.tipoPersona = res.tipo_persona
+                    this.tipoRegimen = res.tipo_regimen
+                    this.tipoObligacion = res.tipo_obligacion
                 })
                 .catch(err => {
                     console.log(err)
@@ -353,13 +371,12 @@ export default {
                 })
         },
         close() {
-            this.$refs.form.reset()
             this.$emit('close')
         },
     },
     mounted() {
-        this.getTypes()
         this.getCountries()
+        this.getDatos()
     },
 }
 </script>

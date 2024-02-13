@@ -5,6 +5,8 @@
         <canReservar :bolean="usuario_reserva" :id="id" @update="getSettings"></canReservar>
 
         <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings"></EmpresaComponent>
+
+        <defaultConfig :id="id"/>
     </div>
 </template>
 
@@ -13,6 +15,7 @@
 import tipoPagos from './components/tipoPagos'
 import canReservar from './components/canReservar'
 import EmpresaComponent from './components/empresaComponent'
+import defaultConfig from './components/defaultConfig'
 import configService from './services/configService'
 
 export default {
@@ -21,6 +24,7 @@ export default {
         tipoPagos,
         canReservar,
         EmpresaComponent,
+        defaultConfig,
     },
     data() {
         return {

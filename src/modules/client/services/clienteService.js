@@ -41,7 +41,7 @@ const clienteService = {
                 })
         })
     },
-    
+
     obtenerTipos() {
         let url = 'client/type/all'
 
@@ -56,7 +56,7 @@ const clienteService = {
         })
     },
 
-    encontrarDocumento(documento){
+    encontrarDocumento(documento) {
         let url = `client/find/document/${documento}`
 
         return new Promise((resolve, reject) => {
@@ -89,6 +89,20 @@ const clienteService = {
 
         return new Promise((resolve, reject) => {
             local.api.delete(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerValoresDefault() {
+        let url = `default`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })

@@ -55,7 +55,7 @@ const configService = {
                 })
         })
     },
-    
+
     empresa(data) {
         let url = 'settings/empresa'
 
@@ -82,7 +82,35 @@ const configService = {
                     reject(err)
                 })
         })
-    }
+    },
+
+    valoresDefault(data) {
+        let url = `default`
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+    
+    obtenerValoresDefault() {
+        let url = `default`
+
+        return new Promise((resolve, reject) => {
+            local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 local.Axios()
