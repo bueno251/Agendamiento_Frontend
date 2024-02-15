@@ -5,11 +5,6 @@
             Logo
         </div>
 
-        <!-- <div class="search-field">
-            <v-text-field class="rounded-pill" prepend-inner-icon="mdi-magnify" type="text" width="500px" clearable dense
-                outlined></v-text-field>
-        </div> -->
-
         <div>
             <v-menu :offset-y="true" transition="scale-transition">
                 <template v-slot:activator="{ on, attrs }">
@@ -52,8 +47,15 @@ export default {
         }
     },
     methods: {
+        /**
+        * Cierra la sesión actual del usuario y redirige a la página de visualización de habitaciones.
+        * Utiliza Vuex para despachar la acción de cierre de sesión.
+        */
         logout() {
+            // Despacha la acción de cierre de sesión a través de Vuex
             this.$store.dispatch('logout')
+
+            // Redirige a la página de visualización de habitaciones
             this.$router.push({ name: 'viewRooms' }).catch(() => { })
         }
     },

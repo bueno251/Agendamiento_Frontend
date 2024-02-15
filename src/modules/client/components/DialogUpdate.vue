@@ -14,8 +14,9 @@
                     </v-col>
 
                     <v-col cols="12" md="6">
-                        <v-text-field v-model="documento" :rules="[rules.required, rules.min]" type="number" outlined
-                            required append-icon="mdi-magnify" @click:append="searchDocument">
+                        <v-text-field v-model="documento" :rules="[rules.required, rules.min]"
+                            @click:append="searchDocument" append-icon="mdi-magnify" type="number" outlined
+                            hide-spin-buttons required>
                             <template v-slot:label>
                                 Documento<span class="red--text">*</span>
                             </template>
@@ -73,43 +74,6 @@
                     </v-col>
 
                     <v-col cols="12" md="3">
-                        <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
-                            :rules="[rules.required]" @change="getStates" no-data-text="Espere un momento..." outlined
-                            required>
-                            <template v-slot:label>
-                                País<span class="red--text">*</span>
-                            </template>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="3">
-                        <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
-                            :loading="loadingState" @change="getCities" no-data-text="No hay departamentos" outlined>
-                            <template v-slot:label>
-                                Departamento<span class="red--text">*</span>
-                            </template>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="3">
-                        <v-select v-model="ciudad" :items="cities" item-text="city_name" item-value="city_name"
-                            :loading="loadingCity" no-data-text="No hay ciudades" outlined>
-                            <template v-slot:label>
-                                Ciudad<span class="red--text">*</span>
-                            </template>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="3">
-                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" type="email" outlined
-                            required>
-                            <template v-slot:label>
-                                Correo<span class="red--text">*</span>
-                            </template>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="3">
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
                             append-icon="mdi-cellphone" outlined required>
                             <template v-slot:label>
@@ -124,6 +88,34 @@
                                 Teléfono Alternativo
                             </template>
                         </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
+                            :rules="[rules.required]" @change="getStates" no-data-text="Espere un momento..." outlined
+                            required>
+                            <template v-slot:label>
+                                País<span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
+                            :loading="loadingState" @change="getCities" no-data-text="No hay departamentos" outlined>
+                            <template v-slot:label>
+                                Departamento<span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="4">
+                        <v-select v-model="ciudad" :items="cities" item-text="city_name" item-value="city_name"
+                            :loading="loadingCity" no-data-text="No hay ciudades" outlined>
+                            <template v-slot:label>
+                                Ciudad<span class="red--text">*</span>
+                            </template>
+                        </v-select>
                     </v-col>
 
                     <v-col cols="12" md="4">
@@ -193,7 +185,6 @@ export default {
             pais: '',
             departamento: '',
             ciudad: '',
-            correo: '',
             telefono: '',
             telefonoAlt: '',
             tipoPersona: '',
@@ -215,10 +206,6 @@ export default {
                 required: value => !!value || 'Campo requerido.',
                 max: value => (value && value.length <= 20) || 'Maximo 20 caracteres',
                 min: value => (value && value.length >= 5) || 'Minimo 5 caracteres',
-                email: value => {
-                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    return pattern.test(value) || 'Correo inválido.'
-                },
                 phone: value => {
                     const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
                     return pattern.test(value) || 'Número de teléfono inválido.'
@@ -227,9 +214,15 @@ export default {
         }
     },
     methods: {
+        /**
+        * Actualiza la información de un cliente existente en la base de datos.
+        * Muestra un mensaje de éxito o error y emite un evento 'update'.
+        */
         updateClient() {
+            // Habilitar la animación de carga
             this.loadingbtn = true
 
+            // Construir objeto con los datos del cliente a actualizar
             let data = {
                 nombre1: this.nombre1,
                 nombre2: this.nombre2,
@@ -241,7 +234,6 @@ export default {
                 pais: this.pais,
                 departamento: this.departamento,
                 ciudad: this.ciudad,
-                correo: this.correo,
                 telefono: this.telefono,
                 telefonoAlt: this.telefonoAlt,
                 tipoPersona: this.tipoPersona,
@@ -250,8 +242,10 @@ export default {
                 observacion: this.observacion,
             }
 
+            // Llamar al servicio para actualizar el cliente en la base de datos
             clienteService.actualizar(data, this.client.id)
                 .then(res => {
+                    // Desactivar la animación de carga, emitir evento 'update' y mostrar mensaje de éxito
                     this.loadingbtn = false
                     this.$emit('update')
                     Swal.fire({
@@ -260,6 +254,7 @@ export default {
                     })
                 })
                 .catch(err => {
+                    // Desactivar la animación de carga y mostrar mensaje de error
                     this.loadingbtn = false
                     Swal.fire({
                         icon: 'error',
@@ -268,9 +263,15 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene los tipos de documentos, obligaciones, personas y regímenes
+         * desde el servicio de cliente y los asigna a las variables correspondientes.
+         */
         getTypes() {
+            // Llamar al servicio para obtener los tipos desde la base de datos
             clienteService.obtenerTipos()
                 .then(res => {
+                    // Asignar los tipos a las variables correspondientes
                     this.tipoDocuments = res.documents
                     this.tipoObligations = res.obligations
                     this.tipoPeople = res.people
@@ -280,23 +281,36 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de países desde el servicio de ubicación
+         * y la asigna a la variable 'countries'.
+         */
         getCountries() {
+            // Obtener la lista de países
             UbicacionService.paises()
                 .then(res => {
+                    // Asignar la lista de países a la variable 'countries'
                     this.countries = res
                 })
                 .catch(err => {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de estados para el país seleccionado
+         * desde el servicio de ubicación y la asigna a la variable 'states'.
+         */
         getStates() {
+            // Habilitar la animación de carga y restablecer las variables relacionadas con el departamento
             this.loadingState = true
             this.departamento = ''
             this.ciudad = ''
             this.cities = []
 
+            // Obtener la lista de estados para el país seleccionado
             UbicacionService.departamentos(this.pais)
                 .then(res => {
+                    // Asignar la lista de estados a la variable 'states' y desactivar la animación de carga
                     this.states = res
                     this.loadingState = false
                 })
@@ -305,12 +319,19 @@ export default {
                     this.loadingState = false
                 })
         },
+        /**
+        * Obtiene la lista de ciudades para el departamento seleccionado
+        * desde el servicio de ubicación y la asigna a la variable 'cities'.
+        */
         getCities() {
+            // Habilitar la animación de carga y restablecer la variable relacionada con la ciudad
             this.loadingCity = true
             this.ciudad = ''
 
+            // Obtener la lista de ciudades para el departamento seleccionado
             UbicacionService.ciudades(this.departamento)
                 .then(res => {
+                    // Asignar la lista de ciudades a la variable 'cities' y desactivar la animación de carga
                     this.cities = res
                     this.loadingCity = false
                 })
@@ -319,7 +340,12 @@ export default {
                     this.loadingCity = false
                 })
         },
+        /**
+         * Busca un documento en la base de datos y muestra un mensaje
+         * indicando si el documento ya está registrado o está disponible.
+         */
         searchDocument() {
+            // Verificar si hay un documento para buscar
             if (!this.documento) {
                 Swal.fire({
                     icon: 'error',
@@ -328,8 +354,10 @@ export default {
                 return
             }
 
+            // Buscar el documento en la base de datos
             clienteService.encontrarDocumento(this.documento)
                 .then(res => {
+                    // Mostrar mensaje según el resultado de la búsqueda
                     if (res.length) {
                         Swal.fire({
                             icon: 'error',
@@ -346,7 +374,11 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Cierra el componente emitiento un evento 'close'.
+         */
         close() {
+            // Emitir evento 'close'
             this.$emit('close')
         },
     },
@@ -362,7 +394,6 @@ export default {
                 this.apellido2 = newclient.apellido2
                 this.direccion = newclient.direccion
                 this.pais = newclient.pais
-                this.correo = newclient.correo
                 this.telefono = newclient.telefono
                 this.telefonoAlt = newclient.telefono_alt
                 this.tipoPersona = newclient.tipo_persona_id

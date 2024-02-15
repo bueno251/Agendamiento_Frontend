@@ -37,14 +37,14 @@
                         <td>{{ row.item.fullname }}</td>
                         <td>{{ row.item.direccion }}</td>
                         <td>{{ row.item.documento }}</td>
-                        <td>{{ row.item.correo }}</td>
                         <td>{{ row.item.observacion }}</td>
                     </tr>
                 </template>
             </v-data-table>
         </v-card>
-        <DialogCreate :show="dialogCreate" @close="close" @create="getClients"></DialogCreate>
-        <DialogUpdate :show="dialogUpdate" :client="client" @close="close" @update="getClients"></DialogUpdate>
+        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @create="getClients(), dialogCreate = false" />
+        <DialogUpdate :show="dialogUpdate" :client="client" @close="dialogUpdate = false"
+            @update="getClients(), dialogUpdate = false" />
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -88,15 +88,17 @@ export default {
                 { text: 'Nombre', key: 'nombre', value: 'fullname' },
                 { text: 'Dirección', key: 'direccion', value: 'direccion' },
                 { text: 'Documento', key: 'documento', value: 'documento' },
-                { text: 'Correo', key: 'correo', value: 'correo' },
                 { text: 'Observaciones', key: 'observaciones', value: 'observaciones' },
             ],
         }
     },
     methods: {
+        /**
+        * Obtiene la lista de clientes.
+        * Realiza una llamada al servicio para obtener la información de los clientes y asigna los resultados a la variable desserts.
+        */
         getClients() {
             this.loading = true
-            this.close()
 
             clienteService.obtener()
                 .then(res => {
@@ -105,9 +107,13 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err);
+                    console.log(err)
                 })
         },
+        /**
+         * Elimina un cliente.
+         * Realiza una llamada al servicio para eliminar un cliente por su ID y actualiza la lista de clientes.
+         */
         deleted() {
             this.loadingbtn = true
 
@@ -115,7 +121,7 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getClients()
+                    this.getClients() // Actualiza la lista de clientes
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -129,10 +135,6 @@ export default {
                     })
                     console.log(err)
                 })
-        },
-        close() {
-            this.dialogCreate = false
-            this.dialogUpdate = false
         },
     },
     mounted() {

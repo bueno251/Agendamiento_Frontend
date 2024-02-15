@@ -354,20 +354,29 @@ export default {
         },
     },
     methods: {
+        /**
+        * Obtiene la información de una habitación según su ID de la ruta.
+        * Si la obtención es exitosa, actualiza la variable 'room' con la información de la habitación.
+        * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
+        */
         getRoom() {
             let id = this.$route.params.id
 
             reservaService.obtenerRoom(id)
                 .then(res => {
-                    this.room = res[0]
+                    this.room = res
                 })
                 .catch(err => {
                     console.log(err)
                     this.$router.push({ name: 'viewRooms' })
                 })
         },
+        /**
+         * Inicia el proceso de agendamiento.
+         * Prepara la información necesaria (fechas, habitación, cantidad de personas, etc.) y la almacena en el estado global.
+         * Luego, redirige al usuario a la vista de pago ('pagar').
+         */
         agendar() {
-
             this.loadingbtn = true
 
             let data = {
@@ -394,11 +403,21 @@ export default {
 
             this.$router.push({ name: 'pagar' })
         },
+        /**
+         * Formatea un número agregando comas para separar miles.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
+            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Obtiene los días festivos en Colombia.
+         * Prepara un rango de fechas desde hoy hasta un año después y obtiene los festivos de ambos años.
+         * Actualiza la variable 'festivos' con la lista de días festivos.
+         */
         getFestivos() {
             let hoy = new Date(Date.now())
 
@@ -419,6 +438,11 @@ export default {
 
             this.festivos = festivos.concat(festivos2)
         },
+        /**
+         * Verifica si una fecha está permitida según las fechas invalidas obtenidas previamente.
+         * @param {string} value - Fecha a verificar.
+         * @returns {boolean} - Indica si la fecha está permitida.
+         */
         allowedDates(value) {
             for (let dates of this.datesInvalid) {
                 if (value >= dates.fecha_entrada && value <= dates.fecha_salida) {
@@ -428,6 +452,9 @@ export default {
 
             return true
         },
+        /**
+         * Obtiene las fechas invalidas para la habitación actual y actualiza la variable 'datesInvalid'.
+         */
         getDates() {
             let id = this.$route.params.id
 
@@ -439,11 +466,20 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Verifica si una característica está incluida en las características de una habitación.
+         * @param {object} caracteris - Característica a verificar.
+         * @param {object} room - Habitación a la que se le verificará la característica.
+         * @returns {boolean} - Indica si la característica está incluida en la habitación.
+         */
         includeCaracteristic(caracteris, room) {
-            return room.caracteristics.includes(caracteris.id)
+            return room.caracteristicas.includes(caracteris.id)
         },
+        /**
+         * Obtiene la información de desayunos, decoraciones y características para ser utilizada en el agendamiento.
+         * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
+         */
         getDatos() {
-
             reservaService.obtenerDesayunos()
                 .then(res => {
                     this.desayunos = [...this.desayunos, ...res]

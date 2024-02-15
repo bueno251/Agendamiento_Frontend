@@ -27,7 +27,7 @@
 
 <script>
 
-// import Swal from 'sweetalert2'
+import Swal from 'sweetalert2'
 import authService from './service/authService'
 
 export default {
@@ -50,28 +50,44 @@ export default {
         }
     },
     methods: {
+        /**
+        * Realiza el inicio de sesión del usuario.
+        */
         login() {
+            // Habilitar la animación de carga
             this.loading = true
 
+            // Crear un objeto con los datos de inicio de sesión
             let data = {
                 correo: this.correo,
                 password: this.password,
             }
 
+            // Llamar al servicio de autenticación para iniciar sesión
             authService.login(data)
                 .then(res => {
+                    // Desactivar la animación de carga
                     this.loading = false
+
+                    // Almacenar el token y la información del usuario en el almacenamiento local
                     this.$store.dispatch('setToken', res.token)
                     this.$store.dispatch('setUser', res.user)
-                    this.$router.push({ name: 'reservas' })
+
+                    // Redirigir a la página de reservas después del inicio de sesión exitoso
+                    this.$router.push({ name: 'reservasApp' })
                 })
                 .catch(err => {
+                    // Desactivar la animación de carga
                     this.loading = false
-                    // Swal.fire({
-                    //     icon: 'error',
-                    //     title: 'Oops...',
-                    //     text: err,
-                    // })
+
+                    // Mostrar mensaje de error utilizando SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: err.response.data.message,
+                    })
+
+                    // Registrar detalles del error en la consola
                     console.log(err);
                 })
         },

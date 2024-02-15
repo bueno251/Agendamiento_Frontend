@@ -84,29 +84,52 @@ export default {
         rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
     }),
     methods: {
+        /**
+        * Obtiene la información de todas las habitaciones.
+        * Organiza los precios de cada habitación agrupándolos por jornada.
+        * Actualiza la variable 'rooms' con la información de las habitaciones.
+        */
         getRooms() {
             reservaService.obtenerRooms()
                 .then(res => {
                     res.forEach(room => {
                         room.precios = Object.groupBy(room.precios, (price) => price.jornada)
-                    });
+                    })
                     this.rooms = res
                 })
                 .catch(err => {
                     console.log(err)
                 })
         },
+        /**
+         * Redirige al usuario a la vista de una habitación específica.
+         * @param {number} id - ID de la habitación a la que se redirigirá.
+         */
         goToRoom(id) {
             this.$router.push({ name: 'room', params: { id: id } })
         },
+        /**
+         * Formatea un número agregando comas para separar miles.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
+            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
-        includeCaracteristic(caracteris, room) {
-            return room.caracteristics.includes(caracteris.id)
+        /**
+         * Verifica si una característica está incluida en las características de una habitación.
+         * @param {object} caracteristica - Característica a verificar.
+         * @param {object} room - Habitación a la que se le verificará la característica.
+         * @returns {boolean} - Indica si la característica está incluida en la habitación.
+         */
+        includeCaracteristic(caracteristica, room) {
+            return room.caracteristicas.includes(caracteristica.id)
         },
+        /**
+         * Obtiene la información de las características disponibles y actualiza la variable 'caracteristicas'.
+         */
         getCaracteristicas() {
             reservaService.obtenerCaracteristicas()
                 .then(res => {

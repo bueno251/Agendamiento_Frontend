@@ -84,6 +84,12 @@ export default {
         }
     },
     methods: {
+        /**
+        * Crea una nueva característica de habitación.
+        * Utiliza los datos proporcionados en el formulario para enviar la solicitud al servicio correspondiente.
+        * Actualiza el estado de 'loadingbtn' durante la operación.
+        * 
+        */
         crear() {
             this.loadingbtn = true
 
@@ -113,13 +119,20 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Abre una nueva pestaña del navegador con la URL que contiene iconos disponibles.
+         */
         toIcons() {
-            window.open('https://pictogrammers.com/library/mdi/', '_blank');
+            window.open('https://pictogrammers.com/library/mdi/', '_blank')
         },
+        /**
+         * Restablece el formulario de creación y emite un evento para cerrar el componente.
+         */
         close() {
             this.$refs.formCreate.reset()
             this.$emit('close')
         },
+
     },
     mounted() {
     },

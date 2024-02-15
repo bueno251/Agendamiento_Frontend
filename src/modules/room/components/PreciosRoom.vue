@@ -114,9 +114,14 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Formatea un número agregando comas para separar miles.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
+            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
         formatNumber(day) {

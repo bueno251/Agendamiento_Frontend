@@ -67,8 +67,8 @@
                                 </v-tooltip>
                             </v-row>
                         </td>
-                        <td>{{ item.desayuno }}</td>
-                        <td>{{ item.decoracion }}</td>
+                        <td>{{ item.cedula }}</td>
+                        <td>{{ item.fullname }}</td>
                         <td>$ {{ comaEnMiles(item.precio) }} COP</td>
                         <td>{{ item.estado }}</td>
                     </tr>
@@ -149,8 +149,8 @@ export default {
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
-                { text: 'Desayuno', key: 'desayuno', value: 'desayuno' },
-                { text: 'Cómoda', key: 'decoracion', value: 'decoracion' },
+                { text: 'Cedula', key: 'cedula', value: 'cedula' },
+                { text: 'Huesped', key: 'huesped', value: 'huesped' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
@@ -158,6 +158,10 @@ export default {
         }
     },
     methods: {
+        /**
+        * Obtiene la lista de reservas.
+        * Realiza una llamada al servicio para obtener la información de las reservas y asigna los resultados a la variable reservas.
+        */
         getReservas() {
             this.loading = true
 
@@ -171,11 +175,20 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Formatea un número agregando comas para separar miles.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
+            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Aprueba una reserva.
+         * Realiza una llamada al servicio para aprobar una reserva por su ID y actualiza la lista de reservas.
+         */
         aprobar() {
             this.loadingbtn = true
 
@@ -183,7 +196,7 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
-                    this.getReservas()
+                    this.getReservas() // Actualiza la lista de reservas
                     console.log(res)
                 })
                 .catch(err => {
@@ -191,6 +204,10 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Rechaza una reserva.
+         * Realiza una llamada al servicio para rechazar una reserva por su ID y actualiza la lista de reservas.
+         */
         rechazar() {
             this.loadingbtn = true
 
@@ -198,7 +215,7 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false
-                    this.getReservas()
+                    this.getReservas() // Actualiza la lista de reservas
                     console.log(res)
                 })
                 .catch(err => {

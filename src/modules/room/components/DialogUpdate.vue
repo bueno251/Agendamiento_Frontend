@@ -171,7 +171,7 @@ export default {
                     this.tipo = newRoom.tipoId;
                     this.capacidad = newRoom.capacidad;
                     this.estado = newRoom.estadoId;
-                    this.selectedCaracteristicas = Array.from(newRoom.caracteristics)
+                    this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
                     this.desayuno = newRoom.has_desayuno
                     this.decoracion = newRoom.has_decoracion
                     this.getCaracteristicas()

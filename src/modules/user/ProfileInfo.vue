@@ -295,7 +295,7 @@ export default {
                         icon: 'success',
                         text: res.message,
                     })
-                    
+
                     this.loading = false
                 })
                 .catch(err => {
@@ -349,23 +349,36 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de países desde el servicio de ubicación
+         * y la asigna a la variable 'countries'.
+         */
         getCountries() {
+            // Obtener la lista de países
             UbicacionService.paises()
                 .then(res => {
+                    // Asignar la lista de países a la variable 'countries'
                     this.countries = res
                 })
                 .catch(err => {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de estados para el país seleccionado
+         * desde el servicio de ubicación y la asigna a la variable 'states'.
+         */
         getStates() {
+            // Habilitar la animación de carga y restablecer las variables relacionadas con el departamento
             this.loadingState = true
             this.departamento = ''
             this.ciudad = ''
             this.cities = []
 
+            // Obtener la lista de estados para el país seleccionado
             UbicacionService.departamentos(this.pais)
                 .then(res => {
+                    // Asignar la lista de estados a la variable 'states' y desactivar la animación de carga
                     this.states = res
                     this.loadingState = false
                 })
@@ -374,12 +387,19 @@ export default {
                     this.loadingState = false
                 })
         },
+        /**
+        * Obtiene la lista de ciudades para el departamento seleccionado
+        * desde el servicio de ubicación y la asigna a la variable 'cities'.
+        */
         getCities() {
+            // Habilitar la animación de carga y restablecer la variable relacionada con la ciudad
             this.loadingCity = true
             this.ciudad = ''
 
+            // Obtener la lista de ciudades para el departamento seleccionado
             UbicacionService.ciudades(this.departamento)
                 .then(res => {
+                    // Asignar la lista de ciudades a la variable 'cities' y desactivar la animación de carga
                     this.cities = res
                     this.loadingCity = false
                 })

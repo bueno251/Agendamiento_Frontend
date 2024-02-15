@@ -45,7 +45,7 @@
                     <strong>
                         Habitacion:
                     </strong>
-                    {{ reserva.room.nombre }} (x{{ reserva.cantidadRooms }})
+                    {{ reserva.room.nombre }} (x{{ reserva.cantidad_rooms }})
                 </p>
                 <p>
                     <strong>
@@ -170,16 +170,20 @@ export default {
                         return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
                     }
 
-                    return true;
+                    return true
                 },
             },
         }
     },
     methods: {
+        /**
+        * Realiza la reserva de una habitación.
+        * Se encarga de enviar la información de la reserva al servidor y gestionar la respuesta.
+        */
         reservar() {
-
             this.loading = true
 
+            // Construye el objeto de datos para la reserva
             let data = {
                 cedula: this.cedula,
                 nombre: this.nombre,
@@ -189,29 +193,41 @@ export default {
                 verificacion_pago: this.metodoPago == 1 ? 0 : 1,
             }
 
+            // Combina los datos de la reserva con la información del formulario
             data = { ...this.reserva, ...data }
 
+            // Asigna el ID de la habitación seleccionada
             data.room = data.room.id
 
+            // Realiza la llamada al servicio para reservar
             reservaService.reservar(data)
                 .then(res => {
                     this.loading = false
+                    // Muestra un mensaje de éxito y regresa a la página anterior
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
-                    })
-                        .then(this.$router.back())
+                    }).then(this.$router.back())
                 })
                 .catch(err => {
                     console.log(err)
                     this.loading = false
                 })
         },
+        /**
+         * Formatea un número agregando comas para separar miles.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresion regular que busca tres digitos
-            let rep = '$1.' //parametro especial para splice porque los numeros no son menores a 100
+            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
+            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Obtiene los métodos de pago disponibles.
+         * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable formasPago.
+         */
         getMetodosPago() {
             reservaService.obtenerFormasPago()
                 .then(res => {
