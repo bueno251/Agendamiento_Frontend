@@ -47,8 +47,7 @@
                     </v-col>
 
                     <v-col cols="12" md="4">
-                        <v-select v-model="desayuno" :items="yesNo" item-text="text"
-                            item-value="value" outlined>
+                        <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" outlined>
                             <template v-slot:label>
                                 Desayuno <span class="red--text">*</span>
                             </template>
@@ -56,8 +55,7 @@
                     </v-col>
 
                     <v-col cols="12" md="4">
-                        <v-select v-model="decoracion" :items="yesNo" item-text="text"
-                            item-value="value" outlined>
+                        <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" outlined>
                             <template v-slot:label>
                                 Decoración <span class="red--text">*</span>
                             </template>
@@ -211,6 +209,12 @@ export default {
         }
     },
     methods: {
+        /**
+        * Crea una nueva habitación utilizando los datos proporcionados en el formulario.
+        * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, cantidad, desayuno, decoración e imágenes.
+        * También permite adjuntar características seleccionadas a la habitación.
+        * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
+        */
         newRoom() {
             this.loading = true
 
@@ -225,11 +229,11 @@ export default {
             data.append('desayuno', this.desayuno)
             data.append('decoracion', this.decoracion)
 
-            const imgsForUpload = this.imgs;
+            const imgsForUpload = this.imgs
             if (imgsForUpload.length) {
                 imgsForUpload.map(img => {
-                    data.append('imgs[]', img);
-                });
+                    data.append('imgs[]', img)
+                })
             }
 
             if (this.selectedCaracteristicas.length) {
@@ -256,12 +260,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Actualiza la propiedad 'preview' de cada archivo de imagen con la URL de la vista previa.
+         */
         handleFileChange() {
             this.imgs.forEach((file) => {
                 // Actualizar la propiedad 'preview' con la URL de la vista previa
                 file.preview = URL.createObjectURL(file)
-            });
+            })
         },
+        /**
+         * Obtiene datos necesarios como tipos de habitación, estados y características de habitaciones.
+         */
         getDatos() {
             roomService.obtenerRoomTipos()
                 .then(res => {
@@ -279,6 +289,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene las características de habitaciones disponibles.
+         */
         getCaracteristicas() {
             roomService.obtenerCaracteristicas()
                 .then(res => {
@@ -288,6 +301,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Restablece el formulario y emite un evento para cerrar el componente.
+         */
         close() {
             this.$refs.form.reset()
             this.$emit('close')

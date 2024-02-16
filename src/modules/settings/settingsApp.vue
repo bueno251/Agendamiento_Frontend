@@ -6,7 +6,7 @@
 
         <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings"></EmpresaComponent>
 
-        <defaultConfig :id="id"/>
+        <defaultConfig :id="id" />
     </div>
 </template>
 
@@ -35,9 +35,13 @@ export default {
         }
     },
     methods: {
+        /**
+         * Obtiene la configuración general del sistema.
+         */
         getSettings() {
             configService.obtener()
                 .then(res => {
+                    // Asigna los valores obtenidos a las variables del componente
                     this.pagos = res.pagos
                     this.empresa = res.empresa
                     this.usuario_reserva = res.usuario_reserva

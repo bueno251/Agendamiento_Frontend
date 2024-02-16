@@ -114,6 +114,10 @@ export default {
         }
     },
     methods: {
+        /**
+        * Actualiza las imágenes de la habitación, eliminando las seleccionadas para eliminar y cargando las nuevas.
+        * Muestra un mensaje de éxito o error después de la operación y emite un evento para actualizar la habitación.
+        */
         updateImgs() {
             this.loading = true
 
@@ -127,11 +131,11 @@ export default {
                 })
             }
 
-            let imgsForUpload = this.imgsToUpload;
+            let imgsForUpload = this.imgsToUpload
             if (imgsForUpload.length) {
                 imgsForUpload.map(img => {
-                    data.append('imgs[]', img);
-                });
+                    data.append('imgs[]', img)
+                })
             }
 
             roomService.actualizarRoomImg(data, this.room.id)
@@ -154,16 +158,26 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Agrega la imagen a la lista de imágenes para eliminar y la elimina de la lista de imágenes actualmente mostradas.
+         * @param {number} index - Índice de la imagen en la lista actual de imágenes.
+         */
         deleteImg(index) {
             this.imgsToDelete.push(this.imgs[index])
             this.imgs.splice(index, 1)
         },
+        /**
+         * Actualiza la propiedad 'preview' de cada archivo de imagen con la URL de la vista previa.
+         */
         handleFileChange() {
             this.imgsToUpload.forEach((file) => {
                 // Actualizar la propiedad 'preview' con la URL de la vista previa
                 file.preview = URL.createObjectURL(file)
-            });
+            })
         },
+        /**
+         * Restablece el componente y emite un evento para cerrarlo.
+         */
         close() {
             this.$emit('close')
             if (this.room.imgs == null) {
@@ -174,10 +188,7 @@ export default {
 
             this.imgsToUpload = []
             this.imgsToDelete = []
-
         },
-    },
-    mounted() {
     },
 }
 </script>

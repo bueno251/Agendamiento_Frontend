@@ -108,9 +108,13 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea o actualiza los valores predeterminados de la configuración.
+         */
         crear() {
             this.loading = true
 
+            // Objeto de datos que se enviará al servicio para establecer los valores predeterminados
             let data = {
                 configuracionId: this.id,
                 pais: this.pais,
@@ -122,6 +126,7 @@ export default {
                 tipoResponsabilidad: this.tipoResponsabilidad,
             }
 
+            // Llama al servicio para establecer los valores predeterminados
             configService.valoresDefault(data)
                 .then(res => {
                     this.loading = false
@@ -135,9 +140,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene los valores predeterminados existentes y actualiza los datos del formulario.
+         */
         getDefault() {
             configService.obtenerValoresDefault()
                 .then(res => {
+                    // Asigna los valores predeterminados obtenidos a las variables del componente
                     this.pais = res.pais
                     this.getDepartamentos()
                     this.departamento = res.departamento
@@ -152,9 +161,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene los tipos de empresa desde el servicio.
+         */
         getTipos() {
             configService.obtenerEmpresaTipos()
                 .then(res => {
+                    // Asigna los tipos de documentos, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos
                     this.personas = res.organizaciones
                     this.regimenes = res.regimenes
@@ -164,6 +177,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de países desde el servicio.
+         */
         getPaises() {
             UbicacionService.paises()
                 .then(res => {
@@ -173,6 +189,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de departamentos para el país seleccionado.
+         */
         getDepartamentos() {
             this.loadingDepartamentos = true
             this.departamento = ''
@@ -189,6 +208,9 @@ export default {
                     this.loadingDepartamentos = false
                 })
         },
+        /**
+         * Obtiene la lista de municipios para el departamento seleccionado.
+         */
         getMunicipios() {
             this.loadingMunicipios = true
             this.municipio = ''

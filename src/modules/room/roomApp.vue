@@ -68,8 +68,9 @@
                 </template>
             </v-data-table>
         </v-card>
-        <DialogCreate :show="dialogCreate" @close="close" @create="getRooms"></DialogCreate>
-        <DialogUpdate :show="dialogUpdate" :room="room" @close="close" @update="getRooms"></DialogUpdate>
+        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @create="getRooms(), dialogCreate = false" />
+        <DialogUpdate :show="dialogUpdate" :room="room" @close="dialogUpdate = false"
+            @update="getRooms(), dialogUpdate = false" />
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -143,11 +144,14 @@ export default {
         }
     },
     methods: {
+        /**
+         * Obtiene la lista de habitaciones.
+         */
         getRooms() {
             this.loading = true
             this.room = {}
-            this.close()
 
+            // Llama al servicio para obtener la lista de habitaciones
             roomService.obtenerRooms()
                 .then(res => {
                     this.loading = false
@@ -158,14 +162,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina una habitación.
+         */
         deleted() {
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar una habitación
             roomService.eliminarRoom(this.room.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getRooms()
+                    this.getRooms() // Actualiza la lista de habitaciones después de la eliminación
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -190,13 +198,14 @@ export default {
             let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Formatea un número y lo asigna a un campo específico.
+         * @param {string} campo - Nombre del campo donde se asignará el número formateado.
+         * @param {string} precio - Número a formatear.
+         */
         formatNumber(campo, precio) {
             let formattedNumber = precio.replace(/\D/g, '');
             this[campo] = this.comaEnMiles(formattedNumber);
-        },
-        close() {
-            this.dialogCreate = false
-            this.dialogUpdate = false
         },
     },
     mounted() {

@@ -251,9 +251,13 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea o actualiza los datos de la empresa.
+         */
         crear() {
             this.loading = true
 
+            // Objeto de datos que se enviará al servicio para crear o actualizar la empresa
             let data = {
                 configuracionId: this.id,
                 nombre: this.nombre,
@@ -276,6 +280,7 @@ export default {
                 tipoRegimen: this.regimen,
             }
 
+            // Llama al servicio para crear o actualizar la empresa
             configService.empresa(data)
                 .then(res => {
                     this.loading = false
@@ -294,9 +299,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene los tipos de empresa desde el servicio.
+         */
         getTipos() {
             configService.obtenerEmpresaTipos()
                 .then(res => {
+                    // Asigna los tipos de documentos, entornos, operaciones, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos
                     this.entornos = res.entornos
                     this.operaciones = res.operaciones
@@ -308,6 +317,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de países desde el servicio.
+         */
         getPaises() {
             UbicacionService.paises()
                 .then(res => {
@@ -317,6 +329,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de departamentos para el país seleccionado.
+         */
         getDepartamentos() {
             this.loadingDepartamentos = true
             this.departamento = ''
@@ -333,6 +348,9 @@ export default {
                     this.loadingDepartamentos = false
                 })
         },
+        /**
+         * Obtiene la lista de municipios para el departamento seleccionado.
+         */
         getMunicipios() {
             this.loadingMunicipios = true
             this.municipio = ''

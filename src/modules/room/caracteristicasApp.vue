@@ -186,9 +186,13 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea una nueva característica de habitación.
+         */
         crear() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 nombre: this.nombre,
                 descripcion: this.descripcion,
@@ -196,12 +200,13 @@ export default {
                 estado: this.estado,
             }
 
+            // Llama al servicio para crear una nueva característica de habitación
             roomService.crearCaracteristica(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getCaracteristicas()
-                    this.$refs.formCreate.reset()
+                    this.getCaracteristicas() // Actualiza la lista de características después de crear una nueva
+                    this.$refs.formCreate.reset() // Reinicia el formulario
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -216,10 +221,14 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de características de habitación.
+         */
         getCaracteristicas() {
             this.loading = true
             this.caracteristica = {}
 
+            // Llama al servicio para obtener la lista de características de habitación
             roomService.obtenerCaracteristicas()
                 .then(res => {
                     this.loading = false
@@ -230,9 +239,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Actualiza una característica de habitación existente.
+         */
         actualizar() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 nombre: this.nombre,
                 descripcion: this.descripcion,
@@ -240,11 +253,12 @@ export default {
                 estado: this.estado,
             }
 
+            // Llama al servicio para actualizar una característica de habitación existente
             roomService.actualizarCaracteristica(data, this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getCaracteristicas()
+                    this.getCaracteristicas() // Actualiza la lista de características después de la actualización
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -259,14 +273,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina una característica de habitación.
+         */
         eliminar() {
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar una característica de habitación
             roomService.eliminarCaracteristica(this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getCaracteristicas()
+                    this.getCaracteristicas() // Actualiza la lista de características después de la eliminación
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -281,9 +299,12 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Abre una nueva pestaña del navegador con la URL que contiene iconos disponibles.
+         */
         toIcons() {
-            window.open('https://pictogrammers.com/library/mdi/', '_blank');
-        }
+            window.open('https://pictogrammers.com/library/mdi/', '_blank')
+        },
     },
     mounted() {
         this.getCaracteristicas()

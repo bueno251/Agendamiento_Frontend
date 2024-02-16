@@ -181,6 +181,12 @@ export default {
         }
     },
     methods: {
+        /**
+        * Actualiza la habitación con la información proporcionada en el formulario.
+        * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, características seleccionadas,
+        * características desactivadas, desayuno y decoración.
+        * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
+        */
         updateRoom() {
             this.loading = true
 
@@ -225,6 +231,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene datos necesarios como tipos de habitación y estados de habitación.
+         */
         getDatos() {
             roomService.obtenerRoomTipos()
                 .then(res => {
@@ -242,6 +251,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene las características de habitaciones disponibles.
+         */
         getCaracteristicas() {
             roomService.obtenerCaracteristicas()
                 .then(res => {
@@ -251,7 +263,11 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+          * Cierra el componente emitiento un evento 'close'.
+          */
         close() {
+            // Emitir evento 'close'
             this.$emit('close')
         },
     },

@@ -121,19 +121,24 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea un nuevo tipo de habitación.
+         */
         newTipo() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 tipo: this.newtipo,
             }
 
+            // Llama al servicio para crear un nuevo tipo de habitación
             roomService.crearRoomTipo(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getTipos()
-                    this.$refs.formCreate.reset()
+                    this.getTipos() // Actualiza la lista de tipos después de crear uno nuevo
+                    this.$refs.formCreate.reset() // Reinicia el formulario
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -148,9 +153,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de tipos de habitación.
+         */
         getTipos() {
             this.loading = true
 
+            // Llama al servicio para obtener la lista de tipos de habitación
             roomService.obtenerRoomTipos()
                 .then(res => {
                     this.loading = false
@@ -161,18 +170,23 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Actualiza un tipo de habitación existente.
+         */
         updateTipo() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 tipo: this.tipo,
             }
 
+            // Llama al servicio para actualizar un tipo de habitación existente
             roomService.actualizarRoomTipo(data, this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getTipos()
+                    this.getTipos() // Actualiza la lista de tipos después de la actualización
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -187,14 +201,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina un tipo de habitación.
+         */
         deleted() {
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar un tipo de habitación
             roomService.eliminarRoomTipo(this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getTipos()
+                    this.getTipos() // Actualiza la lista de tipos después de la eliminación
                     Swal.fire({
                         icon: 'success',
                         text: res.message,

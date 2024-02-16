@@ -48,7 +48,8 @@
                     </v-row>
                     <div class="buttons">
                         <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validCreate" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
+                        <v-btn :disabled="!validCreate" type="submit" :loading="loadingbtn"
+                            color="light-green">crear</v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -67,7 +68,8 @@
                     </v-row>
                     <div class="buttons">
                         <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
+                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
+                            color="light-green">actualizar</v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -94,6 +96,14 @@ import roomService from '../service/roomService'
 
 export default {
     name: 'estadoSettings',
+    watch: {
+        estate: {
+            handler(newEstate) {
+                this.estado = newEstate.estado;
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             search: '',
@@ -119,6 +129,10 @@ export default {
         }
     },
     methods: {
+        /**
+        * Crea un nuevo estado de habitación con la información proporcionada en el formulario.
+        * Muestra un mensaje de éxito o error después de la operación, cierra el diálogo de creación y actualiza la lista de estados.
+        */
         newEstado() {
             this.loadingbtn = true
 
@@ -146,6 +160,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de estados de habitación y actualiza la propiedad correspondiente.
+         */
         getEstados() {
             this.loading = true
 
@@ -159,6 +176,10 @@ export default {
                     this.loading = false
                 })
         },
+        /**
+         * Actualiza el estado de habitación con la información proporcionada en el formulario.
+         * Muestra un mensaje de éxito o error después de la operación, cierra el diálogo de actualización y actualiza la lista de estados.
+         */
         updateEstado() {
             this.loadingbtn = true
 
@@ -185,6 +206,10 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina el estado de habitación seleccionado.
+         * Muestra un mensaje de éxito o error después de la operación, cierra el diálogo de eliminación y actualiza la lista de estados.
+         */
         deleted() {
             this.loadingbtn = true
 
@@ -207,14 +232,6 @@ export default {
                     console.log(err)
                 })
         },
-    },
-    watch: {
-        estate: {
-            handler(newEstate) {
-                this.estado = newEstate.estado;
-            },
-            immediate: true,
-        }
     },
     mounted() {
         this.getEstados()

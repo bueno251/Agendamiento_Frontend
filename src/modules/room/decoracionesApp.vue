@@ -143,19 +143,24 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea una nueva decoración de habitación.
+         */
         crear() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 decoracion: this.newDeco,
             }
 
+            // Llama al servicio para crear una nueva decoración de habitación
             roomService.crearDecoracion(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getDe()
-                    this.$refs.formCreate.reset()
+                    this.getDecoraciones() // Actualiza la lista de decoraciones después de crear una nueva
+                    this.$refs.formCreate.reset() // Reinicia el formulario
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -170,11 +175,14 @@ export default {
                     console.log(err)
                 })
         },
-        getDe() {
+        /**
+         * Obtiene la lista de decoraciones de habitación.
+         */
+        getDecoraciones() {
             this.loading = true
             this.decoration = {}
-            this.close()
 
+            // Llama al servicio para obtener la lista de decoraciones de habitación
             roomService.obtenerDecoraciones()
                 .then(res => {
                     this.loading = false
@@ -185,18 +193,23 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Actualiza una decoración de habitación existente.
+         */
         actualizar() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 decoracion: this.decoracion,
             }
 
+            // Llama al servicio para actualizar una decoración de habitación existente
             roomService.actualizarDecoracion(data, this.decoration.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getDe()
+                    this.getDecoraciones() // Actualiza la lista de decoraciones después de la actualización
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -211,14 +224,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina una decoración de habitación.
+         */
         eliminar() {
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar una decoración de habitación
             roomService.eliminarDecoracion(this.decoration.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getDe()
+                    this.getDecoraciones() // Actualiza la lista de decoraciones después de la eliminación
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -233,13 +250,9 @@ export default {
                     console.log(err)
                 })
         },
-        close() {
-            this.dialogCreate = false
-            this.dialogUpdate = false
-        },
     },
     mounted() {
-        this.getDe()
+        this.getDecoraciones()
     },
 }
 </script>

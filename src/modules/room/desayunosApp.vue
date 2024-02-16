@@ -143,19 +143,24 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea un nuevo desayuno.
+         */
         crear() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 desayuno: this.newDesayuno,
             }
 
+            // Llama al servicio para crear un nuevo desayuno
             roomService.crearDesayuno(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
-                    this.getDesayunos()
-                    this.$refs.formCreate.reset()
+                    this.getDesayunos() // Actualiza la lista de desayunos después de crear uno nuevo
+                    this.$refs.formCreate.reset() // Reinicia el formulario
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -170,11 +175,14 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene la lista de desayunos.
+         */
         getDesayunos() {
             this.loading = true
             this.breakfast = {}
-            this.close()
 
+            // Llama al servicio para obtener la lista de desayunos
             roomService.obtenerDesayunos()
                 .then(res => {
                     this.loading = false
@@ -185,18 +193,23 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Actualiza un desayuno existente.
+         */
         actualizar() {
             this.loadingbtn = true
 
+            // Prepara los datos para enviar al servidor
             let data = {
                 desayuno: this.desayuno,
             }
 
+            // Llama al servicio para actualizar un desayuno existente
             roomService.actualizarDesayuno(data, this.breakfast.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
-                    this.getDesayunos()
+                    this.getDesayunos() // Actualiza la lista de desayunos después de la actualización
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -211,14 +224,18 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Elimina un desayuno.
+         */
         eliminar() {
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar un desayuno
             roomService.eliminarDesayuno(this.breakfast.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
-                    this.getDesayunos()
+                    this.getDesayunos() // Actualiza la lista de desayunos después de la eliminación
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -232,10 +249,6 @@ export default {
                     })
                     console.log(err)
                 })
-        },
-        close() {
-            this.dialogCreate = false
-            this.dialogUpdate = false
         },
     },
     mounted() {

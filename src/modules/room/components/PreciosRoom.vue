@@ -78,15 +78,19 @@ export default {
         }
     },
     methods: {
+        /**
+         * Guarda los precios para cada día de la semana.
+         */
         save() {
             this.loading = true
 
+            // Mapea los datos de la semana para prepararlos para ser enviados al servidor
             let week = []
 
             this.week.map(({ name, precio, jornada_id }) => {
                 let dia = {
                     name: name,
-                    precio: parseInt(precio.replace(/\./g, '')),
+                    precio: parseInt(precio.replace(/\./g, '')), // Convierte el precio a entero eliminando puntos de separación de miles
                     jornada_id: jornada_id
                 }
                 week.push(dia);
@@ -96,10 +100,11 @@ export default {
                 weekdays: week
             }
 
+            // Llama al servicio para guardar los precios en el servidor
             roomService.savePrecios(data, this.id)
                 .then(res => {
                     this.loading = false
-                    this.$emit('update')
+                    this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -121,19 +126,27 @@ export default {
          */
         comaEnMiles(numero) {
             let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
+            let rep = '$1.' // parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Formatea el número de un día de la semana agregando comas para separar miles.
+         * @param {object} day - Objeto que representa un día de la semana con un precio.
+         */
         formatNumber(day) {
-            let formattedNumber = day.precio.replace(/\D/g, '')
-            day.precio = this.comaEnMiles(formattedNumber);
+            let formattedNumber = day.precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
+            day.precio = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
+        /**
+         * Obtiene los precios guardados para la habitación y los muestra en la interfaz de usuario.
+         */
         getPrecios() {
             roomService.getPrecios(this.id)
                 .then(res => {
                     if (res.length == 0) {
                         this.$refs.form.resetValidation()
 
+                        // Inicializa la semana con precios vacíos si no hay datos guardados
                         this.week = [
                             { name: 'Domingo', precio: '', jornada_id: 2 },
                             { name: 'Lunes', precio: '', jornada_id: 1 },
@@ -147,6 +160,7 @@ export default {
                         return
                     }
 
+                    // Formatea los precios con comas y los muestra en la interfaz de usuario
                     res.map(day => {
                         day.precio = this.comaEnMiles(day.precio)
                     })
@@ -157,6 +171,9 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene las jornadas disponibles.
+         */
         getJornadas() {
             roomService.getJornadas()
                 .then(res => {
@@ -166,9 +183,12 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Cierra el formulario de precios.
+         */
         close() {
             this.$refs.form.resetValidation()
-            this.$emit('close')
+            this.$emit('close') // Emite un evento para indicar que se ha cerrado el formulario
         },
     },
     directives: {

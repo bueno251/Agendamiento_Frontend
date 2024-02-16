@@ -79,6 +79,9 @@ export default {
         }
     },
     methods: {
+        /**
+         * Guarda los precios de la habitación.
+         */
         save() {
             this.loading = true
 
@@ -99,6 +102,7 @@ export default {
                 weekdays: week
             }
 
+            // Llamada al servicio para guardar los precios
             roomService.savePrecios(data, this.room.id)
                 .then(res => {
                     this.loading = false
@@ -127,7 +131,11 @@ export default {
             let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
         },
+        /**
+         * Cierra el componente emitiento un evento 'close'.
+         */
         close() {
+            // Emitir evento 'close'
             this.$emit('close')
         },
     }

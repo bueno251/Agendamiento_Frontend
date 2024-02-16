@@ -24,7 +24,7 @@
 
 <script>
 
-import roomService from '../service/roomService';
+import roomService from '../service/roomService'
 
 export default {
     name: 'estadosRoom',
@@ -55,6 +55,9 @@ export default {
         ],
     }),
     methods: {
+        /**
+         * Obtiene la bitácora de una habitación con el identificador proporcionado.
+        */
         obtener() {
             this.loading = true
 
@@ -68,11 +71,13 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Cierra el componente emitiento un evento 'close'.
+         */
         close() {
+            // Emitir evento 'close'
             this.$emit('close')
         },
-    },
-    mounted() {
     },
 }
 </script>

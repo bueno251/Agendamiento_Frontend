@@ -98,7 +98,11 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Cierra el componente emitiento un evento 'close'.
+         */
         close() {
+            // Emitir evento 'close'
             this.$emit('close')
         },
     },
