@@ -1,10 +1,10 @@
 <template>
     <div class="content">
-        <tipoPagos :tipos="pagos" :id="id" @update="getSettings"></tipoPagos>
+        <metodosPago :metodosPago="pagos" :id="id" @update="getSettings" />
 
-        <canReservar :bolean="usuario_reserva" :id="id" @update="getSettings"></canReservar>
+        <canReservar :bolean="usuario_reserva" :id="id" @update="getSettings" />
 
-        <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings"></EmpresaComponent>
+        <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings" />
 
         <defaultConfig :id="id" />
     </div>
@@ -12,7 +12,7 @@
 
 <script>
 
-import tipoPagos from './components/tipoPagos'
+import metodosPago from './components/metodosPago'
 import canReservar from './components/canReservar'
 import EmpresaComponent from './components/empresaComponent'
 import defaultConfig from './components/defaultConfig'
@@ -21,7 +21,7 @@ import configService from './services/configService'
 export default {
     name: 'settingsApp',
     components: {
-        tipoPagos,
+        metodosPago,
         canReservar,
         EmpresaComponent,
         defaultConfig,

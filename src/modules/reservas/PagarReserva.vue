@@ -82,10 +82,10 @@
         <v-card class="pa-5 column2" elevation="5">
             <v-form ref="formPagos" v-model="validPagos" @submit.prevent="reservar()">
                 <v-row>
-                    <v-col cols="12" v-if="formasPago.length > 1">
+                    <v-col cols="12" v-if="metodosPago.length > 1">
                         <label>Selecciona un método de pago <span class="red--text">*</span></label>
-                        <v-select v-model="metodoPago" :items="formasPago" no-data-text="No hay formas de pago validas"
-                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
+                        <v-select v-model="metodoPago" :items="metodosPago" no-data-text="No hay metodos de pago validas"
+                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -147,7 +147,7 @@ export default {
             modalTransferencia: false,
             loading: false,
             file: null,
-            formasPago: [],
+            metodosPago: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 email: value => {
@@ -226,12 +226,12 @@ export default {
         },
         /**
          * Obtiene los métodos de pago disponibles.
-         * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable formasPago.
+         * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable metodosPago.
          */
         getMetodosPago() {
-            reservaService.obtenerFormasPago()
+            reservaService.obtenerMetodosPago()
                 .then(res => {
-                    this.formasPago = res
+                    this.metodosPago = res
                 })
                 .catch(err => {
                     console.log(err)

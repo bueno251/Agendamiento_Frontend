@@ -69,7 +69,7 @@ const reservaService = {
         })
     },
 
-    obtenerFormasPago() {
+    obtenerMetodosPago() {
         let url = 'pagos'
 
         return new Promise((resolve, reject) => {
