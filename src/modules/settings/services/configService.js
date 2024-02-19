@@ -97,12 +97,26 @@ const configService = {
                 })
         })
     },
-    
+
     obtenerValoresDefault() {
         let url = `default`
 
         return new Promise((resolve, reject) => {
             local.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    metodoPago(data) {
+        let url = `metodoPago`
+
+        return new Promise((resolve, reject) => {
+            local.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })

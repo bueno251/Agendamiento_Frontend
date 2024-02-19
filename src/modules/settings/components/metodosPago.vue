@@ -3,7 +3,7 @@
         <v-card-title class="blue lighten-2">
             <div class="flex">
                 <p>
-                    Tipo De Pagos Que Recibe La Empresa
+                    Metodos De Pagos Que Recibe La Empresa
                 </p>
 
                 <v-btn @click="dialogCreate = true">
@@ -18,8 +18,8 @@
         </template>
         <v-container fluid v-else>
             <v-row>
-                <v-col cols="auto" v-for="tipo in tipos" :key="tipo.id">
-                    <v-checkbox v-model="tipoPago" :label="tipo.tipo" :value="tipo"></v-checkbox>
+                <v-col cols="auto" v-for="metodo in metodosPago" :key="metodo.id">
+                    <v-checkbox v-model="metodosPagoActive" :label="metodo.nombre" :value="metodo"></v-checkbox>
                 </v-col>
             </v-row>
             <div class="buttons">
@@ -31,7 +31,7 @@
 
         <v-dialog :value="dialogCreate" width="90%" max-width="600px" persistent>
             <v-card class="pa-5">
-                <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
+                <v-form ref="form" v-model="valid" @submit.prevent="crear()">
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
@@ -58,21 +58,24 @@ import Swal from 'sweetalert2'
 import configService from '../services/configService'
 
 export default {
+    name: 'metodosPago',
     props: {
-        tipos: Array,
+        metodosPago: Array,
         id: Number,
     },
     watch: {
-        tipos: {
-            handler(newtipos) {
-                this.tipoPago = []
-                newtipos.forEach(t => {
-                    if (t.estado === 1) {
-                        this.tipoPago.push(t)
+        metodosPago: {
+            handler(newItem) {
+                if (newItem) {
+                    this.metodosPagoActive = []
+                    newItem.forEach(metodo => {
+                        if (metodo.estado === 1) {
+                            this.metodosPagoActive.push(metodo)
+                        }
+                    })
+                    if (newItem.length) {
+                        this.loadingcard = false
                     }
-                });
-                if (newtipos.length) {
-                    this.loadingcard = false
                 }
             },
             immediate: true,
@@ -86,7 +89,7 @@ export default {
             loadingbtn: false,
             dialogCreate: false,
             loadingcard: true,
-            tipoPago: [],
+            metodosPagoActive: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
@@ -102,7 +105,7 @@ export default {
             // Objeto de datos que se enviará al servicio para guardar la configuración de pagos
             let data = {
                 configuracionId: this.id,
-                pagos: this.pagos(),
+                metodosPago: this.pagos(),
             }
 
             // Llama al servicio para guardar la configuración de pagos
@@ -131,23 +134,67 @@ export default {
         pagos() {
             let pagos = []
 
-            // Itera sobre los tipos de pagos y crea un objeto con el id, tipo y estado para cada uno
-            this.tipos.forEach(t => {
-                let newT = {
-                    id: t.id,
-                    tipo: t.tipo,
+            // Itera sobre los metodos de pagos y crea un objeto con el id, tipo y estado para cada uno
+            this.metodosPago.forEach(metodo => {
+                let newMetodo = {
+                    id: metodo.id,
+                    nombre: metodo.nombre,
                     estado: 0,
                 }
 
-                // Si el tipo de pago está incluido en el array tipoPago, establece el estado como 1
-                if (this.tipoPago.includes(t)) {
-                    newT.estado = 1
+                // Si el tipo de pago está incluido en el array metodosPagoActive, establece el estado como 1
+                if (this.metodosPagoActive.includes(metodo)) {
+                    newMetodo.estado = 1
                 }
 
-                pagos.push(newT)
+                pagos.push(newMetodo)
             });
 
             return pagos
+        },
+        /**
+         * Crear Método de Pago
+         *
+         * Este método se encarga de crear un nuevo método de pago en el sistema. La información del método de pago se envía al servidor a través de una solicitud HTTP, y se realiza la inserción en la base de datos correspondiente.
+         * Se manejan los casos de éxito y error, mostrando mensajes al usuario y actualizando la interfaz en consecuencia.
+         */
+        crear() {
+            // Habilitar indicador de carga
+            this.loadingbtn = true
+
+            // Datos del nuevo método de pago
+            let data = {
+                nombre: this.nombre
+            }
+
+            // Llamar al servicio para crear el método de pago
+            configService.metodoPago(data)
+                .then(res => {
+                    // Deshabilitar indicador de carga
+                    this.loadingbtn = false
+
+                    // Emitir evento de actualización
+                    this.$emit('update')
+
+                    // Mostrar mensaje de éxito al usuario
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
+                })
+                .catch(err => {
+                    // Deshabilitar indicador de carga en caso de error
+                    this.loadingbtn = false
+
+                    // Mostrar mensaje de error al usuario
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+
+                    // Registrar el error en la consola
+                    console.log(err)
+                })
         },
     },
 }
