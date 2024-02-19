@@ -96,7 +96,7 @@
 
                         <v-col cols="12" md="6">
                             <label>Monto <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" v-price dense outlined required>
+                            <v-text-field v-model="monto" :rules="[rules.required]" v-price readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 

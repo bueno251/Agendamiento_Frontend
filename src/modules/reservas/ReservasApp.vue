@@ -43,6 +43,7 @@
                                 </v-list>
                             </v-menu>
                         </td>
+                        <td>{{ item.created_at }}</td>
                         <td>{{ item.fechaEntrada }}</td>
                         <td>{{ item.fechaSalida }}</td>
                         <td>
@@ -128,6 +129,7 @@
 
 <script>
 
+import Swal from 'sweetalert2';
 import reservaService from './service/reservaService';
 
 export default {
@@ -146,6 +148,7 @@ export default {
             reservas: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
+                { text: 'Creada el', key: 'created_at', value: 'created_at' },
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
@@ -159,9 +162,9 @@ export default {
     },
     methods: {
         /**
-        * Obtiene la lista de reservas.
-        * Realiza una llamada al servicio para obtener la información de las reservas y asigna los resultados a la variable reservas.
-        */
+         * Obtiene la lista de reservas.
+         * Realiza una llamada al servicio para obtener la información de las reservas y asigna los resultados a la variable reservas.
+         */
         getReservas() {
             this.loading = true
 
@@ -197,10 +200,17 @@ export default {
                     this.loadingbtn = false
                     this.dialogAprobar = false
                     this.getReservas() // Actualiza la lista de reservas
-                    console.log(res)
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
                 })
                 .catch(err => {
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'success',
+                        text: err.response.data.message,
+                    })
                     console.log(err)
                 })
         },
@@ -216,10 +226,17 @@ export default {
                     this.loadingbtn = false
                     this.dialogRechazar = false
                     this.getReservas() // Actualiza la lista de reservas
-                    console.log(res)
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
                 })
                 .catch(err => {
                     this.loadingbtn = false
+                    Swal.fire({
+                        icon: 'success',
+                        text: err.response.data.message,
+                    })
                     console.log(err)
                 })
         },
