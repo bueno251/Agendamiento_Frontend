@@ -117,8 +117,12 @@ const reservaService = {
         })
     },
 
-    obtenerReservas() {
-        let url = 'reserva/read'
+    obtenerReservas(estado = '') {
+        let url = `reserva/read`
+
+        if (estado) {
+            url += `/${estado}`
+        }
 
         return new Promise((resolve, reject) => {
             local.api.get(url)
