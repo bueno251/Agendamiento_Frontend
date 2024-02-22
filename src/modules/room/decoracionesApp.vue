@@ -108,7 +108,16 @@ import roomService from "./service/roomService"
 
 export default {
     name: 'DecoracionesApp',
-    components: {
+    watch: {
+        decoration: {
+            // Función que se ejecuta cuando hay cambios en decoration
+            handler(newItem) {
+                // Asigna el nuevo valor de decoration a la propiedad decoracion
+                this.decoracion = newItem.decoracion
+            },
+            // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
+            immediate: true
+        }
     },
     data() {
         return {
@@ -132,14 +141,6 @@ export default {
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
-        }
-    },
-    watch: {
-        decoration: {
-            handler(newitem) {
-                this.decoracion = newitem.decoracion;
-            },
-            immediate: true,
         }
     },
     methods: {

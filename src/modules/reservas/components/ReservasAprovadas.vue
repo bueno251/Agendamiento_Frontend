@@ -128,6 +128,25 @@ import reservaService from '../service/reservaService';
 
 export default {
     name: 'ReservasAprobadas',
+    props: {
+        canUpdate: Boolean,
+    },
+    watch: {
+        // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1'.
+        menu1(val) {
+            val && setTimeout(() => (this.datePicker1 = 'YEAR'))
+        },
+        // Observa cambios en 'menu2' y actualiza el valor de 'datePicker2'.
+        menu2(val) {
+            val && setTimeout(() => (this.datePicker2 = 'YEAR'))
+        },
+        // Observa cambios en 'canUpdate' y actualiza las reservas.
+        canUpdate(val) {
+            if (val) {
+                this.getReservas()
+            }
+        },
+    },
     data() {
         return {
             search: '',
@@ -162,18 +181,13 @@ export default {
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
-            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
+            rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
     },
-    watch: {
-        menu1(val) {
-            val && setTimeout(() => (this.datePicker1 = 'YEAR'))
-        },
-        menu2(val) {
-            val && setTimeout(() => (this.datePicker2 = 'YEAR'))
-        },
-    },
     methods: {
+        /**
+         * Obtiene las reservas desde el servicio y actualiza las propiedades 'reservas' y 'reservasFilter'.
+         */
         getReservas() {
             this.loading = true
 
@@ -188,35 +202,43 @@ export default {
                     console.log(err)
                 })
         },
+        /**
+         * Invoca el método 'save' del componente referenciado por 'menu'.
+         * @param {string} menu - Nombre del menú referenciado.
+         * @param {Date} date - Fecha que se pasa al método 'save'.
+         */
         save(menu, date) {
             this.$refs[menu].save(date)
         },
+        /**
+         * Filtra las reservas según los criterios proporcionados.
+         */
         filtrar() {
-
-            if (
-                !this.documento &&
-                !this.telefono &&
-                !this.fechaLLegada &&
-                !this.fechaSalida
-            ) {
+            // Verifica si no se han proporcionado criterios de filtrado.
+            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida) {
                 this.reservasFilter = this.reservas
                 return
             }
 
+            // Filtra las reservas según los criterios proporcionados.
             this.reservasFilter = this.reservas.filter(reserva => {
-                // Verificar si ambas fechas están presentes
+                // Verificar si ambas fechas están presentes.
                 if (this.fechaLLegada && this.fechaSalida) {
-                    return reserva.cedula == this.documento ||
+                    return (
+                        reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
-                        (reserva.fechaEntrada >= this.fechaLLegada && reserva.fechaSalida <= this.fechaSalida);
+                        (reserva.fechaEntrada >= this.fechaLLegada && reserva.fechaSalida <= this.fechaSalida)
+                    )
                 } else {
-                    // Solo hay una fecha, realizar la comprobación correspondiente
-                    return reserva.cedula == this.documento ||
+                    // Solo hay una fecha, realizar la comprobación correspondiente.
+                    return (
+                        reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
                         (this.fechaLLegada && reserva.fechaEntrada >= this.fechaLLegada) ||
-                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida);
+                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida)
+                    )
                 }
-            });
+            })
         },
         /**
          * Formatea un número agregando comas para separar miles.

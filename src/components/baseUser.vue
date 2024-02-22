@@ -15,9 +15,6 @@ export default {
     components: {
         navNormal,
     },
-    data: () => ({
-        //
-    }),
 };
 </script>
 

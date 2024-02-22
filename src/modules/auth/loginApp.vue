@@ -28,7 +28,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import authService from './service/authService'
+import AuthService from './service/authService'
 
 export default {
     name: 'loginApp',
@@ -64,7 +64,7 @@ export default {
             }
 
             // Llamar al servicio de autenticación para iniciar sesión
-            authService.login(data)
+            AuthService.login(data)
                 .then(res => {
                     // Desactivar la animación de carga
                     this.loading = false

@@ -190,90 +190,6 @@ import reservaService from './service/reservaService'
 
 export default {
     name: 'RoomInfo',
-    data() {
-        return {
-            cedula: '',
-            telefono: '',
-            desayuno: null,
-            decoracion: null,
-            maxDate: '',
-            cantidadRooms: 1,
-            model: 0,
-            valid: false,
-            validDatosCliente: false,
-            loading: false,
-            loadingbtn: false,
-            datosCliente: false,
-            file: null,
-            dates: [],
-            datesInvalid: [],
-            festivos: [],
-            caracteristicas: [],
-            adultos: {
-                cantidad: 2,
-                val: 0
-            },
-            niños: {
-                cantidad: 0,
-                val: 0
-            },
-            desayunos: [
-                {
-                    id: null,
-                    desayuno: 'Ninguno'
-                }
-            ],
-            decoraciones: [
-                {
-                    id: null,
-                    decoracion: 'Ninguna'
-                }
-            ],
-            hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            room: {
-                nombre: '',
-                estado: '',
-                capacidad: '',
-                descripcion: '',
-                tipo: '',
-            },
-            rules: {
-                required: value => !!value || 'Campo requerido.',
-                date: () => {
-                    for (let dates of this.datesInvalid) {
-                        if (
-                            (this.dates[0] >= dates.fecha_entrada && this.dates[0] <= dates.fecha_salida) ||
-                            (this.dates[1] >= dates.fecha_entrada && this.dates[1] <= dates.fecha_salida) ||
-                            (this.dates[0] <= dates.fecha_entrada && this.dates[1] >= dates.fecha_salida)
-                        ) {
-                            return 'Fecha No Valida'
-                        }
-                    }
-
-                    return true
-                },
-                file: file => {
-                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
-                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
-
-                    if (!file) {
-                        return 'Campo requerido.'
-                    }
-
-                    if (!allowedFormats.includes(file.type) && !allowedExtensions.includes(file.name.slice(-4).toLowerCase())) {
-                        return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
-                    }
-
-                    return true;
-                },
-                phone: value => {
-                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
-                    return pattern.test(value) || 'Número de teléfono inválido.'
-                },
-            },
-            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
-        }
-    },
     computed: {
         /**
          * Devuelve la fecha de llegada seleccionada.
@@ -396,6 +312,90 @@ export default {
                 let sortDates = this.dates.toSorted()
                 this.dates = sortDates
             }
+        }
+    },
+    data() {
+        return {
+            cedula: '',
+            telefono: '',
+            desayuno: null,
+            decoracion: null,
+            maxDate: '',
+            cantidadRooms: 1,
+            model: 0,
+            valid: false,
+            validDatosCliente: false,
+            loading: false,
+            loadingbtn: false,
+            datosCliente: false,
+            file: null,
+            dates: [],
+            datesInvalid: [],
+            festivos: [],
+            caracteristicas: [],
+            adultos: {
+                cantidad: 2,
+                val: 0
+            },
+            niños: {
+                cantidad: 0,
+                val: 0
+            },
+            desayunos: [
+                {
+                    id: null,
+                    desayuno: 'Ninguno'
+                }
+            ],
+            decoraciones: [
+                {
+                    id: null,
+                    decoracion: 'Ninguna'
+                }
+            ],
+            hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            room: {
+                nombre: '',
+                estado: '',
+                capacidad: '',
+                descripcion: '',
+                tipo: '',
+            },
+            rules: {
+                required: value => !!value || 'Campo requerido.',
+                date: () => {
+                    for (let dates of this.datesInvalid) {
+                        if (
+                            (this.dates[0] >= dates.fecha_entrada && this.dates[0] <= dates.fecha_salida) ||
+                            (this.dates[1] >= dates.fecha_entrada && this.dates[1] <= dates.fecha_salida) ||
+                            (this.dates[0] <= dates.fecha_entrada && this.dates[1] >= dates.fecha_salida)
+                        ) {
+                            return 'Fecha No Valida'
+                        }
+                    }
+
+                    return true
+                },
+                file: file => {
+                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
+
+                    if (!file) {
+                        return 'Campo requerido.'
+                    }
+
+                    if (!allowedFormats.includes(file.type) && !allowedExtensions.includes(file.name.slice(-4).toLowerCase())) {
+                        return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
+                    }
+
+                    return true;
+                },
+                phone: value => {
+                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
+                    return pattern.test(value) || 'Número de teléfono inválido.'
+                },
+            },
+            rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
     },
     methods: {

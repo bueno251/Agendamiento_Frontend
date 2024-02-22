@@ -122,6 +122,33 @@ export default {
     components: {
         CreateCaracteristicRoom,
     },
+    computed: {
+        noSelectedCaracteristicas() {
+            if ("id" in this.room) {
+                return this.caracteristicas.filter(caracteristica => !this.selectedCaracteristicas.includes(caracteristica.id))
+            } else {
+                return false
+            }
+        }
+    },
+    watch: {
+        room: {
+            handler(newRoom) {
+                if ("id" in newRoom) {
+                    this.nombre = newRoom.nombre;
+                    this.descripcion = newRoom.descripcion;
+                    this.tipo = newRoom.tipoId;
+                    this.capacidad = newRoom.capacidad;
+                    this.estado = newRoom.estadoId;
+                    this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
+                    this.desayuno = newRoom.has_desayuno
+                    this.decoracion = newRoom.has_decoracion
+                    this.getCaracteristicas()
+                }
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             nombre: '',
@@ -153,40 +180,13 @@ export default {
             },
         }
     },
-    computed: {
-        noSelectedCaracteristicas() {
-            if ("id" in this.room) {
-                return this.caracteristicas.filter(caracteristica => !this.selectedCaracteristicas.includes(caracteristica.id))
-            } else {
-                return false
-            }
-        }
-    },
-    watch: {
-        room: {
-            handler(newRoom) {
-                if ("id" in newRoom) {
-                    this.nombre = newRoom.nombre;
-                    this.descripcion = newRoom.descripcion;
-                    this.tipo = newRoom.tipoId;
-                    this.capacidad = newRoom.capacidad;
-                    this.estado = newRoom.estadoId;
-                    this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
-                    this.desayuno = newRoom.has_desayuno
-                    this.decoracion = newRoom.has_decoracion
-                    this.getCaracteristicas()
-                }
-            },
-            immediate: true,
-        }
-    },
     methods: {
         /**
-        * Actualiza la habitación con la información proporcionada en el formulario.
-        * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, características seleccionadas,
-        * características desactivadas, desayuno y decoración.
-        * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
-        */
+         * Actualiza la habitación con la información proporcionada en el formulario.
+         * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, características seleccionadas,
+         * características desactivadas, desayuno y decoración.
+         * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
+         */
         updateRoom() {
             this.loading = true
 

@@ -1,7 +1,7 @@
 <template>
     <v-card width="90%" elevation="5">
         <v-card-title class="blue lighten-2">
-            Reservas Confirmadas
+            Reservas En Proceso
         </v-card-title>
         <v-container fluid>
             <v-card-title>
@@ -87,6 +87,9 @@
                                     </template>
                                     <v-list-item link @click="reserva = item">
                                         <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item link @click="reserva = item">
+                                        <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
                                     </v-list-item>
                                 </v-list>
                             </v-menu>
@@ -181,10 +184,22 @@
 </template>
 
 <script>
+
+import Swal from 'sweetalert2';
 import reservaService from '../service/reservaService';
 
 export default {
     name: 'ReservasAprobadas',
+    watch: {
+        // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1' después de un retraso.
+        menu1(val) {
+            val && setTimeout(() => (this.datePicker1 = 'YEAR'))
+        },
+        // Observa cambios en 'menu2' y actualiza el valor de 'datePicker2' después de un retraso.
+        menu2(val) {
+            val && setTimeout(() => (this.datePicker2 = 'YEAR'))
+        },
+    },
     data() {
         return {
             search: '',
@@ -219,18 +234,13 @@ export default {
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
-            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
+            rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
     },
-    watch: {
-        menu1(val) {
-            val && setTimeout(() => (this.datePicker1 = 'YEAR'))
-        },
-        menu2(val) {
-            val && setTimeout(() => (this.datePicker2 = 'YEAR'))
-        },
-    },
     methods: {
+        /**
+         * Obtiene las reservas desde el servicio y actualiza las propiedades 'reservas' y 'reservasFilter'.
+         */
         getReservas() {
             this.loading = true
 
@@ -242,38 +252,46 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
+        /**
+         * Invoca el método 'save' del componente referenciado por 'menu'.
+         * @param {string} menu - Nombre del menú referenciado.
+         * @param {Date} date - Fecha que se pasa al método 'save'.
+         */
         save(menu, date) {
             this.$refs[menu].save(date)
         },
+        /**
+         * Filtra las reservas según los criterios proporcionados.
+         */
         filtrar() {
-
-            if (
-                !this.documento &&
-                !this.telefono &&
-                !this.fechaLLegada &&
-                !this.fechaSalida
-            ) {
+            // Verifica si no se han proporcionado criterios de filtrado.
+            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida) {
                 this.reservasFilter = this.reservas
                 return
             }
 
+            // Filtra las reservas según los criterios proporcionados.
             this.reservasFilter = this.reservas.filter(reserva => {
-                // Verificar si ambas fechas están presentes
+                // Verificar si ambas fechas están presentes.
                 if (this.fechaLLegada && this.fechaSalida) {
-                    return reserva.cedula == this.documento ||
+                    return (
+                        reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
-                        (reserva.fechaEntrada >= this.fechaLLegada && reserva.fechaSalida <= this.fechaSalida);
+                        (reserva.fechaEntrada >= this.fechaLLegada && reserva.fechaSalida <= this.fechaSalida)
+                    )
                 } else {
-                    // Solo hay una fecha, realizar la comprobación correspondiente
-                    return reserva.cedula == this.documento ||
+                    // Solo hay una fecha, realizar la comprobación correspondiente.
+                    return (
+                        reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
                         (this.fechaLLegada && reserva.fechaEntrada >= this.fechaLLegada) ||
-                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida);
+                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida)
+                    )
                 }
-            });
+            })
         },
         /**
          * Formatea un número agregando comas para separar miles.
@@ -296,12 +314,20 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
+                    this.$emit('update')
                     this.getReservas() // Actualiza la lista de reservas
-                    console.log(res)
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
                 })
                 .catch(err => {
                     this.loadingbtn = false
                     console.log(err)
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
                 })
         },
         /**
@@ -315,12 +341,20 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false
+                    this.$emit('update')
                     this.getReservas() // Actualiza la lista de reservas
-                    console.log(res)
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
                 })
                 .catch(err => {
                     this.loadingbtn = false
                     console.log(err)
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
                 })
         },
     },

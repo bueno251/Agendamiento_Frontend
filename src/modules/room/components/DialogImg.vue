@@ -67,6 +67,24 @@ export default {
         show: Boolean,
         room: Object,
     },
+    computed: {
+        imagenes() {
+            return this.dates[0] || ''
+        },
+    },
+    watch: {
+        room: {
+            handler(newRoom) {
+                if (newRoom.imgs == null) {
+                    this.imgs = []
+                    return
+                }
+
+                this.imgs = Array.from(newRoom.imgs)
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             error: '',
@@ -92,25 +110,7 @@ export default {
                     return true;
                 }
             },
-            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
-        }
-    },
-    computed: {
-        imagenes() {
-            return this.dates[0] || ''
-        },
-    },
-    watch: {
-        room: {
-            handler(newRoom) {
-                if (newRoom.imgs == null) {
-                    this.imgs = []
-                    return
-                }
-
-                this.imgs = Array.from(newRoom.imgs)
-            },
-            immediate: true,
+            rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
     },
     methods: {

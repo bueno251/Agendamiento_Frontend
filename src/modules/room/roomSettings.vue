@@ -32,7 +32,7 @@ import tipoSettings from "./components/tipoSettings";
 export default {
     components: {
         estadoSettings,
-       tipoSettings,
+        tipoSettings,
     },
     data() {
         return {

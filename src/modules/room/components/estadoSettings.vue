@@ -130,9 +130,9 @@ export default {
     },
     methods: {
         /**
-        * Crea un nuevo estado de habitación con la información proporcionada en el formulario.
-        * Muestra un mensaje de éxito o error después de la operación, cierra el diálogo de creación y actualiza la lista de estados.
-        */
+         * Crea un nuevo estado de habitación con la información proporcionada en el formulario.
+         * Muestra un mensaje de éxito o error después de la operación, cierra el diálogo de creación y actualiza la lista de estados.
+         */
         newEstado() {
             this.loadingbtn = true
 

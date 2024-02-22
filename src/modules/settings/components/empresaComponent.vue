@@ -166,6 +166,39 @@ export default {
         id: Number,
         empresa: Object,
     },
+    watch: {
+        empresa: {
+            handler(newitem) {
+                if (newitem !== null) {
+                    this.tipoDocumento = newitem.idDocumento
+                    this.identificacion = newitem.identificacion
+                    this.nombre = newitem.nombre
+                    this.dv = newitem.dv
+                    this.registro = newitem.registro
+                    this.direccion = newitem.direccion
+                    this.correo = newitem.correo
+                    this.telefono = newitem.telefono
+                    this.lenguaje = newitem.lenguaje
+                    this.impuesto = newitem.impuesto
+                    this.operacion = newitem.idOperacion
+                    this.entorno = newitem.idEntorno
+                    this.organizacion = newitem.idOrganizacion
+                    this.responsabilidad = newitem.idResponsabilidad
+                    this.regimen = newitem.idRegimen
+                    if (this.pais != newitem.pais) {
+                        this.pais = newitem.pais
+                        this.getDepartamentos()
+                    }
+                    if (this.departamento != newitem.departamento) {
+                        this.departamento = newitem.departamento
+                        this.getMunicipios()
+                    }
+                    this.municipio = newitem.municipio
+                }
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             tipoDocumento: '',
@@ -215,39 +248,6 @@ export default {
                     return pattern.test(value) || 'Número de teléfono inválido.'
                 },
             },
-        }
-    },
-    watch: {
-        empresa: {
-            handler(newitem) {
-                if (newitem !== null) {
-                    this.tipoDocumento = newitem.idDocumento
-                    this.identificacion = newitem.identificacion
-                    this.nombre = newitem.nombre
-                    this.dv = newitem.dv
-                    this.registro = newitem.registro
-                    this.direccion = newitem.direccion
-                    this.correo = newitem.correo
-                    this.telefono = newitem.telefono
-                    this.lenguaje = newitem.lenguaje
-                    this.impuesto = newitem.impuesto
-                    this.operacion = newitem.idOperacion
-                    this.entorno = newitem.idEntorno
-                    this.organizacion = newitem.idOrganizacion
-                    this.responsabilidad = newitem.idResponsabilidad
-                    this.regimen = newitem.idRegimen
-                    if (this.pais != newitem.pais) {
-                        this.pais = newitem.pais
-                        this.getDepartamentos()
-                    }
-                    if (this.departamento != newitem.departamento) {
-                        this.departamento = newitem.departamento
-                        this.getMunicipios()
-                    }
-                    this.municipio = newitem.municipio
-                }
-            },
-            immediate: true,
         }
     },
     methods: {
