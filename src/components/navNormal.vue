@@ -48,9 +48,9 @@ export default {
     },
     methods: {
         /**
-        * Cierra la sesión actual del usuario y redirige a la página de visualización de habitaciones.
-        * Utiliza Vuex para despachar la acción de cierre de sesión.
-        */
+         * Cierra la sesión actual del usuario y redirige a la página de visualización de habitaciones.
+         * Utiliza Vuex para despachar la acción de cierre de sesión.
+         */
         logout() {
             // Despacha la acción de cierre de sesión a través de Vuex
             this.$store.dispatch('logout')

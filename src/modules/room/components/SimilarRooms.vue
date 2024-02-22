@@ -43,13 +43,18 @@ export default {
         room: Object,
     },
     watch: {
+        // Observa cambios en la propiedad 'room'
         room: {
+            // Función que se ejecuta cuando hay cambios en 'room'
             handler(newRoom) {
+                // Verifica si 'id' está presente en 'newRoom'
                 if ("id" in newRoom) {
-                    this.rooms = newRoom.rooms;
+                    // Actualiza la propiedad 'rooms' con el valor de 'newRoom.rooms'
+                    this.rooms = newRoom.rooms
                 }
             },
-            immediate: true,
+            // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
+            immediate: true
         }
     },
     data() {
@@ -64,37 +69,61 @@ export default {
         }
     },
     methods: {
+        /**
+         * Actualiza la información de las habitaciones en el servidor.
+         * Emite un evento 'update' después de la actualización y muestra un mensaje de éxito o error.
+         */
         update() {
+            // Indica que la operación está en curso
             this.loading = true
 
+            // Prepara los datos a enviar al servicio
             let data = {
                 rooms: this.rooms
             }
 
+            // Llama al servicio para actualizar la información de las habitaciones
             roomService.actualizarRooms(data)
                 .then(res => {
+                    // La operación fue exitosa, indica que ya no está en curso
                     this.loading = false
+
+                    // Emite el evento 'update' para notificar a otros componentes sobre la actualización
                     this.$emit('update')
+
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
+                    // La operación falló, indica que ya no está en curso
                     this.loading = false
+
+                    // Muestra un mensaje de error con detalles del error proporcionados por el servidor
                     Swal.fire({
                         icon: 'error',
                         text: err.response.data.message,
                     })
+
+                    // Registra el error en la consola para análisis adicional
                     console.log(err)
                 })
         },
+        /**
+         * Obtiene los datos necesarios, como los estados de las habitaciones, desde el servidor.
+         * Almacena los estados obtenidos en la propiedad 'estados' del componente.
+         */
         getDatos() {
+            // Llama al servicio para obtener los estados de las habitaciones
             roomService.obtenerRoomEstados()
                 .then(res => {
+                    // Almacena los estados obtenidos en la propiedad 'estados' del componente
                     this.estados = res
                 })
                 .catch(err => {
+                    // Maneja cualquier error que pueda ocurrir al obtener los datos
                     console.log(err)
                 })
         },

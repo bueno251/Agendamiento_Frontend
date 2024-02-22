@@ -86,8 +86,8 @@ export default {
     },
     methods: {
         /**
-        * Cierra la sesión actual del usuario y redirige a la página de inicio de sesión.
-        */
+         * Cierra la sesión actual del usuario y redirige a la página de inicio de sesión.
+         */
         closeSession() {
             // Despacha la acción de cierre de sesión a través de Vuex
             this.$store.dispatch('logout')

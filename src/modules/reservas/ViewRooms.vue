@@ -81,14 +81,14 @@ export default {
         caracteristicas: [],
         dialog: false,
         dialogAgendar: false,
-        rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
+        rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
     }),
     methods: {
         /**
-        * Obtiene la información de todas las habitaciones.
-        * Organiza los precios de cada habitación agrupándolos por jornada.
-        * Actualiza la variable 'rooms' con la información de las habitaciones.
-        */
+         * Obtiene la información de todas las habitaciones.
+         * Organiza los precios de cada habitación agrupándolos por jornada.
+         * Actualiza la variable 'rooms' con la información de las habitaciones.
+         */
         getRooms() {
             reservaService.obtenerRooms()
                 .then(res => {

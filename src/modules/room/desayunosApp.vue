@@ -108,7 +108,16 @@ import roomService from "./service/roomService"
 
 export default {
     name: 'desayunosApp',
-    components: {
+    watch: {
+        breakfast: {
+            // Función que se ejecuta cuando hay cambios en breakfast
+            handler(newItem) {
+                // Asigna el nuevo valor de breakfast a la propiedad desayuno
+                this.desayuno = newItem.desayuno
+            },
+            // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
+            immediate: true
+        }
     },
     data() {
         return {
@@ -132,14 +141,6 @@ export default {
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
-        }
-    },
-    watch: {
-        breakfast: {
-            handler(newitem) {
-                this.desayuno = newitem.desayuno;
-            },
-            immediate: true,
         }
     },
     methods: {

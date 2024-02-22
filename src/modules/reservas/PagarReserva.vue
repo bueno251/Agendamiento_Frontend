@@ -96,7 +96,8 @@
 
                         <v-col cols="12" md="6">
                             <label>Monto <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" v-price dense outlined required>
+                            <v-text-field v-model="monto" :rules="[rules.required]" v-price readonly dense outlined
+                                required>
                             </v-text-field>
                         </v-col>
 
@@ -131,6 +132,25 @@ import reservaService from './service/reservaService'
 
 export default {
     name: 'DialogUpdate',
+    directives: {
+        'price': {
+            // Se ejecuta cuando la directiva es vinculada al elemento
+            bind(el) {
+                // Agrega un event listener al evento 'input'
+                el.addEventListener('input', (event) => {
+                    // Obtiene el nuevo valor eliminando cualquier caracter que no sea un dígito
+                    const newValue = event.target.value.replace(/\D/g, '')
+
+                    // Expresión regular para agregar puntos como separadores de miles
+                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
+                    let rep = '$1.'
+
+                    // Asigna el nuevo valor formateado al campo de entrada
+                    event.target.value = newValue.toString().replace(exp, rep)
+                })
+            }
+        },
+    },
     data() {
         return {
             reserva: vuex.state.reserva,
@@ -236,20 +256,6 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
-        },
-    },
-    directives: {
-        'price': {
-            bind(el) {
-                el.addEventListener('input', (event) => {
-                    const newValue = event.target.value.replace(/\D/g, '')
-
-                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
-                    let rep = '$1.'
-
-                    event.target.value = newValue.toString().replace(exp, rep)
-                })
-            }
         },
     },
     mounted() {

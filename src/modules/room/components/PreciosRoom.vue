@@ -47,6 +47,41 @@ export default {
         show: Boolean,
         id: Number,
     },
+    watch: {
+        // Observa cambios en la propiedad 'id'
+        id: {
+            // Función que se ejecuta cuando hay cambios en 'id'
+            handler(newItem) {
+                // Verifica si 'newItem' tiene un valor y si la propiedad 'show' es verdadera
+                if (newItem && this.show) {
+                    // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'id'
+                    this.getPrecios()
+                }
+            },
+            // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
+            immediate: true,
+        }
+    },
+    // Directiva personalizada llamada 'price'
+    directives: {
+        'price': {
+            // Se ejecuta al momento de vincular la directiva al elemento del DOM
+            bind(el) {
+                // Agrega un evento de escucha para el evento de entrada ('input')
+                el.addEventListener('input', (event) => {
+                    // Obtiene el nuevo valor después de eliminar no dígitos del evento
+                    const newValue = event.target.value.replace(/\D/g, '')
+
+                    // Define la expresión regular y el patrón de reemplazo para formatear el número con comas
+                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
+                    let rep = '$1.'
+
+                    // Aplica el formato al nuevo valor y actualiza el valor del elemento del DOM
+                    event.target.value = newValue.toString().replace(exp, rep)
+                })
+            }
+        },
+    },
     data() {
         return {
             valid: false,
@@ -65,16 +100,6 @@ export default {
                 required: value => !!value || 'Campo requerido.',
                 numerico: value => /^[0-9.]+$/.test(value) || "Solo se admiten números y puntos."
             },
-        }
-    },
-    watch: {
-        id: {
-            handler(newitem) {
-                if (newitem && this.show) {
-                    this.getPrecios()
-                }
-            },
-            immediate: true,
         }
     },
     methods: {
@@ -189,20 +214,6 @@ export default {
         close() {
             this.$refs.form.resetValidation()
             this.$emit('close') // Emite un evento para indicar que se ha cerrado el formulario
-        },
-    },
-    directives: {
-        'price': {
-            bind(el) {
-                el.addEventListener('input', (event) => {
-                    const newValue = event.target.value.replace(/\D/g, '')
-
-                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
-                    let rep = '$1.'
-
-                    event.target.value = newValue.toString().replace(exp, rep)
-                })
-            }
         },
     },
     mounted() {

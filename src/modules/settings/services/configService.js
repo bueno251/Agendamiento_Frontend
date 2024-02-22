@@ -1,10 +1,10 @@
 import axios from "axios";
 import vuex from "@/store";
 
-const local = {
+const LOCAL = {
     Axios() {
-        local.api = axios.create({
-            baseURL: process.env.VUE_APP_URL_BASE,
+        LOCAL.api = axios.create({
+            baseURL: process.env.VUE_APP_URL_BASE + "/api",
             headers: {
                 Authorization: `Bearer ${vuex.state.token}`
             },
@@ -18,7 +18,7 @@ const configService = {
         let url = 'settings/pagos'
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -32,7 +32,7 @@ const configService = {
         let url = 'settings/read'
 
         return new Promise((resolve, reject) => {
-            local.api.get(url)
+            LOCAL.api.get(url)
                 .then((res) => {
                     resolve(res.data[0])
                 })
@@ -46,7 +46,7 @@ const configService = {
         let url = 'settings/reservar'
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -60,7 +60,7 @@ const configService = {
         let url = 'settings/empresa'
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -74,7 +74,7 @@ const configService = {
         let url = 'settings/empresa/types'
 
         return new Promise((resolve, reject) => {
-            local.api.get(url)
+            LOCAL.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -88,7 +88,7 @@ const configService = {
         let url = `default`
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -102,7 +102,7 @@ const configService = {
         let url = `default`
 
         return new Promise((resolve, reject) => {
-            local.api.get(url)
+            LOCAL.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -116,7 +116,7 @@ const configService = {
         let url = `metodoPago`
 
         return new Promise((resolve, reject) => {
-            local.api.post(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -127,6 +127,6 @@ const configService = {
     },
 }
 
-local.Axios()
+LOCAL.Axios()
 
 export default configService

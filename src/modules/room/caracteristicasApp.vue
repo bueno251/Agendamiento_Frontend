@@ -133,6 +133,23 @@ export default {
     components: {
         CreateCaracteristicRoom,
     },
+    watch: {
+        caracteristica: {
+            // Función que se ejecuta cuando hay cambios en caracteristica
+            handler(newItem) {
+                // Verifica si newItem tiene un id
+                if ('id' in newItem) {
+                    // Actualiza propiedades con los valores de la nueva característica
+                    this.nombre = newItem.nombre
+                    this.icon = newItem.icon
+                    this.descripcion = newItem.descripcion
+                    this.estado = newItem.estado_id
+                }
+            },
+            // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
+            immediate: true
+        }
+    },
     data() {
         return {
             search: '',
@@ -170,19 +187,6 @@ export default {
             rules: {
                 required: value => !!value || 'Campo requerido.',
             },
-        }
-    },
-    watch: {
-        caracteristica: {
-            handler(newitem) {
-                if (newitem.id) {
-                    this.nombre = newitem.nombre
-                    this.icon = newitem.icon
-                    this.descripcion = newitem.descripcion
-                    this.estado = newitem.estado_id
-                }
-            },
-            immediate: true,
         }
     },
     methods: {

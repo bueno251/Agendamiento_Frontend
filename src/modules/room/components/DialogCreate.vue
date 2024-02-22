@@ -210,11 +210,11 @@ export default {
     },
     methods: {
         /**
-        * Crea una nueva habitación utilizando los datos proporcionados en el formulario.
-        * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, cantidad, desayuno, decoración e imágenes.
-        * También permite adjuntar características seleccionadas a la habitación.
-        * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
-        */
+         * Crea una nueva habitación utilizando los datos proporcionados en el formulario.
+         * Los datos incluyen nombre, descripción, tipo de habitación, capacidad, estado, cantidad, desayuno, decoración e imágenes.
+         * También permite adjuntar características seleccionadas a la habitación.
+         * Muestra un mensaje de éxito o error después de la operación y emite un evento para cerrar el componente.
+         */
         newRoom() {
             this.loading = true
 

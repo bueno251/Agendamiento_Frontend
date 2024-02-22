@@ -33,13 +33,19 @@ export default {
         id: Number,
     },
     watch: {
+        // Observa cambios en la propiedad 'id'
         id: {
+            // Función que se ejecuta cuando hay cambios en 'id'
             handler(newId) {
+                // Verifica si 'newId' tiene un valor y si la propiedad 'show' es verdadera
                 if (newId && this.show) {
+                    // Reinicia la propiedad 'bitacora' a un array vacío
                     this.bitacora = []
+                    // Llama al método 'obtener' para obtener información relacionada con el nuevo 'id'
                     this.obtener()
                 }
             },
+            // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
             immediate: true,
         }
     },
@@ -57,7 +63,7 @@ export default {
     methods: {
         /**
          * Obtiene la bitácora de una habitación con el identificador proporcionado.
-        */
+         */
         obtener() {
             this.loading = true
 

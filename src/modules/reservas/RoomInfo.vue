@@ -123,50 +123,21 @@
                         </v-col>
 
                         <v-col cols="12" md="6">
-                            <label>Habitaciones<span class="red--text">*</span></label>
-                            <v-select v-model="cantidadRooms" :items="rooms" no-data-text="No hay desayunos" dense outlined>
+                            <label>Adultos<span class="red--text">*</span></label>
+                            <v-select v-model="adultos" :items="selectAdultos"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                return-object dense outlined>
                             </v-select>
                         </v-col>
 
                         <v-col cols="12" md="6">
-                            <div class="d-flex justify-space-between align-center">
-                                <label>Adultos</label>
-                                <div>
-                                    <v-btn icon @click="adultos--" :disabled="adultos <= 1">
-                                        <v-icon>
-                                            mdi-minus-circle
-                                        </v-icon>
-                                    </v-btn>
-                                    <span>
-                                        {{ adultos }}
-                                    </span>
-                                    <v-btn icon @click="adultos++" :disabled="huespedes == room.capacidad">
-                                        <v-icon>
-                                            mdi-plus-circle
-                                        </v-icon>
-                                    </v-btn>
-                                </div>
-                            </div>
+                            <label>Niños<span class="red--text">*</span></label>
+                            <v-select v-model="niños" :items="selectNiños"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                return-object dense outlined>
+                            </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6">
-                            <div class="d-flex justify-space-between align-center">
-                                <label>Niños</label>
-                                <div>
-                                    <v-btn icon @click="niños--" :disabled="niños <= 0">
-                                        <v-icon>
-                                            mdi-minus-circle
-                                        </v-icon>
-                                    </v-btn>
-                                    {{ niños }}
-                                    <v-btn icon @click="niños++" :disabled="huespedes == room.capacidad">
-                                        <v-icon>
-                                            mdi-plus-circle
-                                        </v-icon>
-                                    </v-btn>
-                                </div>
-                            </div>
-                        </v-col>
                     </v-row>
 
                     <h2>
@@ -214,12 +185,135 @@
 
 <script>
 
-// import Swal from "sweetalert2"
 import colombiaHolidays from 'colombia-holidays'
 import reservaService from './service/reservaService'
 
 export default {
     name: 'RoomInfo',
+    computed: {
+        /**
+         * Devuelve la fecha de llegada seleccionada.
+         */
+        fechaLlegada() {
+            return this.dates[0] || ''
+        },
+        /**
+         * Devuelve la fecha de salida seleccionada.
+         */
+        fechaSalida() {
+            return this.dates[1] || ''
+        },
+        /**
+         * Calcula el total de huéspedes sumando adultos y niños.
+         */
+        huespedes() {
+            return this.adultos.cantidad + this.niños.cantidad
+        },
+        /**
+         * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida, así como el número de adultos y niños.
+         */
+        precio() {
+            let precio = 0
+
+            if (this.dates.length === 2) {
+                let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
+                let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
+
+                // Calcula el precio acumulado por cada día de estancia
+                while (fechaInicio <= fechaFinal) {
+                    precio += this.room.precios[fechaInicio.getDay()].precio
+
+                    fechaInicio.setDate(fechaInicio.getDate() + 1)
+                }
+            }
+
+            // Agrega el precio de los adultos y niños adicionales
+            precio += this.adultos.val
+            precio += this.niños.val
+
+            return precio
+        },
+        /**
+         * Genera un array con opciones para seleccionar el número de adultos adicionales, considerando la capacidad máxima de la habitación.
+         */
+        selectAdultos() {
+            let adultos = []
+
+            // Límite de adultos adicionales según la capacidad máxima de la habitación y el número actual de adultos seleccionados
+            let limit = this.room.capacidad - this.huespedes + this.adultos.cantidad
+
+            for (let i = 0; i < limit; i++) {
+                let value = 0
+
+                // Asigna el valor del precio de adultos adicionales si está disponible
+                if (this.room.precios.length > 7) {
+                    value = i > 1 ? this.room.precios[7].precio : 0
+                }
+
+                let cantidad = i + 1
+
+                adultos.push({
+                    cantidad: cantidad,
+                    val: value * (cantidad - 2),
+                })
+            }
+
+            return adultos
+        },
+        /**
+         * Genera un array con opciones para seleccionar el número de niños adicionales, considerando la capacidad máxima de la habitación.
+         */
+        selectNiños() {
+            let niños = [
+                {
+                    cantidad: 0,
+                    val: 0
+                }
+            ]
+
+            // Límite de niños adicionales según la capacidad máxima de la habitación y el número actual de niños seleccionados
+            let limit = this.room.capacidad - this.huespedes + this.niños.cantidad
+
+            for (let i = 0; i < limit; i++) {
+                let value = 0
+
+                // Asigna el valor del precio de niños adicionales si está disponible
+                if (this.room.precios.length > 7) {
+                    value = i > 1 ? this.room.precios[8].precio : 0
+                }
+
+                let cantidad = i + 1
+
+                niños.push({
+                    cantidad: cantidad,
+                    val: value * (cantidad - 2),
+                })
+            }
+
+            return niños
+        },
+    },
+    watch: {
+        /**
+         * Observa cambios en la fecha de salida y ajusta las fechas si es necesario.
+         */
+        fechaSalida: function () {
+            if (this.dates.length > 1) {
+                let fecha1 = new Date(this.dates[0])
+                let fecha2 = new Date(this.dates[1])
+
+                // Ajusta la fecha de salida si es igual a la fecha de llegada
+                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
+                    fecha2.setDate(fecha2.getDate() + 1)
+                    this.dates[1] = fecha2.toISOString().slice(0, 10)
+                }
+
+                // Ordena las fechas de llegada y salida
+                let sortDates = this.dates.toSorted()
+                this.dates = sortDates
+            }
+        }
+    },
     data() {
         return {
             cedula: '',
@@ -228,8 +322,6 @@ export default {
             decoracion: null,
             maxDate: '',
             cantidadRooms: 1,
-            adultos: 1,
-            niños: 0,
             model: 0,
             valid: false,
             validDatosCliente: false,
@@ -241,6 +333,14 @@ export default {
             datesInvalid: [],
             festivos: [],
             caracteristicas: [],
+            adultos: {
+                cantidad: 2,
+                val: 0
+            },
+            niños: {
+                cantidad: 0,
+                val: 0
+            },
             desayunos: [
                 {
                     id: null,
@@ -295,70 +395,15 @@ export default {
                     return pattern.test(value) || 'Número de teléfono inválido.'
                 },
             },
-            rootBackend: process.env.VUE_APP_URL_BASE.replace('/api', '/storage/'),
+            rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
-    },
-    computed: {
-        fechaLlegada() {
-            return this.dates[0] || ''
-        },
-        fechaSalida() {
-            return this.dates[1] || ''
-        },
-        huespedes() {
-            return this.adultos + this.niños
-        },
-        precio() {
-            let precio = 0
-
-            if (this.dates.length == 2) {
-                let fechaActual = new Date(this.dates[0].replace(/-/g, '/'));
-
-                while (fechaActual <= new Date(this.dates[1].replace(/-/g, '/'))) {
-                    if (this.festivos.includes(fechaActual.toISOString().slice(0, 10))) {
-                        precio += this.room.precios[fechaActual.getDay()].precio
-                    } else {
-                        precio += this.room.precios[fechaActual.getDay()].precio
-                    }
-
-                    fechaActual.setDate(fechaActual.getDate() + 1);
-                }
-            }
-
-            return precio
-        },
-        rooms() {
-            let rooms = []
-
-            for (let i = 0; i < this.room.rooms; i++) {
-                rooms.push(i + 1)
-            }
-
-            return rooms
-        }
-    },
-    watch: {
-        fechaSalida: function () {
-            if (this.dates.length > 1) {
-                let fecha1 = new Date(this.dates[0]);
-                let fecha2 = new Date(this.dates[1]);
-
-                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
-                    fecha2.setDate(fecha2.getDate() + 1);
-                    this.dates[1] = fecha2.toISOString().slice(0, 10);
-                }
-
-                let sortDates = this.dates.toSorted()
-                this.dates = sortDates
-            }
-        },
     },
     methods: {
         /**
-        * Obtiene la información de una habitación según su ID de la ruta.
-        * Si la obtención es exitosa, actualiza la variable 'room' con la información de la habitación.
-        * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
-        */
+         * Obtiene la información de una habitación según su ID de la ruta.
+         * Si la obtención es exitosa, actualiza la variable 'room' con la información de la habitación.
+         * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
+         */
         getRoom() {
             let id = this.$route.params.id
 
@@ -383,8 +428,8 @@ export default {
                 dateIn: this.fechaLlegada,
                 dateOut: this.fechaSalida,
                 room: this.room,
-                adultos: this.adultos,
-                niños: this.niños,
+                adultos: this.adultos.cantidad,
+                niños: this.niños.cantidad,
                 precio: this.precio,
                 cedula: this.cedula,
                 telefono: this.telefono,

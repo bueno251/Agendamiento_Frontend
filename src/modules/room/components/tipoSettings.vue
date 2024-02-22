@@ -96,6 +96,18 @@ import roomService from '../service/roomService'
 
 export default {
     name: 'tipoSettings',
+    watch: {
+        // Observa cambios en la propiedad 'type'
+        type: {
+            // Manejador que se ejecutará cuando se detecten cambios en 'type'
+            handler(newtype) {
+                // Actualiza la propiedad 'tipo' con el valor de 'newtype.tipo'
+                this.tipo = newtype.tipo;
+            },
+            // Indica que se debe ejecutar el 'handler' inmediatamente después de la creación del componente
+            immediate: true,
+        }
+    },
     data() {
         return {
             search: '',
@@ -227,14 +239,6 @@ export default {
                     console.log(err)
                 })
         },
-    },
-    watch: {
-        type: {
-            handler(newtype) {
-                this.tipo = newtype.tipo;
-            },
-            immediate: true,
-        }
     },
     mounted() {
         this.getTipos()

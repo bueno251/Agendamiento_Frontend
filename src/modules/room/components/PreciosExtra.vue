@@ -35,13 +35,17 @@ export default {
         room: Object,
     },
     watch: {
+        // Observa cambios en la propiedad 'room'
         room: {
+            // Función que se ejecuta cuando hay cambios en 'room'
             handler(newItem) {
+                // Verifica si 'precios' está presente en 'newItem'
                 if ("precios" in newItem) {
-
+                    // Reinicia los valores de 'Adicional' y 'Niños'
                     this.Adicional = 0
                     this.Niños = 0
 
+                    // Itera sobre los precios y actualiza los valores si son 'Adicional' o 'Niños'
                     newItem.precios.map((day) => {
                         if (day.name == 'Adicional' || day.name == 'Niños') {
                             this[day.name] = this.comaEnMiles(day.precio)
@@ -49,6 +53,7 @@ export default {
                     })
                 }
             },
+            // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
             immediate: true
         }
     },

@@ -85,11 +85,11 @@ export default {
     },
     methods: {
         /**
-        * Crea una nueva característica de habitación.
-        * Utiliza los datos proporcionados en el formulario para enviar la solicitud al servicio correspondiente.
-        * Actualiza el estado de 'loadingbtn' durante la operación.
-        * 
-        */
+         * Crea una nueva característica de habitación.
+         * Utiliza los datos proporcionados en el formulario para enviar la solicitud al servicio correspondiente.
+         * Actualiza el estado de 'loadingbtn' durante la operación.
+         * 
+         */
         crear() {
             this.loadingbtn = true
 

@@ -94,9 +94,9 @@ export default {
     },
     methods: {
         /**
-        * Obtiene la lista de clientes.
-        * Realiza una llamada al servicio para obtener la información de los clientes y asigna los resultados a la variable desserts.
-        */
+         * Obtiene la lista de clientes.
+         * Realiza una llamada al servicio para obtener la información de los clientes y asigna los resultados a la variable desserts.
+         */
         getClients() {
             this.loading = true
 

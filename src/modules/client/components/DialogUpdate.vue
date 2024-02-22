@@ -173,6 +173,35 @@ export default {
         show: Boolean,
         client: Object,
     },
+    watch: {
+        // Observa cambios en el 'client' y actualiza las variables del componente con sus valores.
+        client: {
+            handler(newclient) {
+                this.nombre = newclient.nombre
+                this.tipoDocumento = newclient.tipo_documento_id
+                this.documento = newclient.documento
+                this.nombre1 = newclient.nombre1
+                this.nombre2 = newclient.nombre2
+                this.apellido1 = newclient.apellido1
+                this.apellido2 = newclient.apellido2
+                this.direccion = newclient.direccion
+                this.pais = newclient.pais
+                this.telefono = newclient.telefono
+                this.telefonoAlt = newclient.telefono_alt
+                this.tipoPersona = newclient.tipo_persona_id
+                this.tipoObligacion = newclient.tipo_obligacion_id
+                this.tipoRegimen = newclient.tipo_regimen_id
+                this.observacion = newclient.observacion
+                if (newclient.pais) {
+                    this.getStates()
+                    this.departamento = newclient.departamento
+                    this.getCities()
+                    this.ciudad = newclient.ciudad
+                }
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             tipoDocumento: '',
@@ -381,34 +410,6 @@ export default {
             // Emitir evento 'close'
             this.$emit('close')
         },
-    },
-    watch: {
-        client: {
-            handler(newclient) {
-                this.nombre = newclient.nombre
-                this.tipoDocumento = newclient.tipo_documento_id
-                this.documento = newclient.documento
-                this.nombre1 = newclient.nombre1
-                this.nombre2 = newclient.nombre2
-                this.apellido1 = newclient.apellido1
-                this.apellido2 = newclient.apellido2
-                this.direccion = newclient.direccion
-                this.pais = newclient.pais
-                this.telefono = newclient.telefono
-                this.telefonoAlt = newclient.telefono_alt
-                this.tipoPersona = newclient.tipo_persona_id
-                this.tipoObligacion = newclient.tipo_obligacion_id
-                this.tipoRegimen = newclient.tipo_regimen_id
-                this.observacion = newclient.observacion
-                if (newclient.pais) {
-                    this.getStates()
-                    this.departamento = newclient.departamento
-                    this.getCities()
-                    this.ciudad = newclient.ciudad
-                }
-            },
-            immediate: true,
-        }
     },
     mounted() {
         this.getTypes()
