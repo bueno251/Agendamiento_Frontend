@@ -1,6 +1,6 @@
 <template>
     <v-card width="90%" elevation="5">
-        <v-card-title class="blue lighten-2">
+        <v-card-title class="blue lighten-2 white--text">
             Reservas En Proceso
         </v-card-title>
         <v-container fluid>
@@ -63,21 +63,14 @@
                 <template v-slot:item="{ item }">
                     <tr>
                         <td>
-                            <v-menu :offset-x="true" transition="scale-transition">
+                            <v-menu v-if="item.estado == 'Pendiente'" :offset-x="true" transition="scale-transition">
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn icon v-bind="attrs" v-on="on">
                                         <v-icon>mdi-dots-vertical</v-icon>
                                     </v-btn>
                                 </template>
                                 <v-list>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="item.comprobante" link
-                                        @click="reserva = item, dialogComprobante = true">
-                                        <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
-                                    </v-list-item>
-                                    <template v-if="item.estado == 'Pendiente'">
+                                    <template>
                                         <v-list-item link @click="reserva = item, dialogAprobar = true">
                                             <v-list-item-title v-text="'Aprobar'"></v-list-item-title>
                                         </v-list-item>
@@ -85,12 +78,6 @@
                                             <v-list-item-title v-text="'Rechazar'"></v-list-item-title>
                                         </v-list-item>
                                     </template>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
-                                    </v-list-item>
                                 </v-list>
                             </v-menu>
                         </td>
@@ -186,10 +173,10 @@
 <script>
 
 import Swal from 'sweetalert2';
-import reservaService from '../service/reservaService';
+import reservaService from './service/reservaService';
 
 export default {
-    name: 'ReservasAprobadas',
+    name: 'ReservasPendientes',
     watch: {
         // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1' después de un retraso.
         menu1(val) {
@@ -244,7 +231,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            reservaService.obtenerReservas()
+            reservaService.obtenerReservas('No Confirmada')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res
@@ -314,7 +301,6 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
-                    this.$emit('update')
                     this.getReservas() // Actualiza la lista de reservas
                     Swal.fire({
                         icon: 'success',
@@ -341,7 +327,6 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false
-                    this.$emit('update')
                     this.getReservas() // Actualiza la lista de reservas
                     Swal.fire({
                         icon: 'success',

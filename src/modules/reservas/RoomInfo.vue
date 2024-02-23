@@ -108,14 +108,14 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.has_desayuno">
+                        <v-col cols="12" md="6" v-if="room.hasDesayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
                                 item-text="desayuno" item-value="id" dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.has_decoracion">
+                        <v-col cols="12" md="6" v-if="room.hasDecoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
                                 item-text="decoracion" item-value="id" dense outlined>

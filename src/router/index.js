@@ -28,6 +28,16 @@ const routes = [
 				component: () => import('@/modules/reservas/ReservasApp.vue'),
 			},
 			{
+				path: 'reservas/aprovadas',
+				name: 'reservasAprovadas',
+				component: () => import('@/modules/reservas/ReservasAprovadas.vue'),
+			},
+			{
+				path: 'reservas/pendientes',
+				name: 'reservasPendientes',
+				component: () => import('@/modules/reservas/ReservasPendientes.vue'),
+			},
+			{
 				path: 'clientes',
 				name: 'clientes',
 				component: () => import('@/modules/client/clientApp.vue')

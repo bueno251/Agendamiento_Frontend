@@ -1,6 +1,6 @@
 <template>
     <v-card width="90%" min-height="100px">
-        <v-card-title class="blue lighten-2 mb-5">
+        <v-card-title class="blue lighten-2 mb-5 white--text">
             Empresa
         </v-card-title>
         <v-card-text>

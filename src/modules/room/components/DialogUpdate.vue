@@ -141,8 +141,8 @@ export default {
                     this.capacidad = newRoom.capacidad;
                     this.estado = newRoom.estadoId;
                     this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
-                    this.desayuno = newRoom.has_desayuno
-                    this.decoracion = newRoom.has_decoracion
+                    this.desayuno = newRoom.hasDesayuno
+                    this.decoracion = newRoom.hasDecoracion
                     this.getCaracteristicas()
                 }
             },
@@ -156,8 +156,8 @@ export default {
             tipo: '',
             capacidad: '',
             estado: '',
-            desayuno: 0,
-            decoracion: 0,
+            desayuno: false,
+            decoracion: false,
             valid: false,
             loading: false,
             dialogCreate: false,
@@ -167,11 +167,11 @@ export default {
             selectedCaracteristicas: [],
             yesNo: [
                 {
-                    value: 1,
+                    value: true,
                     text: 'Si',
                 },
                 {
-                    value: 0,
+                    value: false,
                     text: 'No',
                 }
             ],

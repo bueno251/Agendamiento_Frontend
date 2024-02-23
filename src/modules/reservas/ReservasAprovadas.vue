@@ -1,7 +1,7 @@
 <template>
     <v-card width="90%" elevation="5">
-        <v-card-title class="blue lighten-2">
-            Reservas Confirmadas
+        <v-card-title class="blue lighten-2 white--text">
+            Reservas Aprovadas
         </v-card-title>
         <v-container fluid>
             <v-card-title>
@@ -124,13 +124,11 @@
 </template>
 
 <script>
-import reservaService from '../service/reservaService';
+
+import reservaService from './service/reservaService'
 
 export default {
     name: 'ReservasAprobadas',
-    props: {
-        canUpdate: Boolean,
-    },
     watch: {
         // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1'.
         menu1(val) {
@@ -139,12 +137,6 @@ export default {
         // Observa cambios en 'menu2' y actualiza el valor de 'datePicker2'.
         menu2(val) {
             val && setTimeout(() => (this.datePicker2 = 'YEAR'))
-        },
-        // Observa cambios en 'canUpdate' y actualiza las reservas.
-        canUpdate(val) {
-            if (val) {
-                this.getReservas()
-            }
         },
     },
     data() {

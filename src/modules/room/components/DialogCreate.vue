@@ -130,7 +130,8 @@
 
                 <div class="buttons">
                     <v-btn @click="close" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">crear</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading"
+                        color="light-green">crear</v-btn>
                 </div>
             </v-form>
         </v-card>

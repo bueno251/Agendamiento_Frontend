@@ -1,6 +1,6 @@
 <template>
     <v-card width="90%">
-        <v-card-title class="blue lighten-2">
+        <v-card-title class="blue lighten-2 white--text">
             Reservas
         </v-card-title>
         <v-container fluid>

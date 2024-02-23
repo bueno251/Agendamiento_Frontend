@@ -1,6 +1,6 @@
 <template>
     <v-card width="90%" min-height="100px">
-        <v-card-title class="blue lighten-2">
+        <v-card-title class="blue lighten-2 white--text">
             <div class="flex">
                 <p>
                     Metodos De Pagos Que Recibe La Empresa

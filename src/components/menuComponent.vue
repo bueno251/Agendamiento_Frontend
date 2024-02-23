@@ -20,6 +20,14 @@
                         <v-list-item router :to="{ name: 'reservasApp' }">
                             <v-list-item-title>Consultar Reservas</v-list-item-title>
                         </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasAprovadas' }">
+                            <v-list-item-title>Reservas Aprovadas</v-list-item-title>
+                        </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasPendientes' }">
+                            <v-list-item-title>Reservas En Proceso</v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
 
                     <v-list-item router :to="{ name: 'clientes' }">
