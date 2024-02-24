@@ -1,7 +1,7 @@
 <template>
     <v-card width="90%" elevation="5">
         <v-card-title class="blue lighten-2 white--text">
-            Reservas Aprovadas
+            Reservas Canceladas
         </v-card-title>
         <v-container fluid>
             <v-card-title>
@@ -62,30 +62,6 @@
                 loading-text="Cargando... Por favor espera">
                 <template v-slot:item="{ item }">
                     <tr>
-                        <td>
-                            <v-menu :offset-x="true" transition="scale-transition">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn icon v-bind="attrs" v-on="on">
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item v-if="item.comprobante" link
-                                        @click="reserva = item, dialogComprobante = true">
-                                        <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="reserva = item, dialogCancelar = true">
-                                        <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </td>
                         <td>{{ item.created_at }}</td>
                         <td>{{ item.fechaEntrada }}</td>
                         <td>{{ item.fechaSalida }}</td>
@@ -120,21 +96,15 @@
                 </template>
             </v-data-table>
         </v-container>
-
-        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false" @update="dialogCancelar = false, getReservas()"/>
     </v-card>
 </template>
 
 <script>
 
 import reservaService from './service/reservaService'
-import CancelacionReserva from './components/CancelacionReserva.vue'
 
 export default {
     name: 'ReservasAprobadas',
-    components: {
-        CancelacionReserva,
-    },
     watch: {
         // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1'.
         menu1(val) {
@@ -160,7 +130,6 @@ export default {
             dialogAprobar: false,
             dialogRechazar: false,
             dialogComprobante: false,
-            dialogCancelar: false,
             datePicker1: null,
             datePicker2: null,
             reserva: {
@@ -169,7 +138,6 @@ export default {
             reservas: [],
             reservasFilter: [],
             headers: [
-                { text: '', key: 'actions', sortable: false },
                 { text: 'Creada el', key: 'created_at', value: 'created_at' },
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
@@ -190,7 +158,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            reservaService.obtenerReservas('Confirmada')
+            reservaService.obtenerReservas('Cancelada')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res

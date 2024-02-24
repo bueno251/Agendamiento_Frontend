@@ -4,12 +4,12 @@
             <v-form v-model="valid" @submit.prevent="save()">
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="Adicional" label="Tarifa Personal" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Adicional" v-price label="Tarifa Personal" :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Adicional', Adicional)" outlined required>
                         </v-text-field>
                     </v-col>
                     <v-col cols="12">
-                        <v-text-field v-model="Niños" label="Tarifa Niños" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Niños" v-price label="Tarifa Niños" :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Niños', Niños)" outlined required>
                         </v-text-field>
                     </v-col>
@@ -135,6 +135,14 @@ export default {
             let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
             let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
             return numero.toString().replace(exp, rep)
+        },
+        /**
+         * Formatea el número de un día de la semana agregando comas para separar miles.
+         * @param {object} precio - Objeto que representa un día de la semana con un precio.
+         */
+        formatNumber(value, precio) {
+            let formattedNumber = precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
+            this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
         /**
          * Cierra el componente emitiento un evento 'close'.

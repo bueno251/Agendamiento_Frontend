@@ -300,6 +300,75 @@ const reservaService = {
         })
     },
 
+    crearCancelacionTipo(data) {
+        let url = `cancelar/tipo/create`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerCancelacionTipos() {
+        let url = `cancelar/tipo/read`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarCancelacionTipo(data, id) {
+        let url = `cancelar/tipo/update/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarCancelacionTipo(id) {
+        let url = `cancelar/tipo/delete/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.delete(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    cancelarReserva(data, id) {
+        let url = `reserva/cancelar/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 LOCAL.Axios()

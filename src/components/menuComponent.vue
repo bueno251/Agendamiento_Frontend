@@ -28,6 +28,10 @@
                         <v-list-item router :to="{ name: 'reservasPendientes' }">
                             <v-list-item-title>Reservas En Proceso</v-list-item-title>
                         </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasCanceladas' }">
+                            <v-list-item-title>Reservas Canceladas</v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
 
                     <v-list-item router :to="{ name: 'clientes' }">

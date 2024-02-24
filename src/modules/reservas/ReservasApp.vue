@@ -22,24 +22,34 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
-                                    </v-list-item>
                                     <v-list-item v-if="item.comprobante" link
                                         @click="reserva = item, dialogComprobante = true">
                                         <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
                                     </v-list-item>
+
+                                    <template v-if="item.estado == 'Confirmada'">
+                                        <v-list-item link @click="reserva = item">
+                                            <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
+                                        </v-list-item>
+
+                                        <v-list-item link @click="reserva = item">
+                                            <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item link @click="reserva = item">
+                                            <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
+                                        </v-list-item>
+                                    </template>
+
                                     <template v-if="item.estado == 'Pendiente'">
                                         <v-list-item link @click="reserva = item, dialogAprobar = true">
                                             <v-list-item-title v-text="'Aprobar'"></v-list-item-title>
                                         </v-list-item>
+
                                         <v-list-item link @click="reserva = item, dialogRechazar = true">
                                             <v-list-item-title v-text="'Rechazar'"></v-list-item-title>
                                         </v-list-item>
                                     </template>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
-                                    </v-list-item>
                                 </v-list>
                             </v-menu>
                         </td>

@@ -220,7 +220,7 @@ export default {
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
                 // Calcula el precio acumulado por cada día de estancia
-                while (fechaInicio <= fechaFinal) {
+                while (fechaInicio < fechaFinal) {
                     precio += this.room.precios[fechaInicio.getDay()].precio
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
