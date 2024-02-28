@@ -63,6 +63,7 @@
                         </td>
                         <td>{{ item.tipo }}</td>
                         <td>{{ item.capacidad }}</td>
+                        <td>{{ item.countRooms }}</td>
                         <td>{{ item.estado }}</td>
                     </tr>
                 </template>
@@ -86,7 +87,8 @@
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
         <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"
             @update="getRooms(), dialogPrecios = false"></PreciosRoom>
-        <PreciosExtra :show="dialogTarifasExtra" :room="room" @close="dialogTarifasExtra = false" />
+        <PreciosExtra :show="dialogTarifasExtra" :room="room" @close="dialogTarifasExtra = false"
+            @update="getRooms(), dialogTarifasExtra = false" />
         <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false">
         </DialogImg>
         <SimilarRooms :show="dialogRooms" :room="room" @close="dialogRooms = false"
@@ -139,6 +141,7 @@ export default {
                 { text: 'Descripción', key: 'descripcion', value: 'descripcion' },
                 { text: 'Tipo', key: 'tipo', value: 'tipo' },
                 { text: 'Capacidad', key: 'capacidad', value: 'capacidad' },
+                { text: 'Cantidad De Habitaciones', key: 'countRooms', value: 'countRooms' },
                 { text: 'estado', key: 'estado', value: 'estado' },
             ],
         }

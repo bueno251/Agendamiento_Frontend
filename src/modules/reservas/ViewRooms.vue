@@ -21,7 +21,7 @@
 
                     <template v-for="(precios, jornada, index) in room.precios">
                         <h1 v-if="index < 2" :key="`${jornada}${index}`" class="blue--text text-center w-100">
-                            $ {{ comaEnMiles(precios[0].precio) }} COP
+                            $ {{ comaEnMiles(precios[0].precio) }} {{ divisa.codigo }}
                         </h1>
                         <p v-if="index < 2" :key="`${jornada} - ${index}`" class="text-center w-100">
                             De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
@@ -70,15 +70,17 @@
 
 // import Swal from 'sweetalert2'
 import reservaService from './service/reservaService'
+import DivisasService from '@/services/DivisasService'
 
 export default {
     name: 'ReservasInterno',
-    components: {
-    },
     data: () => ({
         value: '',
         rooms: [],
         caracteristicas: [],
+        divisa: {
+            codigo: 'COP',
+        },
         dialog: false,
         dialogAgendar: false,
         rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
@@ -98,7 +100,7 @@ export default {
                     this.rooms = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -136,13 +138,23 @@ export default {
                     this.caracteristicas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
+                })
+        },
+        getDivisaDefault() {
+            DivisasService.obtenerDivisaDefault()
+                .then(res => {
+                    this.divisa = res
+                })
+                .catch(err => {
+                    console.error(err)
                 })
         },
     },
     mounted() {
         this.getRooms()
         this.getCaracteristicas()
+        this.getDivisaDefault()
     },
 };
 </script>

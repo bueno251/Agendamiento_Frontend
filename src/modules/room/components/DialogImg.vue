@@ -3,10 +3,6 @@
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="updateImgs">
 
-                <div class="negativo">
-
-                </div>
-
                 <v-file-input v-model="imgsToUpload" :rules="[rules.file]" @change="handleFileChange" label="Imagenes"
                     accept="image/*" prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input outlined
                     required></v-file-input>
@@ -18,7 +14,7 @@
                         <v-menu :key="index" offset-y style="max-width: 600px">
                             <template v-slot:activator="{ on, attrs }">
                                 <v-card class="portrait"
-                                    :img="img.preview || 'https://cdn.vuetifyjs.com/images/cards/girl.jpg'" height="300"
+                                    :img="img.preview" height="300"
                                     width="600" v-bind="attrs" v-on="on"></v-card>
                             </template>
 

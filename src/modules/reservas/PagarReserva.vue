@@ -23,9 +23,9 @@
                     </v-col>
 
                     <v-col cols="12" md="6">
-                        <label>Correo <span class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" type="email" dense outlined
-                            required>
+                        <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
+                        <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired" dense
+                            outlined>
                         </v-text-field>
                     </v-col>
 
@@ -74,7 +74,7 @@
             </div>
             <h2>
                 <strong>
-                    $ {{ comaEnMiles(reserva.precio) }} COP
+                    $ {{ comaEnMiles(reserva.precio) }} {{ divisa.codigo }}
                 </strong>
             </h2>
         </v-card>
@@ -129,6 +129,7 @@
 import vuex from "@/store"
 import Swal from "sweetalert2"
 import reservaService from './service/reservaService'
+import DivisasService from '@/services/DivisasService'
 
 export default {
     name: 'DialogUpdate',
@@ -166,13 +167,22 @@ export default {
             validInfo: false,
             modalTransferencia: false,
             loading: false,
+            correoRequired: true,
             file: null,
             metodosPago: [],
+            divisa: {
+                codigo: 'COP',
+            },
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 email: value => {
                     const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    return pattern.test(value) || 'Correo inválido.'
+
+                    if (this.correoRequired) {
+                        return !!value || 'Campo requerido.'
+                    }
+
+                    return (pattern.test(value) || !value) || 'Correo inválido.'
                 },
                 phone: value => {
                     const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
@@ -257,9 +267,29 @@ export default {
                     console.log(err)
                 })
         },
+        getDatos() {
+            reservaService.obtenerConfigReserva()
+                .then(res => {
+                    this.correoRequired = res.correoObligatorio
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        getDivisaDefault() {
+            DivisasService.obtenerDivisaDefault()
+                .then(res => {
+                    this.divisa = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
     },
     mounted() {
+        this.getDatos()
         this.getMetodosPago()
+        this.getDivisaDefault()
     },
 }
 </script>

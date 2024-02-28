@@ -16,7 +16,7 @@
                     <tr>
                         <td>
                             <v-menu :offset-x="true" transition="scale-transition">
-                                <template v-slot:activator="{ on, attrs }">
+                                <template v-slot:activator="{ on, attrs }" v-if="item.estado != 'Cancelada'">
                                     <v-btn icon v-bind="attrs" v-on="on">
                                         <v-icon>mdi-dots-vertical</v-icon>
                                     </v-btn>
@@ -35,8 +35,8 @@
                                         <v-list-item link @click="reserva = item">
                                             <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
                                         </v-list-item>
-                                        
-                                        <v-list-item link @click="reserva = item">
+
+                                        <v-list-item link @click="reserva = item, dialogCancelar = true">
                                             <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
                                         </v-list-item>
                                     </template>
@@ -134,6 +134,9 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
+
+        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
+            @update="dialogCancelar = false, getReservas()" />
     </div>
 </template>
 
@@ -141,9 +144,13 @@
 
 import Swal from 'sweetalert2'
 import reservaService from './service/reservaService'
+import CancelacionReserva from './components/CancelacionReserva.vue'
 
 export default {
-    name: 'roomApp',
+    name: 'ReservasApp',
+    components: {
+        CancelacionReserva
+    },
     data() {
         return {
             search: '',
@@ -152,6 +159,7 @@ export default {
             dialogAprobar: false,
             dialogRechazar: false,
             dialogComprobante: false,
+            dialogCancelar: false,
             reserva: {
                 comprobante: '',
             },

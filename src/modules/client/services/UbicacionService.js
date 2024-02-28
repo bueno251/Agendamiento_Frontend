@@ -25,8 +25,14 @@ const LOCAL = {
      * @function getToken
      */
     async getToken() {
+        let hoy = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+
         // Verifica si ya existe un token de ubicación en el estado de Vuex
-        if (!store.state.tokenUbicacion) {
+        if (store.state.tokenUbicacion && hoy == store.state.tokenUbicacion.date) {
+            // Si ya existe un token en Vuex, lo configura en Axios
+            LOCAL.api.defaults.headers.common['Authorization'] = `Bearer ${store.state.tokenUbicacion.token}`
+
+        } else {
             let url = 'https://www.universal-tutorial.com/api/getaccesstoken'
 
             let config = {
@@ -40,15 +46,17 @@ const LOCAL = {
             await axios.get(url, config)
                 .then(res => {
                     LOCAL.api.defaults.headers.common['Authorization'] = `Bearer ${res.data.auth_token}`
-                    store.commit('SET_TOKEN_UBICACION', res.data.auth_token)
+
+                    let tokenUbicacion = {
+                        token: res.data.auth_token,
+                        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+                    }
+
+                    store.commit('SET_TOKEN_UBICACION', tokenUbicacion)
                 })
                 .catch(err => {
                     console.log(err)
                 })
-
-        } else {
-            // Si ya existe un token en Vuex, lo configura en Axios
-            LOCAL.api.defaults.headers.common['Authorization'] = `Bearer ${store.state.tokenUbicacion}`
         }
     }
 }

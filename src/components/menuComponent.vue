@@ -53,7 +53,7 @@
                         </v-list-item>
 
                         <v-list-item router :to="{ name: 'habitacionesConfig' }">
-                            <v-list-item-title>Ajustes</v-list-item-title>
+                            <v-list-item-title>Ajustes De Habitaciones</v-list-item-title>
                         </v-list-item>
 
                         <v-list-item router :to="{ name: 'desayunos' }">

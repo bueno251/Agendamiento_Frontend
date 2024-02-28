@@ -369,6 +369,20 @@ const reservaService = {
                 })
         })
     },
+
+    obtenerConfigReserva() {
+        let url = `reservar`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    }
 }
 
 LOCAL.Axios()

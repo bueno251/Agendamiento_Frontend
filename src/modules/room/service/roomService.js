@@ -488,7 +488,7 @@ const roomService = {
         let url = `decoraciones/update/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.patch(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })

@@ -4,10 +4,10 @@
             <v-card-actions class="justify-space-between">
                 <v-btn-toggle v-model="onboarding" mandatory>
                     <v-btn>
-                        Estados
+                        Estado Habitación
                     </v-btn>
                     <v-btn>
-                        Tipos
+                        Tipo Habitación
                     </v-btn>
                 </v-btn-toggle>
             </v-card-actions>

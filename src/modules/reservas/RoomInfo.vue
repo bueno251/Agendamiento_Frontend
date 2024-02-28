@@ -111,14 +111,16 @@
                         <v-col cols="12" md="6" v-if="room.hasDesayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                item-text="desayuno" item-value="id" dense outlined>
+                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precio > 0 ? '+ $' + comaEnMiles(item.precio) : ''}`"
+                                return-object dense outlined>
                             </v-select>
                         </v-col>
 
                         <v-col cols="12" md="6" v-if="room.hasDecoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                item-text="decoracion" item-value="id" dense outlined>
+                                :item-text="item => `${item.nombre} ${item.precio > 0 ? '+ $' + comaEnMiles(item.precio) : ''}`"
+                                return-object dense outlined>
                             </v-select>
                         </v-col>
 
@@ -141,7 +143,7 @@
                     </v-row>
 
                     <h2>
-                        $ {{ comaEnMiles(precio) }} COP
+                        $ {{ comaEnMiles(precio) }} {{ divisa.codigo }}
                     </h2>
 
 
@@ -187,6 +189,7 @@
 
 import colombiaHolidays from 'colombia-holidays'
 import reservaService from './service/reservaService'
+import DivisasService from '@/services/DivisasService'
 
 export default {
     name: 'RoomInfo',
@@ -230,6 +233,11 @@ export default {
             // Agrega el precio de los adultos y niños adicionales
             precio += this.adultos.val
             precio += this.niños.val
+            precio += this.decoracion.precio
+
+            if (!this.room.incluyeDesayuno) {
+                precio += this.desayuno.precio
+            }
 
             return precio
         },
@@ -318,8 +326,16 @@ export default {
         return {
             cedula: '',
             telefono: '',
-            desayuno: null,
-            decoracion: null,
+            desayuno: {
+                id: null,
+                nombre: 'Ninguno',
+                precio: 0,
+            },
+            decoracion: {
+                id: null,
+                nombre: 'Ninguna',
+                precio: 0,
+            },
             maxDate: '',
             cantidadRooms: 1,
             model: 0,
@@ -341,16 +357,21 @@ export default {
                 cantidad: 0,
                 val: 0
             },
+            divisa: {
+                codigo: 'COP',
+            },
             desayunos: [
                 {
                     id: null,
-                    desayuno: 'Ninguno'
+                    nombre: 'Ninguno',
+                    precio: 0,
                 }
             ],
             decoraciones: [
                 {
                     id: null,
-                    decoracion: 'Ninguna'
+                    nombre: 'Ninguna',
+                    precio: 0,
                 }
             ],
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -549,12 +570,22 @@ export default {
                     console.log(err)
                 })
         },
+        getDivisaDefault() {
+            DivisasService.obtenerDivisaDefault()
+                .then(res => {
+                    this.divisa = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
     },
     mounted() {
         this.getRoom()
         this.getDates()
         this.getDatos()
         this.getFestivos()
+        this.getDivisaDefault()
     },
 }
 </script>

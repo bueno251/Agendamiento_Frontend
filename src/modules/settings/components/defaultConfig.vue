@@ -4,30 +4,37 @@
             Valores Por Defecto
         </v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="crear">
+            <v-form ref="form" v-model="valid" @submit.prevent="guardar">
                 <v-row>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="3">
                         <label>País</label>
                         <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]" item-text="country_name"
-                            item-value="country_name" outlined dense required>
+                            @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" return-object outlined
+                            dense required>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="3">
                         <label>Departamento</label>
-                        <v-select v-model="departamento" :items="departamentos" no-data-text="No hay departamentos"
+                        <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione pais"
                             @change="getMunicipios" :rules="[rules.required]" :loading="loadingDepartamentos"
-                            item-text="state_name" item-value="state_name" outlined dense required>
+                            item-text="nombre" return-object outlined dense required>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="3">
                         <label>Municipio</label>
-                        <v-select v-model="municipio" :items="municipios" no-data-text="No hay municipios"
-                            :rules="[rules.required]" :loading="loadingMunicipios" item-text="city_name"
-                            item-value="city_name" outlined dense required>
+                        <v-select v-model="municipio" :items="municipios" no-data-text="Seleccione departamento"
+                            :rules="[rules.required]" :loading="loadingMunicipios" item-text="nombre" return-object outlined
+                            dense required>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="3">
+                        <label>Divisa</label>
+                        <v-select v-model="divisa" :items="divisas" no-data-text="No hay divisas" :rules="[rules.required]"
+                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -73,35 +80,58 @@
 
 <script>
 
-import Swal from 'sweetalert2';
-import configService from '../services/configService';
-import UbicacionService from '@/modules/client/services/UbicacionService';
+import Swal from 'sweetalert2'
+import configService from '@/services/ConfigService'
+import UbicacionService from '@/services/UbicacionService'
+import DivisasService from '@/services/DivisasService'
 
 export default {
     name: 'defaultConfig',
     props: {
         id: Number,
+        updateDivisas: Boolean,
+    },
+    watch: {
+        updateDivisas: {
+            handler(newItem) {
+                if (newItem) {
+                    this.getDivisas()
+                }
+            },
+            immediate: true,
+        },
     },
     data() {
         return {
             pais: '',
-            departamento: '',
+            departamento: null,
             municipio: '',
+            divisa: '',
             tipoDocumento: '',
             tipoPersona: '',
             tipoRegimen: '',
             tipoResponsabilidad: '',
+            nombre: '',
+            codigo: '',
             valid: false,
+            validCreate: false,
+            validUpdate: false,
             loading: false,
+            loadingbtn: false,
             loadingDepartamentos: false,
             loadingMunicipios: false,
+            dialogCreateDivisa: false,
+            dialogUpdateDivisa: false,
+            dialogDeleteDivisa: false,
             paises: [],
             departamentos: [],
             municipios: [],
+            divisas: [],
             documentos: [],
             personas: [],
             regimenes: [],
             responsabilidades: [],
+            divisaSelected: {},
             rules: {
                 required: value => !!value || 'Campo requerido.'
             },
@@ -109,17 +139,18 @@ export default {
     },
     methods: {
         /**
-         * Crea o actualiza los valores predeterminados de la configuración.
+         * guarda los valores predeterminados de la configuración.
          */
-        crear() {
+        guardar() {
             this.loading = true
 
             // Objeto de datos que se enviará al servicio para establecer los valores predeterminados
             let data = {
                 configuracionId: this.id,
-                pais: this.pais,
-                departamento: this.departamento,
-                municipio: this.municipio,
+                pais: this.pais.nombre,
+                departamento: this.departamento.nombre,
+                municipio: this.municipio.nombre,
+                divisa: this.divisa,
                 tipoDocumento: this.tipoDocumento,
                 tipoPersona: this.tipoPersona,
                 tipoRegimen: this.tipoRegimen,
@@ -145,17 +176,20 @@ export default {
          */
         getDefault() {
             configService.obtenerValoresDefault()
-                .then(res => {
-                    // Asigna los valores predeterminados obtenidos a las variables del componente
-                    this.pais = res.pais
-                    this.getDepartamentos()
-                    this.departamento = res.departamento
-                    this.getMunicipios()
-                    this.municipio = res.ciudad
-                    this.tipoDocumento = res.tipo_documento
-                    this.tipoPersona = res.tipo_persona
-                    this.tipoRegimen = res.tipo_regimen
-                    this.tipoResponsabilidad = res.tipo_obligacion
+                .then(async res => {
+                    if ('id' in res) {
+                        // Asigna los valores predeterminados obtenidos a las variables del componente
+                        this.divisa = this.divisas.find((item) => item.id == res.divisa.id)
+                        this.tipoDocumento = res.tipo_documento
+                        this.tipoPersona = res.tipo_persona
+                        this.tipoRegimen = res.tipo_regimen
+                        this.tipoResponsabilidad = res.tipo_obligacion
+                        this.pais = this.paises.find((item) => item.nombre == res.pais)
+                        await this.getDepartamentos()
+                        this.departamento = this.departamentos.find((item) => item.nombre == res.departamento)
+                        await this.getMunicipios()
+                        this.municipio = this.municipios.find((item) => item.nombre == res.municipio)
+                    }
                 })
                 .catch(err => {
                     console.log(err)
@@ -177,11 +211,20 @@ export default {
                     console.log(err)
                 })
         },
+        getDivisas() {
+            DivisasService.obtenerDivisas()
+                .then(res => {
+                    this.divisas = res
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
         /**
          * Obtiene la lista de países desde el servicio.
          */
         getPaises() {
-            UbicacionService.paises()
+            UbicacionService.obtenerPaises()
                 .then(res => {
                     this.paises = res
                 })
@@ -192,13 +235,13 @@ export default {
         /**
          * Obtiene la lista de departamentos para el país seleccionado.
          */
-        getDepartamentos() {
+        async getDepartamentos() {
             this.loadingDepartamentos = true
             this.departamento = ''
             this.municipio = ''
             this.municipios = []
 
-            UbicacionService.departamentos(this.pais)
+            await UbicacionService.obtenerDepartamentos(this.pais.id)
                 .then(res => {
                     this.departamentos = res
                     this.loadingDepartamentos = false
@@ -211,11 +254,11 @@ export default {
         /**
          * Obtiene la lista de municipios para el departamento seleccionado.
          */
-        getMunicipios() {
+        async getMunicipios() {
             this.loadingMunicipios = true
             this.municipio = ''
 
-            UbicacionService.ciudades(this.departamento)
+            await UbicacionService.obtenerMunicipios(this.departamento.id)
                 .then(res => {
                     this.municipios = res
                     this.loadingMunicipios = false
@@ -227,9 +270,10 @@ export default {
         },
     },
     mounted() {
-        this.getDefault()
-        this.getTipos()
         this.getPaises()
+        this.getTipos()
+        this.getDivisas()
+        this.getDefault()
     },
 }
 </script>

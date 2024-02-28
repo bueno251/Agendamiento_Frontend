@@ -4,11 +4,22 @@
             Reservas
         </v-card-title>
         <v-container fluid>
-            <v-row>
-                <v-col cols="auto">
+            <v-row class="ma-0">
+                <v-col cols="12" md="3">
                     <div class="flex">
-                        Usuario puede reservar?
+                        <p>
+                            Usuario puede reservar?
+                        </p>
                         <v-switch v-model="canReservar" :label="canReservar ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3">
+                    <div class="flex">
+                        <p>
+                            Correo obligatorio para el pago?
+                        </p>
+                        <v-switch v-model="correoRequired" :label="correoRequired ? 'Si' : 'No'" inset></v-switch>
                     </div>
                 </v-col>
             </v-row>
@@ -24,18 +35,20 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '../services/configService'
+import configService from '@/services/ConfigService'
 
 export default {
-    name: 'canReservar',
+    name: 'reservaConfig',
     props: {
-        bolean: Boolean,
-        id: Number,
+        config: Object,
     },
     watch: {
-        bolean: {
-            handler(newbolean) {
-                this.canReservar = newbolean
+        config: {
+            handler(newItem) {
+                if ('id' in newItem) {
+                    this.canReservar = newItem.usuarioReserva
+                    this.correoRequired = newItem.correoObligatorio
+                }
             },
             immediate: true,
         }
@@ -43,6 +56,7 @@ export default {
     data() {
         return {
             canReservar: true,
+            correoRequired: true,
             loading: false,
         }
     },
@@ -55,8 +69,9 @@ export default {
 
             // Objeto de datos que se enviará al servicio para actualizar la configuración de reserva
             let data = {
-                configuracionId: this.id,
-                reservar: this.canReservar
+                configuracionId: this.config.id,
+                reservar: this.canReservar,
+                correo: this.correoRequired,
             }
 
             // Llama al servicio para actualizar la configuración de reserva
@@ -88,7 +103,12 @@ export default {
     width: 100%;
     height: 100%;
     align-items: center;
-    justify-content: center;
     gap: 10px;
+}
+
+p{
+    padding: 0;
+    margin: 0;
+    text-wrap: balance;
 }
 </style>

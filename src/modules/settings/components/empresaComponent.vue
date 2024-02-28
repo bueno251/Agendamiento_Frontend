@@ -157,7 +157,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '../services/configService'
+import configService from '@/services/ConfigService'
 import UbicacionService from '@/modules/client/services/UbicacionService'
 
 export default {

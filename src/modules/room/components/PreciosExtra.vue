@@ -112,6 +112,7 @@ export default {
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.message,

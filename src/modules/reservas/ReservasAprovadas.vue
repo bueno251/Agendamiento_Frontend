@@ -15,7 +15,7 @@
                                     v-bind="attrs" v-on="on" clearable readonly dense outlined>
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="fechaLLegada" :active-picker.sync="datePicker1" min="1950-01-01"
+                            <v-date-picker v-model="fechaLLegada" min="1950-01-01"
                                 :max="fechaSalida" @change="save('menu1', fechaLLegada)" locale="es">
                             </v-date-picker>
                         </v-menu>
@@ -29,7 +29,7 @@
                                     v-bind="attrs" v-on="on" clearable readonly dense outlined>
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="fechaSalida" :active-picker.sync="datePicker2" :min="fechaLLegada"
+                            <v-date-picker v-model="fechaSalida" :min="fechaLLegada"
                                 @change="save('menu2', fechaSalida)" locale="es">
                             </v-date-picker>
                         </v-menu>
@@ -135,24 +135,14 @@ export default {
     components: {
         CancelacionReserva,
     },
-    watch: {
-        // Observa cambios en 'menu1' y actualiza el valor de 'datePicker1'.
-        menu1(val) {
-            val && setTimeout(() => (this.datePicker1 = 'YEAR'))
-        },
-        // Observa cambios en 'menu2' y actualiza el valor de 'datePicker2'.
-        menu2(val) {
-            val && setTimeout(() => (this.datePicker2 = 'YEAR'))
-        },
-    },
     data() {
         return {
             search: '',
             documento: '',
             telefono: '',
             estado: '',
-            fechaLLegada: '',
-            fechaSalida: '',
+            fechaLLegada: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            fechaSalida: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             loading: true,
             loadingbtn: false,
             menu1: false,
@@ -161,8 +151,6 @@ export default {
             dialogRechazar: false,
             dialogComprobante: false,
             dialogCancelar: false,
-            datePicker1: null,
-            datePicker2: null,
             reserva: {
                 comprobante: '',
             },

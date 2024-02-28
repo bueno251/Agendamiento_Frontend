@@ -12,7 +12,7 @@ const LOCAL = {
     }
 }
 
-const configService = {
+const ConfigService = {
 
     pagos(data) {
         let url = 'settings/pagos'
@@ -126,35 +126,22 @@ const configService = {
         })
     },
 
-    // crearDivisas(data) {
-    //     let url = `divisa`
+    obtenerDivisas() {
+        let url = `divisas`
 
-    //     return new Promise((resolve, reject) => {
-    //         LOCAL.api.post(url, data)
-    //             .then((res) => {
-    //                 resolve(res.data)
-    //             })
-    //             .catch((err) => {
-    //                 reject(err)
-    //             })
-    //     })
-    // },
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    }
 
-    // actualizarDivisas(data, id) {
-    //     let url = `divisa/${id}`
-
-    //     return new Promise((resolve, reject) => {
-    //         LOCAL.api.path(url, data)
-    //             .then((res) => {
-    //                 resolve(res.data)
-    //             })
-    //             .catch((err) => {
-    //                 reject(err)
-    //             })
-    //     })
-    // },
 }
 
 LOCAL.Axios()
 
-export default configService
+export default ConfigService

@@ -19,7 +19,8 @@
 
                             <v-col cols="12">
                                 <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
-                                    label="Precio" v-price hide-spin-buttons dense outlined required>
+                                    label="Precio" v-price @input="formatNumber(weekday)" hide-spin-buttons
+                                    dense outlined required>
                                 </v-text-field>
                             </v-col>
                         </div>
