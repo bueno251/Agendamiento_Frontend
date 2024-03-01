@@ -1,60 +1,62 @@
 <template>
     <v-row class="pt-5 ma-0 w-100">
-        <v-col cols="12" lg="4" md="6" v-for="room in rooms" :key="room.id">
-            <v-card elevation="5" outlined>
-                <v-card-title>
-                    <h4 class="blue--text text-center w-100 balance">
-                        {{ room.nombre }}
-                    </h4>
-                </v-card-title>
+        <v-col cols="12" lg="4" md="6" sm="6" v-for="room in rooms" :key="room.id">
+            <v-card class="flex" elevation="5" height="100%" outlined>
+                <div>
+                    <v-card-title>
+                        <h4 class="blue--text text-center w-100 balance">
+                            {{ room.nombre }}
+                        </h4>
+                    </v-card-title>
 
-                <v-card-text>
-                    <v-card class="portrait" :img="rootBackend + room.imgs[0].url" height="300" width="600"></v-card>
+                    <v-card-text>
+                        <v-card class="portrait" :img="rootBackend + room.imgs[0].url" height="300" width="600"></v-card>
 
-                    <v-divider class="my-2" />
+                        <v-divider class="my-2" />
 
-                    <p class="">
-                        {{ room.descripcion }}
-                    </p>
-
-                    <v-divider class="my-2" />
-
-                    <template v-for="(precios, jornada, index) in room.precios">
-                        <h1 v-if="index < 2" :key="`${jornada}${index}`" class="blue--text text-center w-100">
-                            $ {{ comaEnMiles(precios[0].precio) }} {{ divisa.codigo }}
-                        </h1>
-                        <p v-if="index < 2" :key="`${jornada} - ${index}`" class="text-center w-100">
-                            De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
+                        <p class="">
+                            {{ room.descripcion }}
                         </p>
-                    </template>
 
-                    <v-divider class="my-2" />
+                        <v-divider class="my-2" />
 
-                    <p>Incluye</p>
-                    <div class="caracteristics">
-                        <template v-for="(item, index) in caracteristicas">
-                            <div v-if="includeCaracteristic(item, room)" class="caracteristic"
-                                :key="`room${room.index}caracteris${index}`">
-                                <v-avatar color="blue">
-                                    <v-icon dark>
-                                        mdi-{{ item.icon }}
-                                    </v-icon>
-                                </v-avatar>
-                                <p>
-                                    {{ item.nombre }}
-                                </p>
-                            </div>
+                        <template v-for="(precios, jornada, index) in room.precios">
+                            <h1 v-if="index < 2" :key="`${jornada}${index}`" class="blue--text text-center w-100">
+                                $ {{ comaEnMiles(precioToDolar(precios[0].precio)) }} {{ divisa.codigo }}
+                            </h1>
+                            <p v-if="index < 2" :key="`${jornada} - ${index}`" class="text-center w-100">
+                                De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
+                            </p>
                         </template>
-                    </div>
 
-                    <v-divider class="my-2" />
+                        <v-divider class="my-2" />
 
-                    <p class="text-uppercase">
-                        Capacidad de: <span class="blue--text font-weight-bold">{{ room.capacidad }}</span> {{
-                            room.capacidad > 1 ?
-                            'Personas' : 'Persona' }}
-                    </p>
-                </v-card-text>
+                        <p>Incluye</p>
+                        <div class="caracteristics">
+                            <template v-for="(item, index) in caracteristicas">
+                                <div v-if="includeCaracteristic(item, room)" class="caracteristic"
+                                    :key="`room${room.index}caracteris${index}`">
+                                    <v-avatar color="blue">
+                                        <v-icon dark>
+                                            mdi-{{ item.icon }}
+                                        </v-icon>
+                                    </v-avatar>
+                                    <p>
+                                        {{ item.nombre }}
+                                    </p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <v-divider class="my-2" />
+
+                        <p class="text-uppercase">
+                            Capacidad de: <span class="blue--text font-weight-bold">{{ room.capacidad }}</span> {{
+                                room.capacidad > 1 ?
+                                'Personas' : 'Persona' }}
+                        </p>
+                    </v-card-text>
+                </div>
 
                 <v-card-actions class="w-100 justify-center">
                     <v-btn @click="goToRoom(room.id)" color="primary" rounded>
@@ -69,17 +71,21 @@
 <script>
 
 // import Swal from 'sweetalert2'
+import ConfigService from '@/services/ConfigService'
 import reservaService from './service/reservaService'
-import DivisasService from '@/services/DivisasService'
+import SocrataService from '@/services/SocrataService'
 
 export default {
     name: 'ReservasInterno',
     data: () => ({
         value: '',
+        dolarPrice: 0,
+        priceInDolar: false,
+        dolarPriceAuto: true,
         rooms: [],
         caracteristicas: [],
         divisa: {
-            codigo: 'COP',
+            codigo: '',
         },
         dialog: false,
         dialogAgendar: false,
@@ -111,14 +117,30 @@ export default {
             this.$router.push({ name: 'room', params: { id: id } })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split('.');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1,';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
+        },
+        precioToDolar(numero) {
+            if (!this.priceInDolar) {
+                return numero
+            }
+
+            return (numero / this.dolarPrice).toFixed(2)
         },
         /**
          * Verifica si una característica está incluida en las características de una habitación.
@@ -141,20 +163,29 @@ export default {
                     console.error(err)
                 })
         },
-        getDivisaDefault() {
-            DivisasService.obtenerDivisaDefault()
-                .then(res => {
-                    this.divisa = res
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+        async getDefault() {
+            try {
+                let res = await ConfigService.obtenerValoresDefault()
+                this.divisa = res.divisa
+                this.priceInDolar = res.priceInDolar
+                this.dolarPriceAuto = res.dolarPriceAuto
+                this.dolarPrice = res.dolarPrice
+
+                if (this.dolarPriceAuto) {
+                    res = await SocrataService.valorDolar()
+                    this.dolarPrice = res.valor
+                }
+            } catch (err) {
+                this.priceInDolar = false
+                console.error(err)
+            }
+
         },
     },
-    mounted() {
+    async mounted() {
+        await this.getDefault()
         this.getRooms()
         this.getCaracteristicas()
-        this.getDivisaDefault()
     },
 };
 </script>
@@ -162,6 +193,16 @@ export default {
 <style scoped>
 .w-100 {
     width: 100%;
+}
+
+.flex {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.portrait {
+    aspect-ratio: 3/2;
 }
 
 .balance {

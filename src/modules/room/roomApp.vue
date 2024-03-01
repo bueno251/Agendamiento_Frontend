@@ -6,11 +6,11 @@
         <v-card width="90%" class="my-5">
             <v-card-title>
                 <v-row>
-                    <v-col cols="12" md="10">
+                    <v-col cols="12" md="10" sm="8">
                         <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
                             hide-details></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="2">
+                    <v-col cols="12" md="2" sm="4">
                         <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
                             <v-icon>mdi-plus-circle</v-icon> agregar
                         </v-btn>
@@ -192,14 +192,23 @@ export default {
                 })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split('.');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1,';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
         },
         /**
          * Formatea un número y lo asigna a un campo específico.

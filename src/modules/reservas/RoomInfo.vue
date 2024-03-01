@@ -46,7 +46,7 @@
                         <tr v-for="(day, i) in room.precios" :key="day.name">
                             <template v-if="i < 7">
                                 <td>{{ day.name }}</td>
-                                <td>$ {{ comaEnMiles(day.precio) }} COP</td>
+                                <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
                                 <td>{{ day.jornada }}</td>
                             </template>
                         </tr>
@@ -82,8 +82,8 @@
             </article>
         </section>
 
-        <section class="calendar pa-5">
-            <v-card class="pa-5 sticky" elevation="5">
+        <section class="calendar sticky pa-5">
+            <v-card class="pa-5" elevation="5">
                 <v-form v-model="valid" ref="fechas">
                     <v-row>
 
@@ -94,57 +94,67 @@
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Fecha De LLegada <span class="red--text">*</span></label>
                             <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
                                 prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Fecha De Salida <span class="red--text">*</span></label>
                             <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
                                 prepend-inner-icon="mdi-calendar" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.hasDesayuno">
+                        <v-col cols="12" md="6" sm="6" v-if="room.hasDesayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precio > 0 ? '+ $' + comaEnMiles(item.precio) : ''}`"
+                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precio > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precio)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.hasDecoracion">
+                        <v-col cols="12" md="6" sm="6" v-if="room.hasDecoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :item-text="item => `${item.nombre} ${item.precio > 0 ? '+ $' + comaEnMiles(item.precio) : ''}`"
+                                :item-text="item => `${item.nombre} ${item.precio > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precio)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Adultos<span class="red--text">*</span></label>
                             <v-select v-model="adultos" :items="selectAdultos"
-                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Niños<span class="red--text">*</span></label>
                             <v-select v-model="niños" :items="selectNiños"
-                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
+                        <v-col v-if="porcentajeSeparacion" cols="6">
+                            <label>Valor Separación {{ porcentajeSeparacion }}%</label>
+                            <h4>
+                                $ {{ comaEnMiles(valorSeparacion) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+                        
+                        <v-col cols="12">
+                            <label>Precio Total De La Reserva</label>
+                            <h2>
+                                $ {{ comaEnMiles(precio) }} {{ divisa.codigo }}
+                            </h2>
+                        </v-col>
                     </v-row>
 
-                    <h2>
-                        $ {{ comaEnMiles(precio) }} {{ divisa.codigo }}
-                    </h2>
 
 
                     <div class="buttons mt-5">
@@ -166,12 +176,6 @@
                                 hide-spin-buttons dense outlined required>
                             </v-text-field>
                         </v-col>
-
-                        <v-col cols="12">
-                            <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" label="Telefono" dense
-                                outlined required>
-                            </v-text-field>
-                        </v-col>
                     </v-row>
                     <div class="buttons mt-5">
                         <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
@@ -188,8 +192,9 @@
 <script>
 
 import colombiaHolidays from 'colombia-holidays'
+import ConfigService from '@/services/ConfigService'
 import reservaService from './service/reservaService'
-import DivisasService from '@/services/DivisasService'
+import SocrataService from '@/services/SocrataService'
 
 export default {
     name: 'RoomInfo',
@@ -224,22 +229,28 @@ export default {
 
                 // Calcula el precio acumulado por cada día de estancia
                 while (fechaInicio < fechaFinal) {
-                    precio += this.room.precios[fechaInicio.getDay()].precio
+                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precio)
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
                 }
             }
 
             // Agrega el precio de los adultos y niños adicionales
-            precio += this.adultos.val
-            precio += this.niños.val
-            precio += this.decoracion.precio
+            precio += this.precioToDolar(this.adultos.val)
+            precio += this.precioToDolar(this.niños.val)
+            precio += this.precioToDolar(this.decoracion.precio)
 
             if (!this.room.incluyeDesayuno) {
-                precio += this.desayuno.precio
+                precio += this.precioToDolar(this.desayuno.precio)
             }
 
-            return precio
+            return precio.toFixed(2)
+        },
+        valorSeparacion() {
+            return this.precio ? (this.precio * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+        },
+        precioTotal(){
+            return Number(this.precio - -this.valorSeparacion).toFixed(2)
         },
         /**
          * Genera un array con opciones para seleccionar el número de adultos adicionales, considerando la capacidad máxima de la habitación.
@@ -325,7 +336,6 @@ export default {
     data() {
         return {
             cedula: '',
-            telefono: '',
             desayuno: {
                 id: null,
                 nombre: 'Ninguno',
@@ -339,6 +349,10 @@ export default {
             maxDate: '',
             cantidadRooms: 1,
             model: 0,
+            porcentajeSeparacion: 0,
+            dolarPrice: 0,
+            priceInDolar: false,
+            dolarPriceAuto: true,
             valid: false,
             validDatosCliente: false,
             loading: false,
@@ -358,7 +372,7 @@ export default {
                 val: 0
             },
             divisa: {
-                codigo: 'COP',
+                codigo: '',
             },
             desayunos: [
                 {
@@ -411,10 +425,6 @@ export default {
 
                     return true;
                 },
-                phone: value => {
-                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
-                    return pattern.test(value) || 'Número de teléfono inválido.'
-                },
             },
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
@@ -453,7 +463,6 @@ export default {
                 niños: this.niños.cantidad,
                 precio: this.precio,
                 cedula: this.cedula,
-                telefono: this.telefono,
                 cantidad_rooms: this.cantidadRooms,
             }
 
@@ -470,14 +479,30 @@ export default {
             this.$router.push({ name: 'pagar' })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split('.');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1,';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
+        },
+        precioToDolar(numero) {
+            if (!this.priceInDolar) {
+                return numero
+            }
+
+            return parseFloat((numero / this.dolarPrice).toFixed(2))
         },
         /**
          * Obtiene los días festivos en Colombia.
@@ -570,29 +595,49 @@ export default {
                     console.log(err)
                 })
         },
-        getDivisaDefault() {
-            DivisasService.obtenerDivisaDefault()
+        async getDefault() {
+
+            ConfigService.obtenerConfigReserva()
                 .then(res => {
-                    this.divisa = res
+                    this.porcentajeSeparacion = res.porcentajeSeparacion
                 })
                 .catch(err => {
-                    console.error(err)
+                    console.log(err)
                 })
+
+            try {
+                let res = await ConfigService.obtenerValoresDefault()
+                this.divisa = res.divisa
+                this.priceInDolar = res.priceInDolar
+                this.dolarPriceAuto = res.dolarPriceAuto
+                this.dolarPrice = res.dolarPrice
+
+                if (this.dolarPriceAuto) {
+                    res = await SocrataService.valorDolar()
+                    this.dolarPrice = res.valor
+                }
+            } catch (err) {
+                this.priceInDolar = false
+                console.error(err)
+            }
+
         },
     },
-    mounted() {
+    async mounted() {
+        await this.getDefault()
         this.getRoom()
         this.getDates()
         this.getDatos()
         this.getFestivos()
-        this.getDivisaDefault()
     },
 }
 </script>
 
 <style scoped>
 .contenido {
+    position: relative;
     display: flex;
+    flex-wrap: wrap;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -621,10 +666,14 @@ h2 {
     text-wrap: pretty;
 }
 
+.portrait {
+    width: 100%;
+    aspect-ratio: 3/2;
+}
+
 .calendar {
     width: min(95%, 500px);
-    height: 100%;
-    position: relative;
+    height: fit-content;
 }
 
 .sticky {

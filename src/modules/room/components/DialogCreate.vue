@@ -4,7 +4,7 @@
             <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
                 <v-row>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
                                 Nombre <span class="red--text">*</span>
@@ -12,7 +12,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-text-field v-model="capacidad" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
                                 Capacidad <span class="red--text">*</span>
@@ -20,7 +20,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-select v-model="tipo" :items="tipos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined>
                             <template v-slot:label>
@@ -29,7 +29,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="estado" item-value="id" outlined>
                             <template v-slot:label>
@@ -38,7 +38,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="cantidad" :rules="[rules.required]" outlined required>
                             <template v-slot:label>
                                 Cantidad <span class="red--text">*</span>
@@ -46,7 +46,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" outlined>
                             <template v-slot:label>
                                 Decoración <span class="red--text">*</span>
@@ -54,7 +54,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" outlined>
                             <template v-slot:label>
                                 Desayuno <span class="red--text">*</span>
@@ -62,7 +62,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3" v-if="desayuno">
+                    <v-col cols="12" md="3" sm="6" v-if="desayuno">
                         <v-select v-model="incluyeDesayuno" :items="yesNo" item-text="text" item-value="value" outlined>
                             <template v-slot:label>
                                 Incluir Desayuno <span class="red--text">*</span>

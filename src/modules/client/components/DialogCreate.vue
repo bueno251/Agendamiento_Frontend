@@ -4,21 +4,21 @@
             <v-form ref="form" v-model="valid" @submit.prevent="newClient">
                 <v-row>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="6">
                         <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
-                                Tipo de documento<span class="red--text">*</span>
+                                Tipo de documento <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-text-field v-model="documento" :rules="[rules.required, rules.min]"
                             @click:append="searchDocument" type="number" append-icon="mdi-magnify" hide-spin-buttons
                             outlined required>
                             <template v-slot:label>
-                                Documento<span class="red--text">*</span>
+                                Documento <span class="red--text">*</span>
                             </template>
                             <template v-slot:append-outer>
                                 <v-tooltip bottom>
@@ -33,15 +33,15 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="nombre1" :rules="[rules.required, rules.textOnly]" outlined required>
                             <template v-slot:label>
-                                Primer Nombre<span class="red--text">*</span>
+                                Primer Nombre <span class="red--text">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="nombre2" :rules="[rules.textOnly]" outlined>
                             <template v-slot:label>
                                 Segundo Nombre
@@ -49,15 +49,15 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="apellido1" :rules="[rules.required, rules.textOnly]" outlined required>
                             <template v-slot:label>
-                                Primer Apellido<span class="red--text">*</span>
+                                Primer Apellido <span class="red--text">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="apellido2" :rules="[rules.textOnly]" outlined>
                             <template v-slot:label>
                                 Segundo Apellido
@@ -65,24 +65,24 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <v-text-field v-model="direccion" :rules="[rules.required]" append-icon="mdi-map-marker" outlined
                             required>
                             <template v-slot:label>
-                                Direccion<span class="red--text">*</span>
+                                Direccion <span class="red--text">*</span>
                             </template></v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
                             append-icon="mdi-cellphone" hide-spin-buttons outlined required>
                             <template v-slot:label>
-                                Teléfono Celular<span class="red--text">*</span>
+                                Teléfono Celular <span class="red--text">*</span>
                             </template>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" hide-spin-buttons
                             outlined>
                             <template v-slot:label>
@@ -91,57 +91,57 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="6">
                         <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
-                            :rules="[rules.required]" @change="getStates" no-data-text="Espere un momento..." outlined
+                            :rules="[rules.required]" @change="getDepartamentos" no-data-text="Espere un momento..." outlined
                             required>
                             <template v-slot:label>
-                                País<span class="red--text">*</span>
+                                País <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="6">
                         <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
-                            :loading="loadingState" @change="getCities" no-data-text="No hay departamentos" outlined>
+                            :loading="loadingState" @change="getMunicipios" no-data-text="No hay departamentos" outlined>
                             <template v-slot:label>
-                                Departamento<span class="red--text">*</span>
+                                Departamento <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
-                        <v-select v-model="ciudad" :items="cities" item-text="city_name" item-value="city_name"
-                            :loading="loadingCity" no-data-text="No hay ciudades" outlined>
+                    <v-col cols="12" md="4" sm="6">
+                        <v-select v-model="municipio" :items="municipios" item-text="city_name" item-value="city_name"
+                            :loading="loadingMunicipio" no-data-text="No hay municipios" outlined>
                             <template v-slot:label>
-                                Ciudad<span class="red--text">*</span>
+                                Municipio <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoPersona" :items="tipoPeople" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
-                                Tipo de Persona<span class="red--text">*</span>
+                                Tipo de Persona <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoObligacion" :items="tipoObligations" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
-                                Tipo de Obligación<span class="red--text">*</span>
+                                Tipo de Obligación <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4">
+                    <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoRegimen" :items="tipoRegimens" :rules="[rules.required]"
                             no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
                             <template v-slot:label>
-                                Tipo de Régimen<span class="red--text">*</span>
+                                Tipo de Régimen <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
@@ -184,7 +184,7 @@ export default {
             direccion: '',
             pais: '',
             departamento: '',
-            ciudad: '',
+            municipio: '',
             telefono: '',
             telefonoAlt: '',
             tipoPersona: '',
@@ -194,13 +194,13 @@ export default {
             valid: false,
             loadingbtn: false,
             loadingState: false,
-            loadingCity: false,
+            loadingMunicipio: false,
             tipoDocuments: [],
             tipoObligations: [],
             tipoPeople: [],
             tipoRegimens: [],
             countries: [],
-            cities: [],
+            municipios: [],
             states: [],
             default: {},
             rules: {
@@ -237,7 +237,7 @@ export default {
                 direccion: this.direccion,
                 pais: this.pais,
                 departamento: this.departamento,
-                ciudad: this.ciudad,
+                ciudad: this.municipio,
                 telefono: this.telefono,
                 telefonoAlt: this.telefonoAlt,
                 tipoPersona: this.tipoPersona,
@@ -299,10 +299,10 @@ export default {
                     // Asignar valores predeterminados a las variables correspondientes
                     this.default = res
                     this.pais = res.pais
-                    this.getStates()
+                    this.getDepartamentos()
                     this.departamento = res.departamento
-                    this.getCities()
-                    this.ciudad = res.ciudad
+                    this.getMunicipios()
+                    this.municipio = res.municipio
                     this.tipoDocumento = res.tipo_documento
                     this.tipoPersona = res.tipo_persona
                     this.tipoRegimen = res.tipo_regimen
@@ -331,12 +331,12 @@ export default {
          * Obtiene la lista de estados para el país seleccionado
          * desde el servicio de ubicación y la asigna a la variable 'states'.
          */
-        getStates() {
+        getDepartamentos() {
             // Habilitar la animación de carga y restablecer las variables relacionadas con el departamento
             this.loadingState = true
             this.departamento = ''
-            this.ciudad = ''
-            this.cities = []
+            this.municipio = ''
+            this.municipios = []
 
             // Obtener la lista de estados para el país seleccionado
             UbicacionService.departamentos(this.pais)
@@ -351,24 +351,24 @@ export default {
                 })
         },
         /**
-        * Obtiene la lista de ciudades para el departamento seleccionado
-        * desde el servicio de ubicación y la asigna a la variable 'cities'.
+        * Obtiene la lista de municipios para el departamento seleccionado
+        * desde el servicio de ubicación y la asigna a la variable 'municipios'.
         */
-        getCities() {
-            // Habilitar la animación de carga y restablecer la variable relacionada con la ciudad
-            this.loadingCity = true
-            this.ciudad = ''
+        getMunicipios() {
+            // Habilitar la animación de carga y restablecer la variable relacionada con la municipio
+            this.loadingMunicipio = true
+            this.municipio = ''
 
-            // Obtener la lista de ciudades para el departamento seleccionado
+            // Obtener la lista de municipios para el departamento seleccionado
             UbicacionService.ciudades(this.departamento)
                 .then(res => {
-                    // Asignar la lista de ciudades a la variable 'cities' y desactivar la animación de carga
-                    this.cities = res
-                    this.loadingCity = false
+                    // Asignar la lista de municipios a la variable 'municipios' y desactivar la animación de carga
+                    this.municipios = res
+                    this.loadingMunicipio = false
                 })
                 .catch(err => {
                     console.log(err)
-                    this.loadingCity = false
+                    this.loadingMunicipio = false
                 })
         },
         /**

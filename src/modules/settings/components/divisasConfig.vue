@@ -12,10 +12,9 @@
             </div>
         </v-card-title>
         <v-container fluid>
-            <v-data-table :headers="headers" :items="divisas" :search="search" :loading="loading"
+            <v-data-table :headers="headers" :items="divisas" :loading="loading"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }"
-                no-results-text="No hay ninguna divisa que coincida" no-data-text="No hay divisas"
-                loading-text="Cargando... Por favor espera">
+                no-data-text="No hay divisas" loading-text="Cargando... Por favor espera">
                 <template v-slot:item="{ item }">
                     <tr>
                         <td>
@@ -149,7 +148,6 @@ export default {
     },
     data() {
         return {
-            search: '',
             pais: '',
             nombre: '',
             codigo: '',
@@ -165,9 +163,9 @@ export default {
             divisas: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
-                { text: 'Nombre', key: 'datein', value: 'nombre' },
-                { text: 'Codigo', key: 'datein', value: 'codigo' },
-                { text: 'Pais', key: 'datein', value: 'pais' },
+                { text: 'Nombre', key: 'nombre', value: 'nombre' },
+                { text: 'Código', key: 'codigo', value: 'codigo' },
+                { text: 'País', key: 'pais', value: 'pais' },
             ],
             rules: {
                 required: value => !!value || 'Campo requerido.'

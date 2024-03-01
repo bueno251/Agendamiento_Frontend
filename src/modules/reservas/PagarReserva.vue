@@ -4,32 +4,32 @@
             <h2>Información de contacto</h2>
             <v-form v-model="validInfo">
                 <v-row>
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Cedula <span class="red--text">*</span></label>
                         <v-text-field v-model="cedula" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Nombre <span class="red--text">*</span></label>
                         <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Apellido <span class="red--text">*</span></label>
                         <v-text-field v-model="apellido" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
                         <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired" dense
                             outlined>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Telefono <span class="red--text">*</span></label>
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" dense outlined required>
                         </v-text-field>
@@ -94,14 +94,14 @@
                             <label>Número para transacciones: 123456789</label>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Monto <span class="red--text">*</span></label>
                             <v-text-field v-model="monto" :rules="[rules.required]" v-price readonly dense outlined
                                 required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Comprobante de pago <span class="red--text">*</span></label>
                             <v-file-input v-model="file" :rules="[rules.file]" :clearable="false" accept="image/*,.pdf"
                                 truncate-length="15" chips outlined dense required></v-file-input>
@@ -128,8 +128,9 @@
 
 import vuex from "@/store"
 import Swal from "sweetalert2"
+import ConfigService from '@/services/ConfigService'
 import reservaService from './service/reservaService'
-import DivisasService from '@/services/DivisasService'
+import ClienteService from "@/services/ClienteService"
 
 export default {
     name: 'DialogUpdate',
@@ -171,7 +172,7 @@ export default {
             file: null,
             metodosPago: [],
             divisa: {
-                codigo: 'COP',
+                codigo: '',
             },
             rules: {
                 required: value => !!value || 'Campo requerido.',
@@ -245,14 +246,23 @@ export default {
                 })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split('.');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1,';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
         },
         /**
          * Obtiene los métodos de pago disponibles.
@@ -275,11 +285,23 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
+
+            ClienteService.encontrarDocumento(this.cedula)
+                .then(res => {
+                    if ('id' in res) {
+                        this.nombre = res.nombre1 + ' ' + res.nombre2
+                        this.apellido = res.apellido1 + ' ' + res.apellido2
+                        this.telefono = res.telefono
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         },
         getDivisaDefault() {
-            DivisasService.obtenerDivisaDefault()
+            ConfigService.obtenerValoresDefault()
                 .then(res => {
-                    this.divisa = res
+                    this.divisa = res.divisa
                 })
                 .catch(err => {
                     console.error(err)

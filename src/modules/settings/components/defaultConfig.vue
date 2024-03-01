@@ -7,7 +7,7 @@
             <v-form ref="form" v-model="valid" @submit.prevent="guardar">
                 <v-row>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>País</label>
                         <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
                             @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" return-object outlined
@@ -15,7 +15,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Departamento</label>
                         <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione pais"
                             @change="getMunicipios" :rules="[rules.required]" :loading="loadingDepartamentos"
@@ -23,7 +23,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Municipio</label>
                         <v-select v-model="municipio" :items="municipios" no-data-text="Seleccione departamento"
                             :rules="[rules.required]" :loading="loadingMunicipios" item-text="nombre" return-object outlined
@@ -31,28 +31,28 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Divisa</label>
-                        <v-select v-model="divisa" :items="divisas" no-data-text="No hay divisas" :rules="[rules.required]"
-                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id" outlined dense required>
+                        <v-select v-model="divisa" :items="divisas" no-data-text="No hay divisas"
+                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id" :disabled="priceInDolar" outlined dense>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Documento</label>
                         <v-select v-model="tipoDocumento" :items="documentos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Persona</label>
                         <v-select v-model="tipoPersona" :items="personas" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Responsabilidad</label>
                         <v-select v-model="tipoResponsabilidad" :items="responsabilidades"
                             no-data-text="Espere un momento..." :rules="[rules.required]" item-text="tipo" item-value="id"
@@ -60,11 +60,35 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Regimen</label>
                         <v-select v-model="tipoRegimen" :items="regimenes" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                         </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
+                        <div class="flex-switch">
+                            <p>
+                                Valores en dolares?
+                            </p>
+                            <v-switch v-model="priceInDolar" :label="priceInDolar ? 'Si' : 'No'" inset></v-switch>
+                        </div>
+                    </v-col>
+
+                    <v-col v-if="priceInDolar" cols="12" md="3" sm="6">
+                        <div class="flex-switch">
+                            <p>
+                                Valor del dolar por defecto?
+                            </p>
+                            <v-switch v-model="dolarPriceAuto" :label="dolarPriceAuto ? 'Si' : 'No'" inset></v-switch>
+                        </div>
+                    </v-col>
+
+                    <v-col v-if="priceInDolar && !dolarPriceAuto" cols="12" md="3" sm="6">
+                        <label>Valor de $1 dolar = ${{ comaEnMiles(dolarPrice) }}</label>
+                        <v-text-field v-model="dolarPrice" type="number" min="0" hide-spin-buttons outlined dense required>
+                        </v-text-field>
                     </v-col>
 
                 </v-row>
@@ -113,6 +137,9 @@ export default {
             tipoResponsabilidad: '',
             nombre: '',
             codigo: '',
+            dolarPrice: 0,
+            priceInDolar: false,
+            dolarPriceAuto: true,
             valid: false,
             validCreate: false,
             validUpdate: false,
@@ -150,6 +177,9 @@ export default {
                 pais: this.pais.nombre,
                 departamento: this.departamento.nombre,
                 municipio: this.municipio.nombre,
+                priceInDolar: this.priceInDolar,
+                dolarPriceAuto: this.dolarPriceAuto,
+                dolarPrice: Number(this.dolarPrice),
                 divisa: this.divisa,
                 tipoDocumento: this.tipoDocumento,
                 tipoPersona: this.tipoPersona,
@@ -179,11 +209,14 @@ export default {
                 .then(async res => {
                     if ('id' in res) {
                         // Asigna los valores predeterminados obtenidos a las variables del componente
-                        this.divisa = this.divisas.find((item) => item.id == res.divisa.id)
+                        this.divisa = res.divisa.id
                         this.tipoDocumento = res.tipo_documento
                         this.tipoPersona = res.tipo_persona
                         this.tipoRegimen = res.tipo_regimen
                         this.tipoResponsabilidad = res.tipo_obligacion
+                        this.priceInDolar = res.priceInDolar
+                        this.dolarPriceAuto = res.dolarPriceAuto
+                        this.dolarPrice = res.dolarPrice
                         this.pais = this.paises.find((item) => item.nombre == res.pais)
                         await this.getDepartamentos()
                         this.departamento = this.departamentos.find((item) => item.nombre == res.departamento)
@@ -237,7 +270,7 @@ export default {
          */
         async getDepartamentos() {
             this.loadingDepartamentos = true
-            this.departamento = ''
+            this.departamento = null
             this.municipio = ''
             this.municipios = []
 
@@ -268,6 +301,25 @@ export default {
                     this.loadingMunicipios = false
                 })
         },
+        /**
+         * Formatea un número agregando comas para separar miles y acepta decimales.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
+        comaEnMiles(numero) {
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split('.');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1,';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
+        },
     },
     mounted() {
         this.getPaises()
@@ -278,4 +330,18 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.flex-switch {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+p {
+    padding: 0;
+    margin: 0;
+    text-wrap: balance;
+}
+</style>

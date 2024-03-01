@@ -4,7 +4,7 @@
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <v-row>
                     <template v-for="room in rooms">
-                        <v-col cols="12" md="6" :key="`name-${room.id}`">
+                        <v-col cols="12" md="6" sm="6" :key="`name-${room.id}`">
                             <v-text-field v-model="room.nombre" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
                                     Nombre<span class="red--text">*</span>
@@ -12,7 +12,7 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6" :key="room.id">
+                        <v-col cols="12" md="6" sm="6" :key="room.id">
                             <v-select v-model="room.estado_id" :items="estados" no-data-text="Espere un momento..."
                                 :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" outlined>
                                 <template v-slot:label>

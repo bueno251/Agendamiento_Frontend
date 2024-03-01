@@ -5,7 +5,7 @@
         </v-card-title>
         <v-container fluid>
             <v-row class="ma-0">
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
                             Usuario puede reservar?
@@ -14,7 +14,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" md="3">
+                <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
                             Correo obligatorio para el pago?
@@ -22,8 +22,21 @@
                         <v-switch v-model="correoRequired" :label="correoRequired ? 'Si' : 'No'" inset></v-switch>
                     </div>
                 </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p class="px-2">
+                            Porcentaje de separación de la reserva: {{ porcentSeparacion }} %
+                        </p>
+                        <v-text-field v-model="porcentSeparacion" type="number" min="0" max="100" hide-spin-buttons outlined
+                            hide-details dense required>
+                        </v-text-field>
+                    </div>
+                    <v-slider v-model="porcentSeparacion" max="100" min="0" thumb-label dense hide-details></v-slider>
+                </v-col>
             </v-row>
-            <div class="buttons">
+
+            <div class="buttons mt-5">
                 <v-btn @click="save" :loading="loading" color="primary">
                     guardar
                 </v-btn>
@@ -48,6 +61,7 @@ export default {
                 if ('id' in newItem) {
                     this.canReservar = newItem.usuarioReserva
                     this.correoRequired = newItem.correoObligatorio
+                    this.porcentSeparacion = newItem.porcentajeSeparacion
                 }
             },
             immediate: true,
@@ -55,6 +69,7 @@ export default {
     },
     data() {
         return {
+            porcentSeparacion: 0,
             canReservar: true,
             correoRequired: true,
             loading: false,
@@ -72,6 +87,7 @@ export default {
                 configuracionId: this.config.id,
                 reservar: this.canReservar,
                 correo: this.correoRequired,
+                porcentaje: this.porcentSeparacion,
             }
 
             // Llama al servicio para actualizar la configuración de reserva
@@ -106,7 +122,7 @@ export default {
     gap: 10px;
 }
 
-p{
+p {
     padding: 0;
     margin: 0;
     text-wrap: balance;

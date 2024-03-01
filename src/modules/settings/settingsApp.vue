@@ -4,22 +4,22 @@
 
         <reservaConfig :config="config" @update="getSettings" />
 
-        <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings" />
-
         <defaultConfig :id="id" :updateDivisas="updateDivisas" />
 
         <divisasConfig @updateDivisas="updateDivisas = true" />
+
+        <EmpresaComponent :empresa="empresa" :id="id" @update="getSettings" />
 
     </div>
 </template>
 
 <script>
 
+import ConfigService from '@/services/ConfigService'
 import metodosPago from './components/metodosPago'
 import reservaConfig from './components/reservaConfig'
 import EmpresaComponent from './components/empresaComponent'
 import defaultConfig from './components/defaultConfig'
-import configService from './services/configService'
 import divisasConfig from './components/divisasConfig.vue'
 
 export default {
@@ -34,8 +34,8 @@ export default {
     watch: {
         updateDivisas: {
             handler(newItem) {
-                if(newItem){
-                    setTimeout(()=>{this.updateDivisas = false}, 100)
+                if (newItem) {
+                    setTimeout(() => { this.updateDivisas = false }, 100)
                 }
             },
             immediate: true,
@@ -55,7 +55,7 @@ export default {
          * Obtiene la configuración general del sistema.
          */
         getSettings() {
-            configService.obtener()
+            ConfigService.obtener()
                 .then(res => {
                     // Asigna los valores obtenidos a las variables del componente
                     this.id = res.id

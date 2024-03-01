@@ -6,11 +6,11 @@
         <v-card width="90%" class="my-5">
             <v-card-title>
                 <v-row>
-                    <v-col cols="12" md="10">
+                    <v-col cols="12" md="10" sm="8">
                         <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
                             hide-details></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="2">
+                    <v-col cols="12" md="2" sm="4">
                         <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
                             <v-icon>mdi-plus-circle</v-icon> agregar
                         </v-btn>

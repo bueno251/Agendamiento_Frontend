@@ -7,7 +7,7 @@
             </v-btn>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-            no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
+            no-results-text="No hay ningun estado de habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
