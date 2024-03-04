@@ -28,8 +28,8 @@
                         <p class="px-2">
                             Porcentaje de separación de la reserva: {{ porcentSeparacion }} %
                         </p>
-                        <v-text-field v-model="porcentSeparacion" type="number" min="0" max="100" hide-spin-buttons outlined
-                            hide-details dense required>
+                        <v-text-field v-model="porcentSeparacion" type="number" min="0" max="100" hide-spin-buttons
+                            outlined hide-details dense required>
                         </v-text-field>
                     </div>
                     <v-slider v-model="porcentSeparacion" max="100" min="0" thumb-label dense hide-details></v-slider>
@@ -91,7 +91,7 @@ export default {
             }
 
             // Llama al servicio para actualizar la configuración de reserva
-            configService.reservar(data)
+            configService.guardarConfigReserva(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update') // Emite un evento para informar a componentes padre sobre la actualización
@@ -106,7 +106,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         }
     },

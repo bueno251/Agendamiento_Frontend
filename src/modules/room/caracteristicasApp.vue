@@ -18,7 +18,7 @@
                 </v-row>
             </v-card-title>
             <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ninguna caraccteristica que coincida" no-data-text="No hay caracteristicas"
+                no-results-text="No hay ningúna caraccteristica que coincida" no-data-text="No hay caracteristicas"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                 <template v-slot:item="{ item }">
@@ -222,7 +222,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -240,7 +240,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -274,7 +274,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -300,7 +300,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

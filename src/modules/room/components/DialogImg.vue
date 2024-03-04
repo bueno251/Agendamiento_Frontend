@@ -151,7 +151,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

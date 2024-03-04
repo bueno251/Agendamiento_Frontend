@@ -108,7 +108,7 @@ export default {
                     })
 
                     // Registra el error en la consola para análisis adicional
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -117,14 +117,14 @@ export default {
          */
         getDatos() {
             // Llama al servicio para obtener los estados de las habitaciones
-            roomService.obtenerRoomEstados()
+            roomService.obtenerEstadosRoom()
                 .then(res => {
                     // Almacena los estados obtenidos en la propiedad 'estados' del componente
                     this.estados = res
                 })
                 .catch(err => {
                     // Maneja cualquier error que pueda ocurrir al obtener los datos
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

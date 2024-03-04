@@ -108,7 +108,7 @@ export default {
             }
 
             // Llamada al servicio para guardar los precios
-            roomService.savePrecios(data, this.room.id)
+            roomService.guardarPrecios(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
@@ -124,7 +124,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -134,15 +134,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },

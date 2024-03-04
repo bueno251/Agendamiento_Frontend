@@ -11,16 +11,16 @@
                                     <label>{{ weekday.name }}</label>
                                     <v-select class="ma-0" v-model="weekday.jornada_id" :items="jornadas"
                                         no-data-text="Espere un momento..." :rules="[rules.required]" label="Jornada"
-                                        item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }" dense
-                                        outlined>
+                                        item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }"
+                                        dense outlined>
                                     </v-select>
                                 </div>
                             </v-col>
 
                             <v-col cols="12">
                                 <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
-                                    label="Precio" v-price @input="formatNumber(weekday)" hide-spin-buttons
-                                    dense outlined required>
+                                    label="Precio" v-price @input="formatNumber(weekday)" hide-spin-buttons dense
+                                    outlined required>
                                 </v-text-field>
                             </v-col>
                         </div>
@@ -56,7 +56,7 @@ export default {
                 // Verifica si 'newItem' tiene un valor y si la propiedad 'show' es verdadera
                 if (newItem && this.show) {
                     // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'id'
-                    this.getPrecios()
+                    this.obtenerPrecios()
                 }
             },
             // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
@@ -127,7 +127,7 @@ export default {
             }
 
             // Llama al servicio para guardar los precios en el servidor
-            roomService.savePrecios(data, this.id)
+            roomService.guardarPrecios(data, this.id)
                 .then(res => {
                     this.loading = false
                     this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
@@ -142,7 +142,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -166,35 +166,32 @@ export default {
         /**
          * Obtiene los precios guardados para la habitación y los muestra en la interfaz de usuario.
          */
-        getPrecios() {
-            roomService.getPrecios(this.id)
+        obtenerPrecios() {
+            roomService.obtenerPrecios(this.id)
                 .then(res => {
-                    if (res.length == 0) {
-                        this.$refs.form.resetValidation()
+                    this.week = [
+                        { name: 'Domingo', precio: '', jornada_id: 2 },
+                        { name: 'Lunes', precio: '', jornada_id: 1 },
+                        { name: 'Martes', precio: '', jornada_id: 1 },
+                        { name: 'Miércoles', precio: '', jornada_id: 1 },
+                        { name: 'Jueves', precio: '', jornada_id: 1 },
+                        { name: 'Viernes', precio: '', jornada_id: 1 },
+                        { name: 'Sábado', precio: '', jornada_id: 2 },
+                    ]
 
-                        // Inicializa la semana con precios vacíos si no hay datos guardados
-                        this.week = [
-                            { name: 'Domingo', precio: '', jornada_id: 2 },
-                            { name: 'Lunes', precio: '', jornada_id: 1 },
-                            { name: 'Martes', precio: '', jornada_id: 1 },
-                            { name: 'Miércoles', precio: '', jornada_id: 1 },
-                            { name: 'Jueves', precio: '', jornada_id: 1 },
-                            { name: 'Viernes', precio: '', jornada_id: 1 },
-                            { name: 'Sábado', precio: '', jornada_id: 2 },
-                        ]
+                    this.$refs.form.resetValidation()
 
-                        return
-                    }
+                    res.map((day) => {
+                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name);
 
-                    // Formatea los precios con comas y los muestra en la interfaz de usuario
-                    res.map(day => {
-                        day.precio = this.comaEnMiles(day.precio)
-                    })
+                        if (index !== -1) {
+                            this.week[index].precio = this.comaEnMiles(day.precio);
+                        }
+                    });
 
-                    this.week = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -206,7 +203,7 @@ export default {
                     this.jornadas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

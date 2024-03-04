@@ -290,7 +290,7 @@ export default {
                     this.tipoRegimens = res.regimens
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
             // Obtener valores predeterminados desde el servicio de cliente
@@ -309,7 +309,7 @@ export default {
                     this.tipoObligacion = res.tipo_obligacion
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -324,7 +324,7 @@ export default {
                     this.countries = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -346,7 +346,7 @@ export default {
                     this.loadingState = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingState = false
                 })
         },
@@ -367,7 +367,7 @@ export default {
                     this.loadingMunicipio = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingMunicipio = false
                 })
         },
@@ -402,7 +402,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

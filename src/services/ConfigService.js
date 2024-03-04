@@ -42,7 +42,7 @@ const ConfigService = {
         })
     },
 
-    reservar(data) {
+    guardarConfigReserva(data) {
         let url = 'settings/reservar'
 
         return new Promise((resolve, reject) => {
@@ -56,7 +56,7 @@ const ConfigService = {
         })
     },
 
-    empresa(data) {
+    guardarEmpresa(data) {
         let url = 'settings/empresa'
 
         return new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ const ConfigService = {
         })
     },
 
-    obtenerEmpresaTipos() {
+    obtenerTiposEmpresa() {
         let url = 'settings/empresa/types'
 
         return new Promise((resolve, reject) => {
@@ -84,7 +84,7 @@ const ConfigService = {
         })
     },
 
-    valoresDefault(data) {
+    guardarValoresDefault(data) {
         let url = `default`
 
         return new Promise((resolve, reject) => {
@@ -112,25 +112,11 @@ const ConfigService = {
         })
     },
 
-    metodoPago(data) {
+    crearMetodoPago(data) {
         let url = `metodoPago`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    obtenerDivisas() {
-        let url = `divisas`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
                 .then((res) => {
                     resolve(res.data)
                 })

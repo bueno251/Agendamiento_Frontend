@@ -72,11 +72,32 @@
                     {{ reserva.niños }}
                 </p>
             </div>
-            <h2>
-                <strong>
-                    $ {{ comaEnMiles(reserva.precio) }} {{ divisa.codigo }}
-                </strong>
-            </h2>
+            <div class="d-flex flex-column">
+                <span v-if="reserva.precioAdultos">
+                    Adultos Extra: ${{ comaEnMiles(reserva.precioAdultos) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioNiños">
+                    Niños: ${{ comaEnMiles(reserva.precioNiños) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioDecoracion">
+                    Decoración: ${{ comaEnMiles(reserva.precioDecoracion) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioDesayuno">
+                    Desayuno: ${{ comaEnMiles(reserva.precioDesayuno) }} {{ divisa.codigo }}
+                </span>
+                <span>
+                    Alojamiento: ${{ comaEnMiles(reserva.precioAlojamiento) }} {{ divisa.codigo }}
+                </span>
+                <span>
+                    Valor Separación ({{ porcentajeSeparacion }}%): ${{ comaEnMiles(reserva.valorSeparacion) }} {{
+                        divisa.codigo }}
+                </span>
+                <h2 style="text-wrap: balance;">
+                    <strong>
+                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }}
+                    </strong>
+                </h2>
+            </div>
         </v-card>
 
         <v-card class="pa-5 column2" elevation="5">
@@ -96,8 +117,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <label>Monto <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" v-price readonly dense outlined
-                                required>
+                            <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
@@ -133,26 +153,7 @@ import reservaService from './service/reservaService'
 import ClienteService from "@/services/ClienteService"
 
 export default {
-    name: 'DialogUpdate',
-    directives: {
-        'price': {
-            // Se ejecuta cuando la directiva es vinculada al elemento
-            bind(el) {
-                // Agrega un event listener al evento 'input'
-                el.addEventListener('input', (event) => {
-                    // Obtiene el nuevo valor eliminando cualquier caracter que no sea un dígito
-                    const newValue = event.target.value.replace(/\D/g, '')
-
-                    // Expresión regular para agregar puntos como separadores de miles
-                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
-                    let rep = '$1.'
-
-                    // Asigna el nuevo valor formateado al campo de entrada
-                    event.target.value = newValue.toString().replace(exp, rep)
-                })
-            }
-        },
-    },
+    name: 'PagarReserva',
     data() {
         return {
             reserva: vuex.state.reserva,
@@ -162,8 +163,9 @@ export default {
             apellido: '',
             correo: '',
             telefono: vuex.state.reserva.telefono,
-            monto: this.comaEnMiles(vuex.state.reserva.precio),
+            monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
             metodoPago: 1,
+            porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
             modalTransferencia: false,
@@ -241,7 +243,7 @@ export default {
                     }).then(this.$router.back())
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loading = false
                 })
         },
@@ -252,15 +254,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },
@@ -274,16 +276,17 @@ export default {
                     this.metodosPago = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         getDatos() {
             reservaService.obtenerConfigReserva()
                 .then(res => {
                     this.correoRequired = res.correoObligatorio
+                    this.porcentajeSeparacion = res.porcentajeSeparacion
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
             ClienteService.encontrarDocumento(this.cedula)
@@ -295,7 +298,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         getDivisaDefault() {
@@ -329,7 +332,7 @@ export default {
 
 .main .v-card {
     justify-self: center;
-    width: 90%;
+    width: 100%;
 }
 
 @media only screen and (max-width: 900px) {

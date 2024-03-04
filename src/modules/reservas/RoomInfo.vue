@@ -140,22 +140,55 @@
                             </v-select>
                         </v-col>
 
+                        <v-col cols="6">
+                            <label>Valor Adultos</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioAdultos) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <label>Valor Niños</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioNiños) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col v-if="room.hasDecoracion" cols="6">
+                            <label>Valor Decoración</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioDecoracion) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col v-if="room.hasDesayuno && !room.incluyeDesayuno" cols="6">
+                            <label>Valor Desayuno</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioDesayuno) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <label>Precio De La Alojamiento</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioAlojamiento) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
                         <v-col v-if="porcentajeSeparacion" cols="6">
                             <label>Valor Separación {{ porcentajeSeparacion }}%</label>
                             <h4>
                                 $ {{ comaEnMiles(valorSeparacion) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
-                        
-                        <v-col cols="12">
-                            <label>Precio Total De La Reserva</label>
-                            <h2>
-                                $ {{ comaEnMiles(precio) }} {{ divisa.codigo }}
-                            </h2>
+
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+                            <h3>Precio Total De La Reserva</h3>
+                            <h1>
+                                $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
+                            </h1>
                         </v-col>
                     </v-row>
-
-
 
                     <div class="buttons mt-5">
                         <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
@@ -220,14 +253,14 @@ export default {
         /**
          * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida, así como el número de adultos y niños.
          */
-        precio() {
+        precioAlojamiento() {
             let precio = 0
 
             if (this.dates.length === 2) {
                 let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
-                // Calcula el precio acumulado por cada día de estancia
+                // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
                     precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precio)
 
@@ -235,22 +268,32 @@ export default {
                 }
             }
 
-            // Agrega el precio de los adultos y niños adicionales
-            precio += this.precioToDolar(this.adultos.val)
-            precio += this.precioToDolar(this.niños.val)
-            precio += this.precioToDolar(this.decoracion.precio)
-
-            if (!this.room.incluyeDesayuno) {
-                precio += this.precioToDolar(this.desayuno.precio)
-            }
-
-            return precio.toFixed(2)
+            return Number(precio.toFixed(2))
+        },
+        precioAdultos() {
+            return Number(this.precioToDolar(this.adultos.val))
+        },
+        precioNiños() {
+            return Number(this.precioToDolar(this.niños.val))
+        },
+        precioDecoracion() {
+            return Number(this.precioToDolar(this.decoracion.precio))
+        },
+        precioDesayuno() {
+            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precio)) : 0
         },
         valorSeparacion() {
-            return this.precio ? (this.precio * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            return this.precioAlojamiento ? (this.precioAlojamiento * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
         },
-        precioTotal(){
-            return Number(this.precio - -this.valorSeparacion).toFixed(2)
+        precioTotal() {
+            let precio = 0
+
+            precio += this.precioAlojamiento
+            precio += this.precioAdultos
+            precio += this.precioNiños
+            precio += this.precioDecoracion
+            precio += this.precioDesayuno
+            return precio
         },
         /**
          * Genera un array con opciones para seleccionar el número de adultos adicionales, considerando la capacidad máxima de la habitación.
@@ -443,7 +486,7 @@ export default {
                     this.room = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.$router.push({ name: 'viewRooms' })
                 })
         },
@@ -461,7 +504,13 @@ export default {
                 room: this.room,
                 adultos: this.adultos.cantidad,
                 niños: this.niños.cantidad,
-                precio: this.precio,
+                precioAlojamiento: this.precioAlojamiento,
+                precioAdultos: this.precioAdultos,
+                precioNiños: this.precioNiños,
+                precioDecoracion: this.precioDecoracion,
+                precioDesayuno: this.precioDesayuno,
+                valorSeparacion: this.valorSeparacion,
+                precioTotal: this.precioTotal,
                 cedula: this.cedula,
                 cantidad_rooms: this.cantidadRooms,
             }
@@ -485,15 +534,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },
@@ -554,7 +603,7 @@ export default {
                     this.datesInvalid = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -576,7 +625,7 @@ export default {
                     this.desayunos = [...this.desayunos, ...res]
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
             reservaService.obtenerDecoraciones()
@@ -584,7 +633,7 @@ export default {
                     this.decoraciones = [...this.decoraciones, ...res]
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
             reservaService.obtenerCaracteristicas()
@@ -592,7 +641,7 @@ export default {
                     this.caracteristicas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         async getDefault() {
@@ -602,7 +651,7 @@ export default {
                     this.porcentajeSeparacion = res.porcentajeSeparacion
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
             try {
@@ -624,8 +673,8 @@ export default {
         },
     },
     async mounted() {
-        await this.getDefault()
         this.getRoom()
+        await this.getDefault()
         this.getDates()
         this.getDatos()
         this.getFestivos()

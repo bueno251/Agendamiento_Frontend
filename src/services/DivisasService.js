@@ -42,20 +42,6 @@ const DivisasService = {
         })
     },
 
-    obtenerDivisaDefault() {
-        let url = `divisa`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
     actualizarDivisa(data, id) {
         let url = `divisa/${id}`
 

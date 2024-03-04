@@ -56,6 +56,10 @@
                             <v-list-item-title>Ajustes De Habitaciones</v-list-item-title>
                         </v-list-item>
 
+                        <v-list-item router :to="{ name: 'habitacionesTarifas' }">
+                            <v-list-item-title>Tarifas De Habitaciones</v-list-item-title>
+                        </v-list-item>
+
                         <v-list-item router :to="{ name: 'desayunos' }">
                             <v-list-item-title>Desayunos</v-list-item-title>
                         </v-list-item>
@@ -68,6 +72,13 @@
                             <v-list-item-title>Caracteristicas</v-list-item-title>
                         </v-list-item>
                     </v-list-group>
+
+                    <v-list-item router :to="{ name: 'impuestos' }">
+                        <v-list-item-icon>
+                            <v-icon>mdi-cog</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>Impuestos</v-list-item-title>
+                    </v-list-item>
 
                     <v-list-item router :to="{ name: 'configuracion' }">
                         <v-list-item-icon>

@@ -12,38 +12,10 @@ const LOCAL = {
     }
 }
 
-const configService = {
+const ImpuestoService = {
 
-    pagos(data) {
-        let url = 'settings/pagos'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    obtener() {
-        let url = 'settings/read'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data[0])
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    guardarConfigReserva(data) {
-        let url = 'settings/reservar'
+    crearImpuesto(data) {
+        let url = `impuesto`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -56,22 +28,8 @@ const configService = {
         })
     },
 
-    guardarEmpresa(data) {
-        let url = 'settings/empresa'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    obtenerTiposEmpresa() {
-        let url = 'settings/empresa/types'
+    obtenerTiposImpuesto() {
+        let url = `impuesto/tipos`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -84,22 +42,8 @@ const configService = {
         })
     },
 
-    guardarValoresDefault(data) {
-        let url = `default`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    obtenerValoresDefault() {
-        let url = `default`
+    obtenerImpuestos() {
+        let url = `impuestos`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -112,11 +56,25 @@ const configService = {
         })
     },
 
-    crearMetodoPago(data) {
-        let url = `metodoPago`
+    actualizarImpuesto(data, id) {
+        let url = `impuesto/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
+            LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarImpuesto(id) {
+        let url = `impuesto/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.delete(url)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -129,4 +87,4 @@ const configService = {
 
 LOCAL.Axios()
 
-export default configService
+export default ImpuestoService

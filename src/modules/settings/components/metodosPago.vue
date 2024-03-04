@@ -124,7 +124,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -168,7 +168,7 @@ export default {
             }
 
             // Llamar al servicio para crear el método de pago
-            configService.metodoPago(data)
+            configService.crearMetodoPago(data)
                 .then(res => {
                     // Deshabilitar indicador de carga
                     this.loadingbtn = false
@@ -193,7 +193,7 @@ export default {
                     })
 
                     // Registrar el error en la consola
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

@@ -7,7 +7,7 @@
             </v-btn>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-            no-results-text="No hay ningun tipo de habitacion que coincida" no-data-text="No hay habitaciones"
+            no-results-text="No hay ningún tipo de habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -145,7 +145,7 @@ export default {
             }
 
             // Llama al servicio para crear un nuevo tipo de habitación
-            roomService.crearRoomTipo(data)
+            roomService.crearTipoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -162,7 +162,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -172,14 +172,14 @@ export default {
             this.loading = true
 
             // Llama al servicio para obtener la lista de tipos de habitación
-            roomService.obtenerRoomTipos()
+            roomService.obtenerTiposRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -194,7 +194,7 @@ export default {
             }
 
             // Llama al servicio para actualizar un tipo de habitación existente
-            roomService.actualizarRoomTipo(data, this.type.id)
+            roomService.actualizarTipoRoom(data, this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -210,7 +210,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -220,7 +220,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar un tipo de habitación
-            roomService.eliminarRoomTipo(this.type.id)
+            roomService.eliminarTipoRoom(this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -236,7 +236,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

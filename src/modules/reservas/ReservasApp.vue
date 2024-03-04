@@ -10,7 +10,7 @@
             </v-card-title>
             <v-data-table :headers="headers" :items="reservas" :search="search" :loading="loading"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }"
-                no-results-text="No hay ninguna reserva que coincida" no-data-text="No hay reservas"
+                no-results-text="No hay ningúna reserva que coincida" no-data-text="No hay reservas"
                 loading-text="Cargando... Por favor espera">
                 <template v-slot:item="{ item }">
                     <tr>
@@ -192,7 +192,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -202,15 +202,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },
@@ -236,7 +236,7 @@ export default {
                         icon: 'success',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -261,7 +261,7 @@ export default {
                         icon: 'success',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

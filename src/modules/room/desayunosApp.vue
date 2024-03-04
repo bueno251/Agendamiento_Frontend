@@ -42,6 +42,9 @@
                         </td>
                         <td>{{ item.nombre }}</td>
                         <td>$ {{ comaEnMiles(item.precio) }}</td>
+                        <td>$ {{ comaEnMiles(item.precioConIva) }}</td>
+                        <td>{{ item.impuesto }} %</td>
+                        <td>$ {{ comaEnMiles(item.precioIva) }}</td>
                         <td>{{ item.created_at }}</td>
                     </tr>
                 </template>
@@ -55,6 +58,7 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
@@ -64,10 +68,38 @@
                         <v-col cols="12">
                             <v-text-field v-model="precio" v-price :rules="[rules.required]"
                                 @input="formatNumber('precio', precio)" outlined required>
+
                                 <template v-slot:label>
                                     Precio <span class="red--text">*</span>
                                 </template>
                             </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <div class="flex">
+                                <p>
+                                    Tiene Un Impuesto?
+                                </p>
+                                <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                            </div>
+                        </v-col>
+
+                        <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                            <v-select v-model="iva" :items="impuestos" :rules="[rules.required]"
+                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+
+                                <template v-slot:label>
+                                    Impuesto <span class="red--text">*</span>
+                                </template>
+
+                                <template v-slot:append-outer>
+                                    <v-btn icon @click="createImpuestoDialog = true">
+                                        <v-icon>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-select>
                         </v-col>
 
                         <v-col cols="12">
@@ -85,6 +117,7 @@
                             <span class="red--text">{{ error }}</span>
 
                             <div class="grid my-5">
+
                                 <template v-for="(file, index) in mediaFiles">
                                     <v-menu :key="index" offset-y style="width: 100%">
                                         <template v-slot:activator="{ on, attrs }">
@@ -123,6 +156,7 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="nombreUpdate" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
@@ -132,25 +166,55 @@
                         <v-col cols="12">
                             <v-text-field v-model="precioUpdate" :rules="[rules.required]"
                                 @input="formatNumber('precioUpdate', precioUpdate)" outlined required>
+
                                 <template v-slot:label>
                                     Precio <span class="red--text">*</span>
                                 </template>
                             </v-text-field>
                         </v-col>
 
+                        <v-col cols="12" md="6" sm="6">
+                            <div class="flex">
+                                <p>
+                                    Tiene Un Impuesto?
+                                </p>
+                                <v-switch v-model="hasIvaUpdate" :label="hasIvaUpdate ? 'Si' : 'No'" inset></v-switch>
+                            </div>
+                        </v-col>
+
+                        <v-col v-if="hasIvaUpdate" cols="12" md="6" sm="6">
+                            <v-select v-model="ivaUpdate" :items="impuestos" :rules="[rules.required]"
+                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+
+                                <template v-slot:label>
+                                    Impuesto <span class="red--text">*</span>
+                                </template>
+
+                                <template v-slot:append-outer>
+                                    <v-btn icon @click="createImpuestoDialog = true">
+                                        <v-icon>
+                                            mdi-plus-circle
+                                        </v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-select>
+                        </v-col>
+
                         <v-col cols="12">
-                            <v-textarea v-model="descripcionUpdate" label="Descripción" auto-grow rows="5" dense outlined>
+                            <v-textarea v-model="descripcionUpdate" label="Descripción" auto-grow rows="5" dense
+                                outlined>
                             </v-textarea>
                         </v-col>
 
                         <v-col cols="12">
 
                             <v-file-input v-model="mediaFilesToUpload" :rules="[rules.file]"
-                                @change="handleFileChange('mediaFilesToUpload')" label="Imagenes" accept="image/*,video/*"
-                                prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input outlined
-                                required></v-file-input>
+                                @change="handleFileChange('mediaFilesToUpload')" label="Imagenes"
+                                accept="image/*,video/*" prepend-icon="mdi-plus-circle" truncate-length="15" multiple
+                                hide-input outlined required></v-file-input>
 
                             <div class="grid my-5">
+
                                 <template v-for="(file, index) in mediaFilesToUpload">
                                     <v-menu :key="index" offset-y style="max-width: 600px">
                                         <template v-slot:activator="{ on, attrs }">
@@ -211,16 +275,23 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
+
+        <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
+
     </div>
 </template>
 
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from "./service/roomService"
+import service from '@/services/service'
+import createImpuesto from '../impuestos/components/createImpuesto.vue'
 
 export default {
     name: 'DesayunosApp',
+    components: {
+        createImpuesto,
+    },
     watch: {
         breakfast: {
             // Función que se ejecuta cuando hay cambios en breakfast
@@ -228,6 +299,8 @@ export default {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
                     this.precioUpdate = this.comaEnMiles(newItem.precio)
+                    this.ivaUpdate = newItem.impuestoId
+                    this.hasIvaUpdate = newItem.hasIva
                     this.descripcionUpdate = newItem.descripcion
                     this.mediaToSee = !newItem.media ? [] : Array.from(newItem.media)
                 }
@@ -257,12 +330,17 @@ export default {
             nombre: '',
             precio: '',
             descripcion: '',
+            iva: '',
             nombreUpdate: '',
             precioUpdate: '',
             descripcionUpdate: '',
+            hasIvaUpdate: '',
+            ivaUpdate: '',
+            hasIva: false,
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
+            createImpuestoDialog: false,
             dialogUpdate: false,
             dialogDelete: false,
             validCreate: false,
@@ -273,10 +351,14 @@ export default {
             mediaToSee: [],
             mediaFilesToUpload: [],
             mediaFilesToDelete: [],
+            impuestos: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
+                { text: 'Precio Con Iva', key: 'precioConIva', value: 'precioConIva' },
+                { text: 'Procentaje Del Iva', key: 'impuesto', value: 'impuesto' },
+                { text: 'Aumento Del Iva', key: 'precioIva', value: 'precioIva' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
             rules: {
@@ -322,6 +404,8 @@ export default {
             data.append('nombre', this.nombre)
             data.append('precio', parseInt(this.precio.replace(".", "")))
             data.append('descripcion', this.descripcion)
+            data.append('hasIva', this.hasIva ? 1 : 0)
+            data.append('impuesto', this.iva)
 
             const mediaForUpload = this.mediaFiles
             if (mediaForUpload.length) {
@@ -331,7 +415,7 @@ export default {
             }
 
             // Llama al servicio para crear un nuevo desayuno
-            roomService.crearDesayuno(data)
+            service.crearDesayuno(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -351,7 +435,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -362,14 +446,14 @@ export default {
             this.breakfast = {}
 
             // Llama al servicio para obtener la lista de desayunos
-            roomService.obtenerDesayunos()
+            service.obtenerDesayunos()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -384,6 +468,8 @@ export default {
             data.append('nombre', this.nombreUpdate)
             data.append('precio', parseInt(this.precioUpdate.replace(".", "")))
             data.append('descripcion', this.descripcionUpdate)
+            data.append('hasIva', this.hasIvaUpdate ? 1 : 0)
+            data.append('impuesto', this.ivaUpdate)
 
             let mediaFilesToDelete = this.mediaFilesToDelete
             if (mediaFilesToDelete.length) {
@@ -401,7 +487,7 @@ export default {
             }
 
             // Llama al servicio para actualizar un desayuno existente
-            roomService.actualizarDesayuno(data, this.breakfast.id)
+            service.actualizarDesayuno(data, this.breakfast.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -419,7 +505,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -429,7 +515,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar un desayuno
-            roomService.eliminarDesayuno(this.breakfast.id)
+            service.eliminarDesayuno(this.breakfast.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -445,7 +531,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -472,15 +558,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },
@@ -521,9 +607,19 @@ export default {
             // Verificar por tipo
             return file.type && file.type.startsWith('image/')
         },
+        getImpuestos() {
+            service.obtenerImpuestos()
+                .then(res => {
+                    this.impuestos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
     },
     mounted() {
         this.getDesayunos()
+        this.getImpuestos()
     },
 }
 </script>
@@ -533,5 +629,19 @@ export default {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
+}
+
+.flex {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+p {
+    padding: 0;
+    margin: 0;
+    text-wrap: balance;
 }
 </style>

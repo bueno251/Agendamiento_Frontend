@@ -10,7 +10,8 @@
                     </v-card-title>
 
                     <v-card-text>
-                        <v-card class="portrait" :img="rootBackend + room.imgs[0].url" height="300" width="600"></v-card>
+                        <v-card class="portrait" :img="rootBackend + room.imgs[0].url" height="300"
+                            width="600"></v-card>
 
                         <v-divider class="my-2" />
 
@@ -33,6 +34,7 @@
 
                         <p>Incluye</p>
                         <div class="caracteristics">
+
                             <template v-for="(item, index) in caracteristicas">
                                 <div v-if="includeCaracteristic(item, room)" class="caracteristic"
                                     :key="`room${room.index}caracteris${index}`">
@@ -52,8 +54,8 @@
 
                         <p class="text-uppercase">
                             Capacidad de: <span class="blue--text font-weight-bold">{{ room.capacidad }}</span> {{
-                                room.capacidad > 1 ?
-                                'Personas' : 'Persona' }}
+            room.capacidad > 1 ?
+                'Personas' : 'Persona' }}
                         </p>
                     </v-card-text>
                 </div>
@@ -123,15 +125,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },
@@ -183,7 +185,7 @@ export default {
         },
     },
     async mounted() {
-        await this.getDefault()
+        this.getDefault()
         this.getRooms()
         this.getCaracteristicas()
     },

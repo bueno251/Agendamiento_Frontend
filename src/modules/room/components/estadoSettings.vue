@@ -7,7 +7,7 @@
             </v-btn>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-            no-results-text="No hay ningun estado de habitacion que coincida" no-data-text="No hay habitaciones"
+            no-results-text="No hay ningún estado de habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -140,7 +140,7 @@ export default {
                 estado: this.newestado,
             }
 
-            roomService.crearRoomEstado(data)
+            roomService.crearEstadoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -157,7 +157,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -166,13 +166,13 @@ export default {
         getEstados() {
             this.loading = true
 
-            roomService.obtenerRoomEstados()
+            roomService.obtenerEstadosRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loading = false
                 })
         },
@@ -187,7 +187,7 @@ export default {
                 estado: this.estado,
             }
 
-            roomService.actualizarRoomEstado(data, this.estate.id)
+            roomService.actualizarEstadoRoom(data, this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -203,7 +203,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -213,7 +213,7 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            roomService.eliminarRoomEstado(this.estate.id)
+            roomService.eliminarEstadoRoom(this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -229,7 +229,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

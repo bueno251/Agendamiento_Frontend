@@ -126,7 +126,7 @@ const roomService = {
      * @param {Object} data - Datos del tipo de habitación a crear.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    crearRoomTipo(data) {
+    crearTipoRoom(data) {
         let url = 'room/type/create'
 
         return new Promise((resolve, reject) => {
@@ -146,7 +146,7 @@ const roomService = {
      * @memberof RoomService
      * @returns {Promise} Promesa que se resuelve con la lista de tipos de habitaciones o se rechaza con un error.
      */
-    obtenerRoomTipos() {
+    obtenerTiposRoom() {
         let url = 'room/type'
 
         return new Promise((resolve, reject) => {
@@ -168,7 +168,7 @@ const roomService = {
      * @param {number} id - Identificador único del tipo de habitación a actualizar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarRoomTipo(data, id) {
+    actualizarTipoRoom(data, id) {
         let url = `room/type/update/${id}`
 
         return new Promise((resolve, reject) => {
@@ -189,7 +189,7 @@ const roomService = {
      * @param {number} id - Identificador único del tipo de habitación a eliminar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    eliminarRoomTipo(id) {
+    eliminarTipoRoom(id) {
         let url = `room/type/delete/${id}`
 
         return new Promise((resolve, reject) => {
@@ -210,7 +210,7 @@ const roomService = {
      * @param {Object} data - Datos del estado de habitación a crear.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    crearRoomEstado(data) {
+    crearEstadoRoom(data) {
         let url = 'room/estado/create'
 
         return new Promise((resolve, reject) => {
@@ -230,7 +230,7 @@ const roomService = {
      * @memberof RoomService
      * @returns {Promise} Promesa que se resuelve con la lista de estados de habitaciones o se rechaza con un error.
      */
-    obtenerRoomEstados() {
+    obtenerEstadosRoom() {
         let url = 'room/estado'
 
         return new Promise((resolve, reject) => {
@@ -252,7 +252,7 @@ const roomService = {
      * @param {number} id - Identificador único del estado de habitación a actualizar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarRoomEstado(data, id) {
+    actualizarEstadoRoom(data, id) {
         let url = `room/estado/update/${id}`
 
         return new Promise((resolve, reject) => {
@@ -273,7 +273,7 @@ const roomService = {
      * @param {number} id - Identificador único del estado de habitación a eliminar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    eliminarRoomEstado(id) {
+    eliminarEstadoRoom(id) {
         let url = `room/estado/delete/${id}`
 
         return new Promise((resolve, reject) => {
@@ -316,7 +316,7 @@ const roomService = {
      * @param {number} id - Identificador único de la habitación.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    savePrecios(data, id) {
+    guardarPrecios(data, id) {
         let url = `room/precios/${id}`
 
         return new Promise((resolve, reject) => {
@@ -337,7 +337,7 @@ const roomService = {
      * @param {number} id - Identificador único de la habitación.
      * @returns {Promise} Promesa que se resuelve con la lista de precios o se rechaza con un error.
      */
-    getPrecios(id) {
+    obtenerPrecios(id) {
         let url = `room/precios/${id}`
 
         return new Promise((resolve, reject) => {

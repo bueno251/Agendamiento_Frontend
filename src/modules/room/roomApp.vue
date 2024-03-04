@@ -18,7 +18,7 @@
                 </v-row>
             </v-card-title>
             <v-data-table :headers="headers" :items="rooms" :search="search" :loading="loading"
-                no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
+                no-results-text="No hay ningúna habitacion que coincida" no-data-text="No hay habitaciones"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                 <template v-slot:item="{ item }">
@@ -39,12 +39,6 @@
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogRooms = true">
                                         <v-list-item-title v-text="'Habitaciones'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="room = item, dialogPrecios = true">
-                                        <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="room = item, dialogTarifasExtra = true">
-                                        <v-list-item-title v-text="'Tarifas Adicionales'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogBitacora = true">
                                         <v-list-item-title v-text="'Bitacora'"></v-list-item-title>
@@ -132,7 +126,6 @@ export default {
             dialogTarifasExtra: false,
             dialogImg: false,
             dialogRooms: false,
-            valid: false,
             room: {},
             rooms: [],
             headers: [
@@ -162,7 +155,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -188,7 +181,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -198,26 +191,17 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
-        },
-        /**
-         * Formatea un número y lo asigna a un campo específico.
-         * @param {string} campo - Nombre del campo donde se asignará el número formateado.
-         * @param {string} precio - Número a formatear.
-         */
-        formatNumber(campo, precio) {
-            let formattedNumber = precio.replace(/\D/g, '');
-            this[campo] = this.comaEnMiles(formattedNumber);
         },
     },
     mounted() {

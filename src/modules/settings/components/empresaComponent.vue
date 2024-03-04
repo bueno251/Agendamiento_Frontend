@@ -281,7 +281,7 @@ export default {
             }
 
             // Llama al servicio para crear o actualizar la empresa
-            configService.empresa(data)
+            configService.guardarEmpresa(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update')
@@ -296,14 +296,14 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
          * Obtiene los tipos de empresa desde el servicio.
          */
         getTipos() {
-            configService.obtenerEmpresaTipos()
+            configService.obtenerTiposEmpresa()
                 .then(res => {
                     // Asigna los tipos de documentos, entornos, operaciones, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos
@@ -314,7 +314,7 @@ export default {
                     this.responsabilidades = res.responsabilidades
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -326,7 +326,7 @@ export default {
                     this.paises = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -344,7 +344,7 @@ export default {
                     this.loadingDepartamentos = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingDepartamentos = false
                 })
         },
@@ -361,7 +361,7 @@ export default {
                     this.loadingMunicipios = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingMunicipios = false
                 })
         },

@@ -58,6 +58,11 @@ const routes = [
 				component: () => import('@/modules/room/roomSettings.vue')
 			},
 			{
+				path: 'habitaciones/tarifas',
+				name: 'habitacionesTarifas',
+				component: () => import('@/modules/room/roomTarifas.vue')
+			},
+			{
 				path: 'configuracion',
 				name: 'configuracion',
 				component: () => import('@/modules/settings/settingsApp.vue')
@@ -76,6 +81,11 @@ const routes = [
 				path: 'caracteristicas',
 				name: 'caracteristicas',
 				component: () => import('@/modules/room/caracteristicasApp.vue')
+			},
+			{
+				path: 'impuestos',
+				name: 'impuestos',
+				component: () => import('@/modules/impuestos/impuestosApp.vue')
 			},
 		]
 	},

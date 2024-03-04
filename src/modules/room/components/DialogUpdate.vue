@@ -228,27 +228,27 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
          * Obtiene datos necesarios como tipos de habitación y estados de habitación.
          */
         getDatos() {
-            roomService.obtenerRoomTipos()
+            roomService.obtenerTiposRoom()
                 .then(res => {
                     this.tipos = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
-            roomService.obtenerRoomEstados()
+            roomService.obtenerEstadosRoom()
                 .then(res => {
                     this.estados = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -260,7 +260,7 @@ export default {
                     this.caracteristicas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

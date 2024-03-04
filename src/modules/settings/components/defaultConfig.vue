@@ -188,7 +188,7 @@ export default {
             }
 
             // Llama al servicio para establecer los valores predeterminados
-            configService.valoresDefault(data)
+            configService.guardarValoresDefault(data)
                 .then(res => {
                     this.loading = false
                     Swal.fire({
@@ -198,7 +198,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -225,14 +225,14 @@ export default {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
          * Obtiene los tipos de empresa desde el servicio.
          */
         getTipos() {
-            configService.obtenerEmpresaTipos()
+            configService.obtenerTiposEmpresa()
                 .then(res => {
                     // Asigna los tipos de documentos, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos
@@ -241,7 +241,7 @@ export default {
                     this.responsabilidades = res.responsabilidades
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         getDivisas() {
@@ -250,7 +250,7 @@ export default {
                     this.divisas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -262,7 +262,7 @@ export default {
                     this.paises = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -280,7 +280,7 @@ export default {
                     this.loadingDepartamentos = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingDepartamentos = false
                 })
         },
@@ -297,7 +297,7 @@ export default {
                     this.loadingMunicipios = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingMunicipios = false
                 })
         },
@@ -308,15 +308,15 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split('.');
+            let partes = numero.toString().split(',');
 
             // Expresión regular para agregar comas a la parte entera
             let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1,';
+            let repParteEntera = '$1.';
 
             // Formatear la parte entera y agregar la parte decimal si existe
             let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + '.' + partes[1] : parteEnteraFormateada;
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
         },

@@ -55,7 +55,7 @@ const LOCAL = {
                     store.commit('SET_TOKEN_UBICACION', tokenUbicacion)
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         }
     }

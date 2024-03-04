@@ -295,7 +295,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -313,7 +313,7 @@ export default {
                     this.tipoRegimens = res.regimens
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -328,7 +328,7 @@ export default {
                     this.countries = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -350,7 +350,7 @@ export default {
                     this.loadingDepartamentos = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingDepartamentos = false
                 })
         },
@@ -371,7 +371,7 @@ export default {
                     this.loadingMunicipio = false
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loadingMunicipio = false
                 })
         },
@@ -406,7 +406,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

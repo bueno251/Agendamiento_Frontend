@@ -199,7 +199,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         actualizar() {
@@ -228,7 +228,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         eliminar() {
@@ -251,7 +251,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         getDivisas() {
@@ -261,7 +261,7 @@ export default {
                     this.divisas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -273,7 +273,7 @@ export default {
                     this.paises = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

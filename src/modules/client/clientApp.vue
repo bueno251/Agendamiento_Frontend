@@ -12,7 +12,7 @@
                 </v-btn>
             </v-card-title>
             <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ningun cliente que coincida" no-data-text="No hay clientes"
+                no-results-text="No hay ningún cliente que coincida" no-data-text="No hay clientes"
                 loading-text="Cargando... Por favor espera"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                 <template v-slot:item="row">
@@ -107,7 +107,7 @@ export default {
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -133,7 +133,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

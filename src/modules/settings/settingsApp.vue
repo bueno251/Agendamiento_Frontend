@@ -64,7 +64,7 @@ export default {
                     this.empresa = res.empresa
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         }
     },
