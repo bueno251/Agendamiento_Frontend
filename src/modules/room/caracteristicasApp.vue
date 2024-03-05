@@ -125,7 +125,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from "./service/roomService"
+import service from '@/services/service'
 import CreateCaracteristicRoom from './components/CreateCaracteristicRoom.vue'
 
 export default {
@@ -205,7 +205,7 @@ export default {
             }
 
             // Llama al servicio para crear una nueva característica de habitación
-            roomService.crearCaracteristica(data)
+            service.crearCaracteristica(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -233,7 +233,7 @@ export default {
             this.caracteristica = {}
 
             // Llama al servicio para obtener la lista de características de habitación
-            roomService.obtenerCaracteristicas()
+            service.obtenerCaracteristicas()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
@@ -258,7 +258,7 @@ export default {
             }
 
             // Llama al servicio para actualizar una característica de habitación existente
-            roomService.actualizarCaracteristica(data, this.caracteristica.id)
+            service.actualizarCaracteristica(data, this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -284,7 +284,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar una característica de habitación
-            roomService.eliminarCaracteristica(this.caracteristica.id)
+            service.eliminarCaracteristica(this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

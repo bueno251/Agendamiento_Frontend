@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%" min-height="100px">
+    <v-card width="90%" elevation="5" min-height="100px">
         <v-card-title class="blue lighten-2 mb-5 white--text">
             Valores Por Defecto
         </v-card-title>
@@ -105,9 +105,8 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '@/services/ConfigService'
+import service from '@/services/service'
 import UbicacionService from '@/services/UbicacionService'
-import DivisasService from '@/services/DivisasService'
 
 export default {
     name: 'defaultConfig',
@@ -188,7 +187,7 @@ export default {
             }
 
             // Llama al servicio para establecer los valores predeterminados
-            configService.guardarValoresDefault(data)
+            service.guardarValoresDefault(data)
                 .then(res => {
                     this.loading = false
                     Swal.fire({
@@ -205,7 +204,7 @@ export default {
          * Obtiene los valores predeterminados existentes y actualiza los datos del formulario.
          */
         getDefault() {
-            configService.obtenerValoresDefault()
+            service.obtenerValoresDefault()
                 .then(async res => {
                     if ('id' in res) {
                         // Asigna los valores predeterminados obtenidos a las variables del componente
@@ -232,7 +231,7 @@ export default {
          * Obtiene los tipos de empresa desde el servicio.
          */
         getTipos() {
-            configService.obtenerTiposEmpresa()
+            service.obtenerTiposEmpresa()
                 .then(res => {
                     // Asigna los tipos de documentos, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos
@@ -245,7 +244,7 @@ export default {
                 })
         },
         getDivisas() {
-            DivisasService.obtenerDivisas()
+            service.obtenerDivisas()
                 .then(res => {
                     this.divisas = res
                 })

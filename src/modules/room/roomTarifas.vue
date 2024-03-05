@@ -63,7 +63,7 @@
             </v-data-table>
         </v-card>
 
-        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"
+        <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false"
             @update="getRooms(), dialogPrecios = false"></PreciosRoom>
         <PreciosExtra :show="dialogTarifasExtra" :room="room" @close="dialogTarifasExtra = false"
             @update="getRooms(), dialogTarifasExtra = false" />
@@ -156,13 +156,16 @@ export default {
                             { name: 'Niños', precio: 0, jornada_id: null },
                         ]
 
-                        room.precios.map(day => {
-                            const index = week.findIndex((weekDay) => weekDay.name === day.name);
+                        if (room.precios) {
+                            room.precios.map(day => {
+                                const index = week.findIndex((weekDay) => weekDay.name === day.name);
 
-                            if (index !== -1) {
-                                week[index].precio = this.comaEnMiles(day.precio);
-                            }
-                        })
+                                if (index !== -1) {
+                                    week[index].precio = this.comaEnMiles(day.precio);
+                                    week[index].impuestoId = day.impuestoId;
+                                }
+                            })
+                        }
 
                         room.precios = week
                     })

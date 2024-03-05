@@ -92,7 +92,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'tipoSettings',
@@ -145,7 +145,7 @@ export default {
             }
 
             // Llama al servicio para crear un nuevo tipo de habitación
-            roomService.crearTipoRoom(data)
+            service.crearTipoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -172,7 +172,7 @@ export default {
             this.loading = true
 
             // Llama al servicio para obtener la lista de tipos de habitación
-            roomService.obtenerTiposRoom()
+            service.obtenerTiposRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
@@ -194,7 +194,7 @@ export default {
             }
 
             // Llama al servicio para actualizar un tipo de habitación existente
-            roomService.actualizarTipoRoom(data, this.type.id)
+            service.actualizarTipoRoom(data, this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -220,7 +220,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar un tipo de habitación
-            roomService.eliminarTipoRoom(this.type.id)
+            service.eliminarTipoRoom(this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

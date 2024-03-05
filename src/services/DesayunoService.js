@@ -27,7 +27,7 @@ const DesayunoService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearDesayuno(data) {
-        let url = 'desayunos/create'
+        let url = 'desayuno'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -47,7 +47,7 @@ const DesayunoService = {
      * @returns {Promise} Promesa que se resuelve con la lista de desayunos o se rechaza con un error.
      */
     obtenerDesayunos() {
-        let url = 'desayunos/read'
+        let url = 'desayunos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -69,7 +69,7 @@ const DesayunoService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarDesayuno(data, id) {
-        let url = `desayunos/update/${id}`
+        let url = `desayuno/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -90,7 +90,7 @@ const DesayunoService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarDesayuno(id) {
-        let url = `desayunos/delete/${id}`
+        let url = `desayuno/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

@@ -1,5 +1,5 @@
-import axios from "axios";
-import vuex from "@/store";
+import axios from "axios"
+import vuex from "@/store"
 
 const LOCAL = {
     Axios() {
@@ -12,38 +12,10 @@ const LOCAL = {
     }
 }
 
-const configService = {
+const TarifaService = {
 
-    pagos(data) {
-        let url = 'settings/pagos'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    obtener() {
-        let url = 'settings/read'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data[0])
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    guardarConfigReserva(data) {
-        let url = 'settings/reservar'
+    gurdarTarifa(data) {
+        let url = 'tarifa'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -56,8 +28,8 @@ const configService = {
         })
     },
 
-    guardarEmpresa(data) {
-        let url = 'settings/empresa'
+    guardarTarifas(data, id) {
+        let url = `tarifas/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -70,8 +42,15 @@ const configService = {
         })
     },
 
-    obtenerTiposEmpresa() {
-        let url = 'settings/empresa/types'
+    /**
+     * Obtiene los precios asociados a una habitación específica mediante una solicitud GET a la API.
+     * @function
+     * @memberof RoomService
+     * @param {number} id - Identificador único de la habitación.
+     * @returns {Promise} Promesa que se resuelve con la lista de precios o se rechaza con un error.
+    */
+    obtenerTarifas(id) {
+        let url = `tarifas/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -84,11 +63,11 @@ const configService = {
         })
     },
 
-    guardarValoresDefault(data) {
-        let url = `default`
+    eliminarTarifa(id) {
+        let url = `tarifa/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
+            LOCAL.api.delete(url)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -98,8 +77,14 @@ const configService = {
         })
     },
 
-    obtenerValoresDefault() {
-        let url = `default`
+    /**
+    * Obtiene la lista de jornadas disponibles mediante una solicitud GET a la API.
+    * @function
+    * @memberof RoomService
+    * @returns {Promise} Promesa que se resuelve con la lista de jornadas o se rechaza con un error.
+    */
+    obtenerJornadas() {
+        let url = 'jornadas'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -112,21 +97,8 @@ const configService = {
         })
     },
 
-    crearMetodoPago(data) {
-        let url = `metodoPago`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
 }
 
 LOCAL.Axios()
 
-export default configService
+export default TarifaService

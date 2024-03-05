@@ -27,7 +27,7 @@ const DecoracionService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearDecoracion(data) {
-        let url = 'decoraciones/create'
+        let url = 'decoracion'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -47,7 +47,7 @@ const DecoracionService = {
      * @returns {Promise} Promesa que se resuelve con la lista de decoraciones o se rechaza con un error.
      */
     obtenerDecoraciones() {
-        let url = 'decoraciones/read'
+        let url = 'decoraciones'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -69,7 +69,7 @@ const DecoracionService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarDecoracion(data, id) {
-        let url = `decoraciones/update/${id}`
+        let url = `decoracion/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -90,7 +90,7 @@ const DecoracionService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarDecoracion(id) {
-        let url = `decoraciones/delete/${id}`
+        let url = `decoracion/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

@@ -78,13 +78,9 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
-        <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false"></estadosRoom>
-        <PreciosRoom :show="dialogPrecios" :id="room.id" @close="dialogPrecios = false"
-            @update="getRooms(), dialogPrecios = false"></PreciosRoom>
-        <PreciosExtra :show="dialogTarifasExtra" :room="room" @close="dialogTarifasExtra = false"
-            @update="getRooms(), dialogTarifasExtra = false" />
-        <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false">
-        </DialogImg>
+
+        <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false" />
+        <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false" />
         <SimilarRooms :show="dialogRooms" :room="room" @close="dialogRooms = false"
             @update="getRooms(), dialogRooms = false" />
     </div>
@@ -93,21 +89,17 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from "./service/roomService"
-import PreciosRoom from './components/PreciosRoom';
-import PreciosExtra from './components/PreciosExtra';
+import service from '@/services/service'
 import estadosRoom from "./components/estadosRoom"
-import DialogCreate from "./components/DialogCreate";
-import DialogUpdate from "./components/DialogUpdate";
-import DialogImg from './components/DialogImg.vue';
-import SimilarRooms from './components/SimilarRooms.vue';
+import DialogCreate from "./components/DialogCreate"
+import DialogUpdate from "./components/DialogUpdate"
+import DialogImg from './components/DialogImg.vue'
+import SimilarRooms from './components/SimilarRooms.vue'
 
 export default {
     name: 'roomApp',
     components: {
         estadosRoom,
-        PreciosRoom,
-        PreciosExtra,
         DialogCreate,
         DialogUpdate,
         DialogImg,
@@ -122,8 +114,6 @@ export default {
             dialogUpdate: false,
             dialogDelete: false,
             dialogBitacora: false,
-            dialogPrecios: false,
-            dialogTarifasExtra: false,
             dialogImg: false,
             dialogRooms: false,
             room: {},
@@ -148,7 +138,7 @@ export default {
             this.room = {}
 
             // Llama al servicio para obtener la lista de habitaciones
-            roomService.obtenerRooms()
+            service.obtenerRooms()
                 .then(res => {
                     this.loading = false
                     this.rooms = res
@@ -165,7 +155,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar una habitación
-            roomService.eliminarRoom(this.room.id)
+            service.eliminarRoom(this.room.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -191,17 +181,17 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split(',');
+            let partes = numero.toString().split(',')
 
             // Expresión regular para agregar comas a la parte entera
-            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1.';
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g
+            let repParteEntera = '$1.'
 
             // Formatear la parte entera y agregar la parte decimal si existe
-            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera)
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada
 
-            return resultado;
+            return resultado
         },
     },
     mounted() {

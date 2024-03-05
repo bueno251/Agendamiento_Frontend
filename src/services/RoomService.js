@@ -27,7 +27,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearRoom(data) {
-        let url = 'room/create'
+        let url = 'room'
 
         let config = {
             headers: {
@@ -53,7 +53,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la lista de habitaciones o se rechaza con un error.
      */
     obtenerRooms() {
-        let url = 'room/read'
+        let url = 'rooms/read'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -75,7 +75,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarRoom(data, id) {
-        let url = `room/update/${id}`
+        let url = `room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -96,7 +96,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarRoom(id) {
-        let url = `room/delete/${id}`
+        let url = `room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -118,69 +118,6 @@ const roomService = {
      */
     bitacora(id) {
         let url = `room/bitacora/${id}`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Guarda los precios para una habitación específica mediante una solicitud POST a la API.
-     * @function
-     * @memberof RoomService
-     * @param {Object} data - Datos de precios a guardar.
-     * @param {number} id - Identificador único de la habitación.
-     * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
-     */
-    guardarPrecios(data, id) {
-        let url = `room/precios/${id}`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene los precios asociados a una habitación específica mediante una solicitud GET a la API.
-     * @function
-     * @memberof RoomService
-     * @param {number} id - Identificador único de la habitación.
-     * @returns {Promise} Promesa que se resuelve con la lista de precios o se rechaza con un error.
-     */
-    obtenerPrecios(id) {
-        let url = `room/precios/${id}`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene la lista de jornadas disponibles mediante una solicitud GET a la API.
-     * @function
-     * @memberof RoomService
-     * @returns {Promise} Promesa que se resuelve con la lista de jornadas o se rechaza con un error.
-     */
-    getJornadas() {
-        let url = 'jornadas/read'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -228,11 +165,25 @@ const roomService = {
      * @param {Object} data - Datos de las habitaciones a actualizar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarRoomsEstado(data) {
-        let url = `room/estados`
+    actualizarRooms(data) {
+        let url = `rooms`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarRoomHija(id) {
+        let url = `room-hija/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.delete(url)
                 .then((res) => {
                     resolve(res.data)
                 })

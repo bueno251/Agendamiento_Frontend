@@ -27,7 +27,7 @@ const TipoRoomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearTipoRoom(data) {
-        let url = 'room/type/create'
+        let url = 'tipo-room'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -47,7 +47,7 @@ const TipoRoomService = {
      * @returns {Promise} Promesa que se resuelve con la lista de tipos de habitaciones o se rechaza con un error.
      */
     obtenerTiposRoom() {
-        let url = 'room/type'
+        let url = 'tipos-room'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -69,7 +69,7 @@ const TipoRoomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarTipoRoom(data, id) {
-        let url = `room/type/update/${id}`
+        let url = `tipo-room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -90,7 +90,7 @@ const TipoRoomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarTipoRoom(id) {
-        let url = `room/type/delete/${id}`
+        let url = `tipo-room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

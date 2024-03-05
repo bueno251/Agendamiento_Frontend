@@ -1,10 +1,10 @@
 <template>
-    <v-dialog :value="show" width="90%" max-width="600px" persistent>
+    <v-dialog :value="show" width="90%" max-width="800px" persistent>
         <v-card class="pa-5">
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <v-row>
                     <template v-for="room in rooms">
-                        <v-col cols="12" md="6" sm="6" :key="`name-${room.id}`">
+                        <v-col cols="12" md="5" sm="4" :key="`name-${room.id}`">
                             <v-text-field v-model="room.nombre" :rules="[rules.required]" outlined required>
                                 <template v-slot:label>
                                     Nombre<span class="red--text">*</span>
@@ -12,13 +12,22 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6" :key="room.id">
+                        <v-col cols="12" md="5" sm="4" :key="room.id">
                             <v-select v-model="room.estado_id" :items="estados" no-data-text="Espere un momento..."
                                 :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" outlined>
+
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
                                 </template>
                             </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="2" sm="4" :key="`btn-${room.id}`">
+                            <div class="d-flex c-100 align-center">
+                                <v-btn color="error" @click="habitacion = room, dialogDelete = true">
+                                    Eliminar
+                                </v-btn>
+                            </div>
                         </v-col>
                     </template>
                 </v-row>
@@ -28,13 +37,26 @@
                 </div>
             </v-form>
         </v-card>
+
+        <v-dialog :value="dialogDelete" width="90%" max-width="600px" persistent>
+            <v-card>
+                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
+                    <h3>Eliminar la habitación {{ habitacion.nombre }}?</h3>
+                    <div class="buttons">
+                        <v-btn @click="dialogDelete = false" color="error"
+                            class="white--text text--accent-4">cancelar</v-btn>
+                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                    </div>
+                </v-sheet>
+            </v-card>
+        </v-dialog>
     </v-dialog>
 </template>
 
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'SimilarRooms',
@@ -61,6 +83,11 @@ export default {
         return {
             valid: false,
             loading: false,
+            loadingbtn: false,
+            dialogDelete: false,
+            habitacion: {
+                nombre: ''
+            },
             estados: [],
             rooms: [],
             rules: {
@@ -83,7 +110,7 @@ export default {
             }
 
             // Llama al servicio para actualizar la información de las habitaciones
-            roomService.actualizarRooms(data)
+            service.actualizarRooms(data)
                 .then(res => {
                     // La operación fue exitosa, indica que ya no está en curso
                     this.loading = false
@@ -117,13 +144,42 @@ export default {
          */
         getDatos() {
             // Llama al servicio para obtener los estados de las habitaciones
-            roomService.obtenerEstadosRoom()
+            service.obtenerEstadosRoom()
                 .then(res => {
                     // Almacena los estados obtenidos en la propiedad 'estados' del componente
                     this.estados = res
                 })
                 .catch(err => {
                     // Maneja cualquier error que pueda ocurrir al obtener los datos
+                    console.error(err)
+                })
+        },
+        eliminar() {
+            this.loadingbtn = true
+
+            service.eliminarRoomHija(this.habitacion.id)
+                .then(res => {
+                    this.loadingbtn = false
+                    this.dialogDelete = false
+
+                    // Emite el evento 'update' para notificar a otros componentes sobre la actualización
+                    this.$emit('update')
+
+                    // Muestra un mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        text: res.message,
+                    })
+                })
+                .catch(err => {
+                    // Maneja cualquier error que pueda ocurrir al obtener los datos
+                    this.loadingbtn = false
+
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+
                     console.error(err)
                 })
         },
@@ -141,4 +197,9 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.c-100 {
+    width: 100%;
+    height: 60%;
+}
+</style>

@@ -25,7 +25,7 @@ const ClienteService = {
      * @throws {Error} - Error si la creación del cliente falla.
      */
     crearCliente(data) {
-        let url = 'client/create'
+        let url = 'cliente'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -45,7 +45,7 @@ const ClienteService = {
      * @throws {Error} - Error si la obtención de clientes falla.
      */
     obtenerClientes() {
-        let url = 'client/read'
+        let url = 'clientes'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -65,7 +65,7 @@ const ClienteService = {
      * @throws {Error} - Error si la obtención de tipos de clientes falla.
      */
     obtenerTiposCliente() {
-        let url = 'client/type/all'
+        let url = 'cliente/tipos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -86,7 +86,7 @@ const ClienteService = {
      * @throws {Error} - Error si la búsqueda del cliente falla.
      */
     encontrarClienteDocumento(documento) {
-        let url = `client/find/document/${documento}`
+        let url = `cliente/document/${documento}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -108,7 +108,7 @@ const ClienteService = {
      * @throws {Error} - Error si la actualización del cliente falla.
      */
     actualizarCliente(data, id) {
-        let url = `client/update/${id}`
+        let url = `cliente/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -129,7 +129,7 @@ const ClienteService = {
      * @throws {Error} - Error si la eliminación del cliente falla.
      */
     eliminarCliente(id) {
-        let url = `client/delete/${id}`
+        let url = `cliente/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

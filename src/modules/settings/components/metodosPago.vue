@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%" min-height="100px">
+    <v-card width="90%" elevation="5" min-height="100px">
         <v-card-title class="blue lighten-2 white--text">
             <div class="flex">
                 <p>
@@ -55,7 +55,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '../services/configService'
+import service from '@/services/service'
 
 export default {
     name: 'metodosPago',
@@ -109,7 +109,7 @@ export default {
             }
 
             // Llama al servicio para guardar la configuración de pagos
-            configService.pagos(data)
+            service.guardarMetodosPago(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update')
@@ -168,7 +168,7 @@ export default {
             }
 
             // Llamar al servicio para crear el método de pago
-            configService.crearMetodoPago(data)
+            service.crearMetodoPago(data)
                 .then(res => {
                     // Deshabilitar indicador de carga
                     this.loadingbtn = false

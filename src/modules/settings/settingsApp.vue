@@ -15,7 +15,7 @@
 
 <script>
 
-import ConfigService from '@/services/ConfigService'
+import service from '@/services/service'
 import metodosPago from './components/metodosPago'
 import reservaConfig from './components/reservaConfig'
 import EmpresaComponent from './components/empresaComponent'
@@ -55,7 +55,7 @@ export default {
          * Obtiene la configuración general del sistema.
          */
         getSettings() {
-            ConfigService.obtener()
+            service.obtenerConfig()
                 .then(res => {
                     // Asigna los valores obtenidos a las variables del componente
                     this.id = res.id

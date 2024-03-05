@@ -92,7 +92,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'estadoSettings',
@@ -140,7 +140,7 @@ export default {
                 estado: this.newestado,
             }
 
-            roomService.crearEstadoRoom(data)
+            service.crearEstadoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -166,7 +166,7 @@ export default {
         getEstados() {
             this.loading = true
 
-            roomService.obtenerEstadosRoom()
+            service.obtenerEstadosRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
@@ -187,7 +187,7 @@ export default {
                 estado: this.estado,
             }
 
-            roomService.actualizarEstadoRoom(data, this.estate.id)
+            service.actualizarEstadoRoom(data, this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -213,7 +213,7 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            roomService.eliminarEstadoRoom(this.estate.id)
+            service.eliminarEstadoRoom(this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

@@ -27,7 +27,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearEstadoRoom(data) {
-        let url = 'room/estado/create'
+        let url = 'estado-room'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -47,7 +47,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la lista de estados de habitaciones o se rechaza con un error.
      */
     obtenerEstadosRoom() {
-        let url = 'room/estado'
+        let url = 'estados-room'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -69,7 +69,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarEstadoRoom(data, id) {
-        let url = `room/estado/update/${id}`
+        let url = `estado-room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -90,7 +90,7 @@ const roomService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarEstadoRoom(id) {
-        let url = `room/estado/delete/${id}`
+        let url = `estado-room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

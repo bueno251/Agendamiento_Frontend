@@ -27,7 +27,7 @@ const CaracteristicasService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     crearCaracteristica(data) {
-        let url = `room/caracteristicas/create`
+        let url = `caracteristica`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -47,7 +47,7 @@ const CaracteristicasService = {
      * @returns {Promise} Promesa que se resuelve con la lista de características o se rechaza con un error.
      */
     obtenerCaracteristicas() {
-        let url = `room/caracteristicas/read`
+        let url = `caracteristicas`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -69,7 +69,7 @@ const CaracteristicasService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     actualizarCaracteristica(data, id) {
-        let url = `room/caracteristicas/update/${id}`
+        let url = `caracteristica/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -90,7 +90,7 @@ const CaracteristicasService = {
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     eliminarCaracteristica(id) {
-        let url = `room/caracteristicas/delete/${id}`
+        let url = `caracteristica/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

@@ -9,7 +9,7 @@ import EstadoRoomService from './EstadoRoomService';
 import ImpuestoService from './ImpuestoService';
 import RoomService from './RoomService';
 import SocrataService from './SocrataService';
-import TarifaService from './TarifaController';
+import TarifaService from './TarifaService';
 import TipoRoomService from './TipoRoomService';
 import UbicacionService from './UbicacionService';
 

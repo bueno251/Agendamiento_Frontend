@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%" min-height="100px">
+    <v-card width="90%" elevation="5" min-height="100px">
         <v-card-title class="blue lighten-2 mb-5 white--text">
             Empresa
         </v-card-title>
@@ -157,7 +157,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '@/services/ConfigService'
+import service from '@/services/service'
 import UbicacionService from '@/modules/client/services/UbicacionService'
 
 export default {
@@ -281,7 +281,7 @@ export default {
             }
 
             // Llama al servicio para crear o actualizar la empresa
-            configService.guardarEmpresa(data)
+            service.guardarEmpresa(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update')
@@ -303,7 +303,7 @@ export default {
          * Obtiene los tipos de empresa desde el servicio.
          */
         getTipos() {
-            configService.obtenerTiposEmpresa()
+            service.obtenerTiposEmpresa()
                 .then(res => {
                     // Asigna los tipos de documentos, entornos, operaciones, organizaciones, regímenes y responsabilidades a las variables del componente
                     this.documentos = res.documentos

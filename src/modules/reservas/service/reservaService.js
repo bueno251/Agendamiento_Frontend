@@ -38,7 +38,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de habitaciones falla.
      */
     obtenerRooms() {
-        let url = 'room/read/client'
+        let url = 'rooms'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -60,7 +60,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de la habitación falla.
      */
     obtenerRoom(id) {
-        let url = `room/find/${id}`
+        let url = `room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -81,7 +81,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de desayunos falla.
      */
     obtenerDesayunos() {
-        let url = 'desayunos/read'
+        let url = 'desayunos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -102,7 +102,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de decoraciones falla.
      */
     obtenerDecoraciones() {
-        let url = 'decoraciones/read'
+        let url = 'decoraciones'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -145,7 +145,7 @@ const reservaService = {
      * @throws {Error} - Error si la reserva falla.
      */
     reservar(data) {
-        let url = 'reserva/create'
+        let url = 'reserva'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -196,7 +196,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de reservas falla.
      */
     obtenerReservas(estado = '') {
-        let url = `reserva/read`
+        let url = `reservas`
 
         if (estado) {
             url += `/${estado}`
@@ -287,7 +287,7 @@ const reservaService = {
      * @throws {Error} - Error si la obtención de características de las habitaciones falla.
      */
     obtenerCaracteristicas() {
-        let url = `room/caracteristicas/read`
+        let url = `caracteristicas`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -301,7 +301,7 @@ const reservaService = {
     },
 
     crearCancelacionTipo(data) {
-        let url = `cancelar/tipo/create`
+        let url = `cancelar/tipo`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -315,7 +315,7 @@ const reservaService = {
     },
 
     obtenerCancelacionTipos() {
-        let url = `cancelar/tipo/read`
+        let url = `cancelar/tipos`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -329,7 +329,7 @@ const reservaService = {
     },
 
     actualizarCancelacionTipo(data, id) {
-        let url = `cancelar/tipo/update/${id}`
+        let url = `cancelar/tipo${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -343,7 +343,7 @@ const reservaService = {
     },
 
     eliminarCancelacionTipo(id) {
-        let url = `cancelar/tipo/delete/${id}`
+        let url = `cancelar/tipo${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)

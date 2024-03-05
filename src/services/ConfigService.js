@@ -14,7 +14,7 @@ const LOCAL = {
 
 const ConfigService = {
 
-    pagos(data) {
+    guardarMetodosPago(data) {
         let url = 'settings/pagos'
 
         return new Promise((resolve, reject) => {
@@ -28,8 +28,8 @@ const ConfigService = {
         })
     },
 
-    obtener() {
-        let url = 'settings/read'
+    obtenerConfig() {
+        let url = 'settings'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -71,7 +71,7 @@ const ConfigService = {
     },
 
     obtenerTiposEmpresa() {
-        let url = 'settings/empresa/types'
+        let url = 'settings/empresa/tipos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)

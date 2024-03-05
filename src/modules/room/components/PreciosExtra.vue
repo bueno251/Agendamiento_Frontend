@@ -3,17 +3,55 @@
         <v-card class="pa-5">
             <v-form v-model="valid" @submit.prevent="save()">
                 <v-row>
+
                     <v-col cols="12">
-                        <v-text-field v-model="Adicional" v-price label="Tarifa Personal" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Adicional" v-price :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Adicional', Adicional)" outlined required>
+
+                            <template v-slot:label>
+                                Tarifa Persona <span class="red--text">*</span>
+                            </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12">
-                        <v-text-field v-model="Niños" v-price label="Tarifa Niños" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Niños" v-price :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Niños', Niños)" outlined required>
+
+                            <template v-slot:label>
+                                Tarifa Niños <span class="red--text">*</span>
+                            </template>
                         </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="6" sm="6">
+                        <div class="flex">
+                            <p>
+                                Tienen Un Impuesto?
+                            </p>
+                            <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                        </div>
+                    </v-col>
+
+                    <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                        <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+
+                            <template v-slot:label>
+                                Impuesto <span class="red--text">*</span>
+                            </template>
+
+                            <template v-slot:append-outer>
+                                <v-btn icon @click="createImpuestoDialog = true">
+                                    <v-icon>
+                                        mdi-plus-circle
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                        </v-select>
                     </v-col>
                 </v-row>
+
                 <div class="buttons pt-5">
                     <v-btn @click="close" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
@@ -25,8 +63,8 @@
 
 <script>
 
-import Swal from 'sweetalert2';
-import roomService from '../service/roomService';
+import Swal from 'sweetalert2'
+import service from '@/services/service'
 
 export default {
     name: 'PreciosExtra',
@@ -49,6 +87,10 @@ export default {
                     newItem.precios.map((day) => {
                         if (day.name == 'Adicional' || day.name == 'Niños') {
                             this[day.name] = this.comaEnMiles(day.precio)
+                            if (day.impuestoId) {
+                                this.impuesto = day.impuestoId
+                                this.hasIva = true
+                            }
                         }
                     })
                 }
@@ -75,8 +117,11 @@ export default {
         return {
             Adicional: '',
             Niños: '',
+            impuesto: '',
+            hasIva: false,
             valid: false,
             loading: false,
+            impuestos: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 numerico: value => /^[0-9.]+$/.test(value) || "Solo se admiten números y puntos."
@@ -104,11 +149,13 @@ export default {
             ]
 
             let data = {
+                impuesto: this.room.impuestoId,
+                hasIva: this.room.hasIva,
                 weekdays: week
             }
 
             // Llamada al servicio para guardar los precios
-            roomService.guardarPrecios(data, this.room.id)
+            service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
@@ -154,6 +201,15 @@ export default {
             let formattedNumber = precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
             this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
+        getImpuestos() {
+            service.obtenerImpuestos()
+                .then(res => {
+                    this.impuestos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
         /**
          * Cierra el componente emitiento un evento 'close'.
          */
@@ -161,9 +217,26 @@ export default {
             // Emitir evento 'close'
             this.$emit('close')
         },
-    }
+    },
+    mounted() {
+        this.getImpuestos()
+    },
 
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.flex {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+.flex p {
+    padding: 0;
+    margin: 0;
+    text-wrap: balance;
+}
+</style>

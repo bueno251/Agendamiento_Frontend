@@ -40,22 +40,21 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'PreciosRoom',
     props: {
         show: Boolean,
-        id: Number,
+        room: Object,
     },
     watch: {
-        // Observa cambios en la propiedad 'id'
-        id: {
-            // Función que se ejecuta cuando hay cambios en 'id'
+        room: {
+            // Función que se ejecuta cuando hay cambios en 'room'
             handler(newItem) {
                 // Verifica si 'newItem' tiene un valor y si la propiedad 'show' es verdadera
-                if (newItem && this.show) {
-                    // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'id'
+                if (this.show && 'id' in newItem) {
+                    // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'room'
                     this.obtenerPrecios()
                 }
             },
@@ -123,11 +122,13 @@ export default {
             })
 
             let data = {
-                weekdays: week
+                impuesto: this.room.impuestoId,
+                hasIva: this.room.hasIva,
+                weekdays: week,
             }
 
             // Llama al servicio para guardar los precios en el servidor
-            roomService.guardarPrecios(data, this.id)
+            service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
@@ -167,7 +168,7 @@ export default {
          * Obtiene los precios guardados para la habitación y los muestra en la interfaz de usuario.
          */
         obtenerPrecios() {
-            roomService.obtenerPrecios(this.id)
+            service.obtenerTarifas(this.room.id)
                 .then(res => {
                     this.week = [
                         { name: 'Domingo', precio: '', jornada_id: 2 },
@@ -198,7 +199,7 @@ export default {
          * Obtiene las jornadas disponibles.
          */
         getJornadas() {
-            roomService.getJornadas()
+            service.obtenerJornadas()
                 .then(res => {
                     this.jornadas = res
                 })

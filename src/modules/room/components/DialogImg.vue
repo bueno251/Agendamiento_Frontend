@@ -55,7 +55,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'DialogImg',
@@ -134,7 +134,7 @@ export default {
                 })
             }
 
-            roomService.actualizarRoomImg(data, this.room.id)
+            service.actualizarRoomImg(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.imgsToUpload = []

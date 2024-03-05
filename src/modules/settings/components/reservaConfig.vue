@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%">
+    <v-card width="90%" elevation="5">
         <v-card-title class="blue lighten-2 white--text">
             Reservas
         </v-card-title>
@@ -20,6 +20,15 @@
                             Correo obligatorio para el pago?
                         </p>
                         <v-switch v-model="correoRequired" :label="correoRequired ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
+                            Usar tarifas generales?
+                        </p>
+                        <v-switch v-model="tarifasGenerales" :label="tarifasGenerales ? 'Si' : 'No'" inset></v-switch>
                     </div>
                 </v-col>
 
@@ -48,7 +57,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import configService from '@/services/ConfigService'
+import service from '@/services/service'
 
 export default {
     name: 'reservaConfig',
@@ -62,6 +71,7 @@ export default {
                     this.canReservar = newItem.usuarioReserva
                     this.correoRequired = newItem.correoObligatorio
                     this.porcentSeparacion = newItem.porcentajeSeparacion
+                    this.tarifasGenerales = newItem.tarifasGenerales
                 }
             },
             immediate: true,
@@ -72,6 +82,7 @@ export default {
             porcentSeparacion: 0,
             canReservar: true,
             correoRequired: true,
+            tarifasGenerales: true,
             loading: false,
         }
     },
@@ -87,11 +98,12 @@ export default {
                 configuracionId: this.config.id,
                 reservar: this.canReservar,
                 correo: this.correoRequired,
+                tarifasGenerales: this.tarifasGenerales,
                 porcentaje: this.porcentSeparacion,
             }
 
             // Llama al servicio para actualizar la configuración de reserva
-            configService.guardarConfigReserva(data)
+            service.guardarConfigReserva(data)
                 .then(res => {
                     this.loading = false
                     this.$emit('update') // Emite un evento para informar a componentes padre sobre la actualización

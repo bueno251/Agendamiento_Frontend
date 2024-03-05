@@ -51,7 +51,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'CreateCaracteristicRoom',
@@ -100,7 +100,7 @@ export default {
                 estado: this.estado,
             }
 
-            roomService.crearCaracteristica(data)
+            service.crearCaracteristica(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.$refs.formCreate.reset()
