@@ -5,13 +5,13 @@
                 <v-row>
                     <v-col cols="12">
                         <v-text-field v-model="correo" label="Correo" :rules="[rules.required, rules.email]"
-                            prepend-inner-icon="mdi-account" outlined required>
+                            prepend-inner-icon="mdi-account" dense outlined required>
                         </v-text-field>
                     </v-col>
                     <v-col cols="12">
                         <v-text-field v-model="password" label="Contraseña" :rules="[rules.required, rules.min]"
                             :type="show ? 'text' : 'password'" prepend-inner-icon="mdi-key"
-                            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" @click:append="show = !show" outlined required>
+                            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" @click:append="show = !show" dense outlined required>
                         </v-text-field>
                     </v-col>
                     <v-col cols="12" class="flex">

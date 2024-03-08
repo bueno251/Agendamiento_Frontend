@@ -11,7 +11,7 @@
 
                     <v-col cols="12">
                         <v-select v-model="tipo" :items="tipos" no-data-text="No hay tipos" :rules="[rules.required]"
-                            item-text="tipo" item-value="id" outlined>
+                            item-text="tipo" item-value="id" dense outlined>
                             <template v-slot:label>
                                 Tipo <span class="red--text">*</span>
                             </template>
@@ -61,7 +61,7 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">confirmar</v-btn>
                 </div>
             </v-form>
@@ -72,7 +72,7 @@
                 <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
@@ -93,7 +93,7 @@
                 <v-form ref="formUpdate" v-model="validCreate" @submit.prevent="actualizar">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
@@ -171,6 +171,7 @@ export default {
             service.cancelarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',
@@ -198,7 +199,6 @@ export default {
                     this.loadingbtn = false
                     this.dialogCreate = false
                     this.getTipos()
-                    this.close()
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -211,6 +211,15 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
+                    console.error(err)
+                })
+        },
+        getTipos() {
+            service.obtenerTiposCancelacion()
+                .then(res => {
+                    this.tipos = res
+                })
+                .catch(err => {
                     console.error(err)
                 })
         },
@@ -262,18 +271,6 @@ export default {
                     })
                     console.error(err)
                 })
-        },
-        getTipos() {
-            service.obtenerTiposCancelacion()
-                .then(res => {
-                    this.tipos = res
-                })
-                .catch(err => {
-                    console.error(err)
-                })
-        },
-        close() {
-            this.$emit('close')
         },
     },
     mounted() {

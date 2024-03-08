@@ -4,37 +4,9 @@
             <v-form ref="form" v-model="valid" @submit.prevent="newClient">
                 <v-row>
 
-                    <v-col cols="12" md="4" sm="6">
-                        <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
-                            <template v-slot:label>
-                                Tipo de documento <span class="red--text">*</span>
-                            </template>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="documento" :rules="[rules.required, rules.min]"
-                            @click:append="searchDocument" type="number" append-icon="mdi-magnify" hide-spin-buttons
-                            outlined required>
-                            <template v-slot:label>
-                                Documento <span class="red--text">*</span>
-                            </template>
-                            <template v-slot:append-outer>
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-icon v-on="on">
-                                            mdi-help-circle-outline
-                                        </v-icon>
-                                    </template>
-                                    Buscar documento
-                                </v-tooltip>
-                            </template>
-                        </v-text-field>
-                    </v-col>
-
                     <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="nombre1" :rules="[rules.required, rules.textOnly]" outlined required>
+                        <v-text-field v-model="nombre1" :rules="[rules.required, rules.textOnly]" dense outlined
+                            required>
                             <template v-slot:label>
                                 Primer Nombre <span class="red--text">*</span>
                             </template>
@@ -42,7 +14,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="nombre2" :rules="[rules.textOnly]" outlined>
+                        <v-text-field v-model="nombre2" :rules="[rules.textOnly]" dense outlined>
                             <template v-slot:label>
                                 Segundo Nombre
                             </template>
@@ -50,7 +22,8 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="apellido1" :rules="[rules.required, rules.textOnly]" outlined required>
+                        <v-text-field v-model="apellido1" :rules="[rules.required, rules.textOnly]" dense outlined
+                            required>
                             <template v-slot:label>
                                 Primer Apellido <span class="red--text">*</span>
                             </template>
@@ -58,24 +31,36 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="apellido2" :rules="[rules.textOnly]" outlined>
+                        <v-text-field v-model="apellido2" :rules="[rules.textOnly]" dense outlined>
                             <template v-slot:label>
                                 Segundo Apellido
                             </template>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="direccion" :rules="[rules.required]" append-icon="mdi-map-marker" outlined
+                    <v-col cols="12" md="3" sm="6">
+                        <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
                             required>
                             <template v-slot:label>
-                                Direccion <span class="red--text">*</span>
-                            </template></v-text-field>
+                                Tipo de documento <span class="red--text">*</span>
+                            </template>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model="documento" @focusout="searchDocument"
+                            :rules="[rules.required, rules.min]" type="number" dense hide-spin-buttons outlined
+                            required>
+                            <template v-slot:label>
+                                Documento <span class="red--text">*</span>
+                            </template>
+                        </v-text-field>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
-                            append-icon="mdi-cellphone" hide-spin-buttons outlined required>
+                            append-icon="mdi-cellphone" hide-spin-buttons dense outlined required>
                             <template v-slot:label>
                                 Teléfono Celular <span class="red--text">*</span>
                             </template>
@@ -84,35 +69,44 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <v-text-field v-model="telefonoAlt" type="number" append-icon="mdi-phone" hide-spin-buttons
-                            outlined>
+                            dense outlined>
                             <template v-slot:label>
                                 Teléfono Alternativo
                             </template>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model="direccion" :rules="[rules.required]" append-icon="mdi-map-marker" dense
+                            outlined required>
+                            <template v-slot:label>
+                                Direccion <span class="red--text">*</span>
+                            </template></v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
                         <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
-                            :rules="[rules.required]" @change="getDepartamentos" no-data-text="Espere un momento..." outlined
-                            required>
+                            :rules="[rules.required]" @change="getDepartamentos" no-data-text="Espere un momento..."
+                            dense outlined required>
                             <template v-slot:label>
                                 País <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
-                        <v-select v-model="departamento" :items="states" item-text="state_name" item-value="state_name"
-                            :loading="loadingState" @change="getMunicipios" no-data-text="No hay departamentos" outlined>
+                    <v-col cols="12" md="3" sm="6">
+                        <v-select v-model="departamento" :items="departamentos" item-text="state_name"
+                            item-value="state_name" :loading="loadingDepartamentos" @change="getMunicipios"
+                            no-data-text="Seleccione un pais" dense outlined>
                             <template v-slot:label>
                                 Departamento <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <v-select v-model="municipio" :items="municipios" item-text="city_name" item-value="city_name"
-                            :loading="loadingMunicipio" no-data-text="No hay municipios" outlined>
+                            :loading="loadingMunicipio" no-data-text="Seleccione un departamento" dense outlined>
                             <template v-slot:label>
                                 Municipio <span class="red--text">*</span>
                             </template>
@@ -121,7 +115,8 @@
 
                     <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoPersona" :items="tipoPeople" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                            required>
                             <template v-slot:label>
                                 Tipo de Persona <span class="red--text">*</span>
                             </template>
@@ -130,7 +125,8 @@
 
                     <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoObligacion" :items="tipoObligations" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                            required>
                             <template v-slot:label>
                                 Tipo de Obligación <span class="red--text">*</span>
                             </template>
@@ -139,7 +135,8 @@
 
                     <v-col cols="12" md="4" sm="4">
                         <v-select v-model="tipoRegimen" :items="tipoRegimens" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                            required>
                             <template v-slot:label>
                                 Tipo de Régimen <span class="red--text">*</span>
                             </template>
@@ -154,7 +151,7 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
                 </div>
             </v-form>
@@ -165,7 +162,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import clienteService from '../services/clienteService'
+import service from '@/services/service'
 import UbicacionService from '../services/UbicacionService'
 
 export default {
@@ -193,7 +190,7 @@ export default {
             observacion: '',
             valid: false,
             loadingbtn: false,
-            loadingState: false,
+            loadingDepartamentos: false,
             loadingMunicipio: false,
             tipoDocuments: [],
             tipoObligations: [],
@@ -201,7 +198,7 @@ export default {
             tipoRegimens: [],
             countries: [],
             municipios: [],
-            states: [],
+            departamentos: [],
             default: {},
             rules: {
                 required: value => !!value || 'Campo requerido.',
@@ -247,7 +244,7 @@ export default {
             }
 
             // Llamar al servicio para crear un nuevo cliente
-            clienteService.crear(data)
+            service.crearCliente(data)
                 .then(res => {
                     // Desactivar la animación de carga del botón
                     this.loadingbtn = false
@@ -256,7 +253,8 @@ export default {
                     this.$refs.form.reset()
 
                     // Emitir un evento para informar que se ha creado un nuevo cliente
-                    this.$emit('create')
+                    this.$emit('close')
+                    this.$emit('update')
 
                     // Mostrar mensaje de éxito utilizando SweetAlert
                     Swal.fire({
@@ -281,7 +279,7 @@ export default {
         */
         getDatos() {
             // Obtener tipos de documentos, obligaciones, personas y regímenes
-            clienteService.obtenerTipos()
+            service.obtenerTiposCliente()
                 .then(res => {
                     // Asignar resultados a las variables correspondientes
                     this.tipoDocuments = res.documents
@@ -294,7 +292,7 @@ export default {
                 })
 
             // Obtener valores predeterminados desde el servicio de cliente
-            clienteService.obtenerValoresDefault()
+            service.obtenerValoresDefault()
                 .then(res => {
                     // Asignar valores predeterminados a las variables correspondientes
                     this.default = res
@@ -329,11 +327,11 @@ export default {
         },
         /**
          * Obtiene la lista de estados para el país seleccionado
-         * desde el servicio de ubicación y la asigna a la variable 'states'.
+         * desde el servicio de ubicación y la asigna a la variable 'departamentos'.
          */
         getDepartamentos() {
             // Habilitar la animación de carga y restablecer las variables relacionadas con el departamento
-            this.loadingState = true
+            this.loadingDepartamentos = true
             this.departamento = ''
             this.municipio = ''
             this.municipios = []
@@ -341,13 +339,13 @@ export default {
             // Obtener la lista de estados para el país seleccionado
             UbicacionService.departamentos(this.pais)
                 .then(res => {
-                    // Asignar la lista de estados a la variable 'states' y desactivar la animación de carga
-                    this.states = res
-                    this.loadingState = false
+                    // Asignar la lista de estados a la variable 'departamentos' y desactivar la animación de carga
+                    this.departamentos = res
+                    this.loadingDepartamentos = false
                 })
                 .catch(err => {
                     console.error(err)
-                    this.loadingState = false
+                    this.loadingDepartamentos = false
                 })
         },
         /**
@@ -377,40 +375,24 @@ export default {
          */
         searchDocument() {
             // Verificar si hay un documento para buscar
-            if (!this.documento) {
-                Swal.fire({
-                    icon: 'error',
-                    text: 'No hay documento a buscar',
-                })
+            if (this.documento.length < 5) {
                 return
             }
 
             // Buscar el documento en la base de datos
-            clienteService.encontrarDocumento(this.documento)
+            service.encontrarClienteDocumento(this.documento)
                 .then(res => {
                     // Mostrar mensaje según el resultado de la búsqueda
-                    if (res.length) {
+                    if ('documento' in res) {
                         Swal.fire({
                             icon: 'error',
                             text: 'Ya se encuentra registrado ese número de documento',
-                        })
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            text: 'Documento disponible',
                         })
                     }
                 })
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        /**
-         * Cierra el componente emitiento un evento 'close'.
-         */
-        close() {
-            // Emitir evento 'close'
-            this.$emit('close')
         },
     },
     mounted() {

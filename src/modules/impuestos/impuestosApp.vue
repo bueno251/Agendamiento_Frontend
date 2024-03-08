@@ -43,7 +43,7 @@
             </v-data-table>
         </v-card>
 
-        <createImpuesto :show="dialogCreate" @close="dialogCreate = false" @update="dialogCreate = false, get()" />
+        <createImpuesto :show="dialogCreate" @close="dialogCreate = false" @update="get()" />
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
@@ -51,7 +51,7 @@
                     <v-row>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="nombreUpdate" :rules="[rules.required]" outlined>
+                            <v-text-field v-model="nombreUpdate" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
@@ -60,7 +60,7 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="codigoUpdate" :rules="[rules.required]" outlined>
+                            <v-text-field v-model="codigoUpdate" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     codigo <span class="red--text">*</span>
@@ -70,7 +70,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-text-field v-model="tasaUpdate" type="number" min="0" :rules="[rules.required]"
-                                hide-spin-buttons outlined>
+                                hide-spin-buttons dense outlined required>
 
                                 <template v-slot:label>
                                     Tasa <span class="red--text">*</span>
@@ -80,7 +80,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="tipoUpdate" :items="tiposImpuesto" :rules="[rules.required]"
-                                no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
+                                no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined required>
 
                                 <template v-slot:label>
                                     Tipo De Impuesto <span class="red--text">*</span>

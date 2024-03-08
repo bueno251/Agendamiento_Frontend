@@ -6,7 +6,7 @@
 
                     <v-col cols="12">
                         <v-text-field v-model="Adicional" v-price :rules="[rules.required, rules.numerico]"
-                            @input="formatNumber('Adicional', Adicional)" outlined required>
+                            @input="formatNumber('Adicional', Adicional)" dense outlined required>
 
                             <template v-slot:label>
                                 Tarifa Persona <span class="red--text">*</span>
@@ -16,7 +16,7 @@
 
                     <v-col cols="12">
                         <v-text-field v-model="Niños" v-price :rules="[rules.required, rules.numerico]"
-                            @input="formatNumber('Niños', Niños)" outlined required>
+                            @input="formatNumber('Niños', Niños)" dense outlined required>
 
                             <template v-slot:label>
                                 Tarifa Niños <span class="red--text">*</span>
@@ -29,13 +29,13 @@
                             <p>
                                 Tienen Un Impuesto?
                             </p>
-                            <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                            <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
                         </div>
                     </v-col>
 
-                    <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                    <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
-                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined required>
 
                             <template v-slot:label>
                                 Impuesto <span class="red--text">*</span>
@@ -53,13 +53,14 @@
                 </v-row>
 
                 <div class="buttons pt-5">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>
 
         <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
+
     </v-dialog>
 </template>
 
@@ -67,12 +68,16 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
+import createImpuesto from '@/modules/impuestos/components/createImpuesto.vue'
 
 export default {
     name: 'PreciosExtra',
     props: {
         show: Boolean,
         room: Object,
+    },
+    components: {
+        createImpuesto,
     },
     watch: {
         // Observa cambios en la propiedad 'room'
@@ -91,7 +96,7 @@ export default {
                             this[day.name] = this.comaEnMiles(day.precio)
                             if (day.impuestoId) {
                                 this.impuesto = day.impuestoId
-                                this.hasIva = true
+                                this.tieneIva = true
                             }
                         }
                     })
@@ -120,7 +125,7 @@ export default {
             Adicional: '',
             Niños: '',
             impuesto: '',
-            hasIva: false,
+            tieneIva: false,
             valid: false,
             loading: false,
             createImpuestoDialog: false,
@@ -153,7 +158,7 @@ export default {
 
             let data = {
                 impuesto: this.impuesto,
-                hasIva: this.hasIva,
+                tieneIva: this.tieneIva,
                 tarifas: week
             }
 

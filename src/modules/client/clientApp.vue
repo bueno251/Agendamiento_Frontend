@@ -34,17 +34,19 @@
                                 </v-list>
                             </v-menu>
                         </td>
+                        <td>{{ row.item.documento }}</td>
                         <td>{{ row.item.fullname }}</td>
                         <td>{{ row.item.direccion }}</td>
-                        <td>{{ row.item.documento }}</td>
                         <td>{{ row.item.observacion }}</td>
                     </tr>
                 </template>
             </v-data-table>
         </v-card>
-        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @create="getClients(), dialogCreate = false" />
-        <DialogUpdate :show="dialogUpdate" :client="client" @close="dialogUpdate = false"
-            @update="getClients(), dialogUpdate = false" />
+
+        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @update="getClients()" />
+
+        <DialogUpdate :show="dialogUpdate" :client="client" @close="dialogUpdate = false" @update="getClients()" />
+        
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -63,9 +65,9 @@
 <script>
 
 import Swal from 'sweetalert2'
-import DialogCreate from "./components/DialogCreate";
-import DialogUpdate from "./components/DialogUpdate";
-import clienteService from './services/clienteService'
+import service from '@/services/service'
+import DialogCreate from "./components/DialogCreate"
+import DialogUpdate from "./components/DialogUpdate"
 
 export default {
     name: 'clientApp',
@@ -85,9 +87,9 @@ export default {
             desserts: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
+                { text: 'Documento', key: 'documento', value: 'documento' },
                 { text: 'Nombre', key: 'nombre', value: 'fullname' },
                 { text: 'Dirección', key: 'direccion', value: 'direccion' },
-                { text: 'Documento', key: 'documento', value: 'documento' },
                 { text: 'Observaciones', key: 'observaciones', value: 'observaciones' },
             ],
         }
@@ -100,7 +102,7 @@ export default {
         getClients() {
             this.loading = true
 
-            clienteService.obtener()
+            service.obtenerClientes()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
@@ -117,7 +119,7 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            clienteService.eliminar(this.client.id)
+            service.eliminarCliente(this.client.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

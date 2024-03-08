@@ -453,14 +453,14 @@ export default {
                 {
                     id: null,
                     nombre: 'Ninguno',
-                    precio: 0,
+                    precioConIva: 0,
                 }
             ],
             decoraciones: [
                 {
                     id: null,
                     nombre: 'Ninguna',
-                    precio: 0,
+                    precioConIva: 0,
                 }
             ],
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),

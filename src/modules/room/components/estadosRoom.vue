@@ -4,7 +4,7 @@
             <v-toolbar elevation="0">
                 <v-toolbar-title>Bitacora cambios</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon class="ml-3" @click="close"><v-icon>mdi-close-box</v-icon></v-btn>
+                <v-btn icon class="ml-3" @click="$emit('close')"><v-icon>mdi-close-box</v-icon></v-btn>
             </v-toolbar>
             <v-data-table :headers="headers" :items="bitacora" :loading="loading"
                 no-data-text="No hay ningún cambio registrado" loading-text="Cargando... Por favor espera"

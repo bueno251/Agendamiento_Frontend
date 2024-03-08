@@ -30,7 +30,7 @@
                                         <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogExtra = true">
-                                        <v-list-item-title v-text="'Tarifas Adicionales'"></v-list-item-title>
+                                        <v-list-item-title v-text="'Tarifa Persona Adicional'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogEspeciales = true">
                                         <v-list-item-title v-text="'Tarifas Especiales'"></v-list-item-title>
@@ -61,12 +61,12 @@
             </v-data-table>
         </v-card>
 
-        <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false"
-            @update="getRooms(), dialogPrecios = false" />
-        <PreciosExtra :show="dialogExtra" :room="room" @close="dialogExtra = false"
-            @update="getRooms(), dialogExtra = false" />
-        <tarifasEspeciales :show="dialogEspeciales" :room="room" @close="dialogEspeciales = false"
-            @update="getRooms(), dialogEspeciales = false" />
+        <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false" @update="getRooms()" />
+
+        <PreciosExtra :show="dialogExtra" :room="room" @close="dialogExtra = false" @update="getRooms()" />
+
+        <tarifasEspeciales :show="dialogEspeciales" :room="room" @close="dialogEspeciales = false" @update="getRooms()" />
+
     </div>
 </template>
 

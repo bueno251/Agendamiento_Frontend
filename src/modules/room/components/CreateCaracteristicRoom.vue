@@ -4,7 +4,7 @@
             <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                        <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                             <template v-slot:label>
                                 Nombre <span class="red--text">*</span>
                             </template>
@@ -13,7 +13,8 @@
 
                     <v-col cols="12">
                         <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
-                            append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" outlined required>
+                            append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" dense outlined
+                            required>
                             <template v-slot:label>
                                 Icono <span class="red--text">*</span>
                             </template>
@@ -22,7 +23,7 @@
 
                     <v-col cols="12">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="estado" item-value="id" outlined>
+                            :rules="[rules.required]" item-text="estado" item-value="id" dense outlined>
                             <template v-slot:label>
                                 Estado <span class="red--text">*</span>
                             </template>
@@ -40,8 +41,9 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="close(), $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit" color="light-green">crear</v-btn>
+                    <v-btn @click="$emit('close'), $refs.formCreate.reset()" color="blue">cancelar</v-btn>
+                    <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
+                        color="light-green">crear</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -104,7 +106,8 @@ export default {
                 .then(res => {
                     this.loadingbtn = false
                     this.$refs.formCreate.reset()
-                    this.$emit('create')
+                    this.$emit('close')
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -125,14 +128,6 @@ export default {
         toIcons() {
             window.open('https://pictogrammers.com/library/mdi/', '_blank')
         },
-        /**
-         * Restablece el formulario de creación y emite un evento para cerrar el componente.
-         */
-        close() {
-            this.$refs.formCreate.reset()
-            this.$emit('close')
-        },
-
     },
 }
 </script>

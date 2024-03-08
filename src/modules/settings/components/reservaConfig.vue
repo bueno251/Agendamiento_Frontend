@@ -90,11 +90,11 @@
                                 <p>
                                     Tienen Un Impuesto?
                                 </p>
-                                <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                                <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
                             </div>
                         </v-col>
 
-                        <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                        <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                             <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
                                 :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
 
@@ -102,13 +102,16 @@
                                     Impuesto <span class="red--text">*</span>
                                 </template>
 
-                                <template v-slot:append-outer>
-                                    <v-btn icon @click="createImpuestoDialog = true">
-                                        <v-icon>
-                                            mdi-plus-circle
-                                        </v-icon>
-                                    </v-btn>
-                                </template>
+                                <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
+                            </template>
                             </v-select>
                         </v-col>
                     </v-row>
@@ -123,6 +126,7 @@
         </v-dialog>
 
         <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
+
     </v-card>
 </template>
 
@@ -179,7 +183,7 @@ export default {
             loading: false,
             tarifasGeneralesDialog: false,
             createImpuestoDialog: false,
-            hasIva: false,
+            tieneIva: false,
             valid: false,
             loadingbtn: false,
             impuestos: [],
@@ -234,7 +238,7 @@ export default {
             let tarifas = this.tarifas.map(nombre => ({ nombre: nombre, precio: parseInt(this[nombre].replace(/\./g, '')) }));
 
             let data = {
-                hasIva: this.hasIva,
+                tieneIva: this.tieneIva,
                 impuesto: this.impuesto,
                 tarifas: tarifas,
             }
@@ -301,7 +305,7 @@ export default {
                             this[day.nombre] = this.comaEnMiles(day.precio)
                             if (day.impuestoId) {
                                 this.impuesto = day.impuestoId
-                                this.hasIva = true
+                                this.tieneIva = true
                             }
                         }
                     })

@@ -81,7 +81,7 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-select v-model="departamento" :items="departamentos" no-data-text="No hay departamentos"
+                        <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione un pais"
                             @change="getMunicipios" :rules="[rules.required]" :disabled="empresa !== null"
                             :loading="loadingDepartamentos" item-text="state_name" item-value="state_name" outlined dense
                             required>
@@ -90,7 +90,7 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Municipio <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-select v-model="municipio" :items="municipios" no-data-text="No hay municipios"
+                        <v-select v-model="municipio" :items="municipios" no-data-text="Seleccione un departamento"
                             :rules="[rules.required]" :disabled="empresa !== null" :loading="loadingMunicipios"
                             item-text="city_name" item-value="city_name" outlined dense required>
                         </v-select>

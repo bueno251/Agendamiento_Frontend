@@ -361,7 +361,7 @@ export default {
                 descripcion: this.descripcion,
                 room: this.room.id,
                 impuesto: this.room.impuestoId,
-                hasIva: this.room.hasIva,
+                tieneIva: this.room.tieneIva,
             }
 
             service.crearTarifaEspecial(data)

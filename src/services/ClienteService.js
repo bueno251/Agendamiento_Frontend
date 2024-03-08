@@ -65,7 +65,7 @@ const ClienteService = {
      * @throws {Error} - Error si la obtención de tipos de clientes falla.
      */
     obtenerTiposCliente() {
-        let url = 'cliente/tipos'
+        let url = 'cliente-tipos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -86,7 +86,7 @@ const ClienteService = {
      * @throws {Error} - Error si la búsqueda del cliente falla.
      */
     encontrarClienteDocumento(documento) {
-        let url = `cliente/document/${documento}`
+        let url = `cliente/documento/${documento}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)

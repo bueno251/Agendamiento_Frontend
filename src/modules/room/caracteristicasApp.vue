@@ -52,14 +52,14 @@
         </v-data-table>
 
         <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
-            @create="getCaracteristicas(), dialogCreate = false" />
+            @update="getCaracteristicas()" />
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="actualizar">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
@@ -69,7 +69,7 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
-                                append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" outlined
+                                append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" dense outlined
                                 required>
 
                                 <template v-slot:label>
@@ -80,7 +80,7 @@
 
                         <v-col cols="12">
                             <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
-                                :rules="[rules.required]" item-text="estado" item-value="id" outlined>
+                                :rules="[rules.required]" item-text="estado" item-value="id" dense outlined>
 
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>

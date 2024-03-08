@@ -4,8 +4,19 @@
             <h2>Información de contacto</h2>
             <v-form v-model="validInfo">
                 <v-row>
+
                     <v-col cols="12" md="6" sm="6">
-                        <label>Cedula <span class="red--text">*</span></label>
+                        <label>
+                            Tipo de documento <span class="red--text">*</span>
+                        </label>
+                        <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                            required>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="6" sm="6">
+                        <label>Número Documento <span class="red--text">*</span></label>
                         <v-text-field v-model="cedula" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
@@ -24,8 +35,8 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired" dense
-                            outlined>
+                        <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired"
+                            dense outlined>
                         </v-text-field>
                     </v-col>
 
@@ -34,6 +45,7 @@
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" dense outlined required>
                         </v-text-field>
                     </v-col>
+
                 </v-row>
             </v-form>
         </v-card>
@@ -90,7 +102,7 @@
                 </span>
                 <span>
                     Valor Separación ({{ porcentajeSeparacion }}%): ${{ comaEnMiles(reserva.valorSeparacion) }} {{
-                        divisa.codigo }}
+                divisa.codigo }}
                 </span>
                 <h2 style="text-wrap: balance;">
                     <strong>
@@ -105,8 +117,9 @@
                 <v-row>
                     <v-col cols="12" v-if="metodosPago.length > 1">
                         <label>Selecciona un método de pago <span class="red--text">*</span></label>
-                        <v-select v-model="metodoPago" :items="metodosPago" no-data-text="No hay metodos de pago validas"
-                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
+                        <v-select v-model="metodoPago" :items="metodosPago"
+                            no-data-text="No hay metodos de pago validas" :rules="[rules.required]" item-text="nombre"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -149,7 +162,6 @@
 import vuex from "@/store"
 import Swal from "sweetalert2"
 import service from "@/services/service"
-import ClienteService from "@/services/ClienteService"
 
 export default {
     name: 'PagarReserva',
@@ -158,6 +170,7 @@ export default {
             reserva: vuex.state.reserva,
             cedula: vuex.state.reserva.cedula,
             roomid: vuex.state.reserva.room.id,
+            tipoDocumento: '',
             nombre: '',
             apellido: '',
             correo: '',
@@ -172,6 +185,7 @@ export default {
             correoRequired: true,
             file: null,
             metodosPago: [],
+            tipoDocuments: [],
             divisa: {
                 codigo: '',
             },
@@ -288,11 +302,11 @@ export default {
                     console.error(err)
                 })
 
-            ClienteService.encontrarDocumento(this.cedula)
+            service.encontrarClienteDocumento(this.cedula)
                 .then(res => {
                     if ('id' in res) {
-                        this.nombre = res.nombre1 + ' ' + res.nombre2
-                        this.apellido = res.apellido1 + ' ' + res.apellido2
+                        this.nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
+                        this.apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
                         this.telefono = res.telefono
                     }
                 })
@@ -321,7 +335,8 @@ export default {
 <style scoped>
 .main {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    width: min(95%, 1275px);
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 15px;
 }
 
