@@ -19,7 +19,7 @@ const store = new Vuex.Store({
 
     state: {
         token: null,
-        tokenUbicacion: null,
+        tokenUbicacion: {},
         user: {},
         reserva: {},
     },
@@ -39,6 +39,7 @@ const store = new Vuex.Store({
         },
         LOGOUT(state) {
             state.token = null;
+            state.tokenUbicacion = {};
             state.user = {};
         },
     },

@@ -24,117 +24,10 @@ const LOCAL = {
 
 /**
  * Servicio para realizar operaciones relacionadas con las reservas utilizando la API externa.
- * @namespace reservaService
+ * @namespace ReservaService
  * @type {Object}
  */
-const reservaService = {
-
-    /**
-     * Obtiene la lista de habitaciones disponibles para el cliente.
-     * 
-     * @memberof reservaService
-     * @function obtenerRooms
-     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la respuesta.
-     * @throws {Error} - Error si la obtención de habitaciones falla.
-     */
-    obtenerRooms() {
-        let url = 'room/read/client'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene información detallada de una habitación por su ID.
-     * 
-     * @function obtenerRoom
-     * @param {string} id - Identificador único de la habitación.
-     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la habitación.
-     * @throws {Error} - Error si la obtención de la habitación falla.
-     */
-    obtenerRoom(id) {
-        let url = `room/find/${id}`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene la lista de opciones de desayuno disponibles.
-     * 
-     * @function obtenerDesayunos
-     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de los desayunos disponibles.
-     * @throws {Error} - Error si la obtención de desayunos falla.
-     */
-    obtenerDesayunos() {
-        let url = 'desayunos/read'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene la lista de opciones de decoración disponibles.
-     * 
-     * @function obtenerDecoraciones
-     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de las decoraciones disponibles.
-     * @throws {Error} - Error si la obtención de decoraciones falla.
-     */
-    obtenerDecoraciones() {
-        let url = 'decoraciones/read'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    /**
-     * Obtiene la lista de métodos de pago disponibles.
-     * 
-     * @function obtenerMetodosPago
-     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de los métodos de pago disponibles.
-     * @throws {Error} - Error si la obtención de métodos de pago falla.
-     */
-    obtenerMetodosPago() {
-        let url = 'pagos'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
+const ReservaService = {
 
     /**
      * Realiza una nueva reserva.
@@ -145,7 +38,7 @@ const reservaService = {
      * @throws {Error} - Error si la reserva falla.
      */
     reservar(data) {
-        let url = 'reserva/create'
+        let url = 'reserva'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -189,14 +82,14 @@ const reservaService = {
     /**
      * Obtiene la lista de reservas con un estado opcional.
      * 
-     * @memberof reservaService
+     * @memberof ReservaService
      * @function obtenerReservas
      * @param {string} [estado=''] - Estado opcional de la reserva.
      * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la respuesta.
      * @throws {Error} - Error si la obtención de reservas falla.
      */
     obtenerReservas(estado = '') {
-        let url = `reserva/read`
+        let url = `reservas`
 
         if (estado) {
             url += `/${estado}`
@@ -279,18 +172,11 @@ const reservaService = {
         })
     },
 
-    /**
-     * Obtiene las características de las habitaciones.
-     * 
-     * @function obtenerCaracteristicas
-     * @returns {Promise<Object>} - Promesa que se resuelve con las características de las habitaciones.
-     * @throws {Error} - Error si la obtención de características de las habitaciones falla.
-     */
-    obtenerCaracteristicas() {
-        let url = `room/caracteristicas/read`
+    cancelarReserva(data, id) {
+        let url = `reserva/cancelar/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -304,4 +190,4 @@ const reservaService = {
 
 LOCAL.Axios()
 
-export default reservaService
+export default ReservaService

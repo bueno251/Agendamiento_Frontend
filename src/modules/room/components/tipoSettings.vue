@@ -1,5 +1,5 @@
 <template>
-    <v-card class="my-5">
+    <v-card width="90%" class="my-5" elevation="5">
         <v-card-title>
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details></v-text-field>
             <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
@@ -7,7 +7,7 @@
             </v-btn>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-            no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
+            no-results-text="No hay ningún tipo de habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -40,6 +40,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="newtipo" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
                                 </template>
@@ -60,6 +61,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="tipo" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
                                 </template>
@@ -92,7 +94,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'tipoSettings',
@@ -145,7 +147,7 @@ export default {
             }
 
             // Llama al servicio para crear un nuevo tipo de habitación
-            roomService.crearRoomTipo(data)
+            service.crearTipoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -162,7 +164,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -172,14 +174,14 @@ export default {
             this.loading = true
 
             // Llama al servicio para obtener la lista de tipos de habitación
-            roomService.obtenerRoomTipos()
+            service.obtenerTiposRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -194,7 +196,7 @@ export default {
             }
 
             // Llama al servicio para actualizar un tipo de habitación existente
-            roomService.actualizarRoomTipo(data, this.type.id)
+            service.actualizarTipoRoom(data, this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -210,7 +212,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -220,7 +222,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar un tipo de habitación
-            roomService.eliminarRoomTipo(this.type.id)
+            service.eliminarTipoRoom(this.type.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -236,7 +238,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

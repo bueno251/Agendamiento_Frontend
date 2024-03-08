@@ -20,6 +20,18 @@
                         <v-list-item router :to="{ name: 'reservasApp' }">
                             <v-list-item-title>Consultar Reservas</v-list-item-title>
                         </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasAprovadas' }">
+                            <v-list-item-title>Reservas Aprovadas</v-list-item-title>
+                        </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasPendientes' }">
+                            <v-list-item-title>Reservas En Proceso</v-list-item-title>
+                        </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'reservasCanceladas' }">
+                            <v-list-item-title>Reservas Canceladas</v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
 
                     <v-list-item router :to="{ name: 'clientes' }">
@@ -41,21 +53,20 @@
                         </v-list-item>
 
                         <v-list-item router :to="{ name: 'habitacionesConfig' }">
-                            <v-list-item-title>Ajustes</v-list-item-title>
+                            <v-list-item-title>Ajustes De Habitaciones</v-list-item-title>
                         </v-list-item>
 
-                        <v-list-item router :to="{ name: 'desayunos' }">
-                            <v-list-item-title>Desayunos</v-list-item-title>
-                        </v-list-item>
-
-                        <v-list-item router :to="{ name: 'decoraciones' }">
-                            <v-list-item-title>Decoraciones</v-list-item-title>
-                        </v-list-item>
-
-                        <v-list-item router :to="{ name: 'caracteristicas' }">
-                            <v-list-item-title>Caracteristicas</v-list-item-title>
+                        <v-list-item router :to="{ name: 'habitacionesTarifas' }">
+                            <v-list-item-title>Tarifas De Habitaciones</v-list-item-title>
                         </v-list-item>
                     </v-list-group>
+
+                    <v-list-item router :to="{ name: 'impuestos' }">
+                        <v-list-item-icon>
+                            <v-icon>mdi-cog</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>Impuestos</v-list-item-title>
+                    </v-list-item>
 
                     <v-list-item router :to="{ name: 'configuracion' }">
                         <v-list-item-icon>

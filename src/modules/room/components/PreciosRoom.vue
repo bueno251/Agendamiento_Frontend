@@ -11,15 +11,16 @@
                                     <label>{{ weekday.name }}</label>
                                     <v-select class="ma-0" v-model="weekday.jornada_id" :items="jornadas"
                                         no-data-text="Espere un momento..." :rules="[rules.required]" label="Jornada"
-                                        item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }" dense
-                                        outlined>
+                                        item-text="nombre" item-value="id" :style="{ transform: 'scale(0.6, 0.6)' }"
+                                        dense outlined>
                                     </v-select>
                                 </div>
                             </v-col>
 
                             <v-col cols="12">
                                 <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
-                                    label="Precio" v-price hide-spin-buttons dense outlined required>
+                                    label="Precio" v-price @input="formatNumber(weekday)" hide-spin-buttons dense
+                                    outlined required>
                                 </v-text-field>
                             </v-col>
                         </div>
@@ -39,23 +40,22 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'PreciosRoom',
     props: {
         show: Boolean,
-        id: Number,
+        room: Object,
     },
     watch: {
-        // Observa cambios en la propiedad 'id'
-        id: {
-            // Función que se ejecuta cuando hay cambios en 'id'
+        room: {
+            // Función que se ejecuta cuando hay cambios en 'room'
             handler(newItem) {
                 // Verifica si 'newItem' tiene un valor y si la propiedad 'show' es verdadera
-                if (newItem && this.show) {
-                    // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'id'
-                    this.getPrecios()
+                if (this.show && 'id' in newItem) {
+                    // Llama al método 'getPrecios' para obtener información relacionada con el nuevo 'room'
+                    this.obtenerPrecios()
                 }
             },
             // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
@@ -122,11 +122,13 @@ export default {
             })
 
             let data = {
-                weekdays: week
+                impuesto: this.room.impuestoId,
+                hasIva: this.room.hasIva,
+                tarifas: week,
             }
 
             // Llama al servicio para guardar los precios en el servidor
-            roomService.savePrecios(data, this.id)
+            service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
@@ -141,7 +143,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -165,47 +167,44 @@ export default {
         /**
          * Obtiene los precios guardados para la habitación y los muestra en la interfaz de usuario.
          */
-        getPrecios() {
-            roomService.getPrecios(this.id)
+        obtenerPrecios() {
+            service.obtenerTarifas(this.room.id)
                 .then(res => {
-                    if (res.length == 0) {
-                        this.$refs.form.resetValidation()
+                    this.week = [
+                        { name: 'Domingo', precio: '', jornada_id: 2 },
+                        { name: 'Lunes', precio: '', jornada_id: 1 },
+                        { name: 'Martes', precio: '', jornada_id: 1 },
+                        { name: 'Miércoles', precio: '', jornada_id: 1 },
+                        { name: 'Jueves', precio: '', jornada_id: 1 },
+                        { name: 'Viernes', precio: '', jornada_id: 1 },
+                        { name: 'Sábado', precio: '', jornada_id: 2 },
+                    ]
 
-                        // Inicializa la semana con precios vacíos si no hay datos guardados
-                        this.week = [
-                            { name: 'Domingo', precio: '', jornada_id: 2 },
-                            { name: 'Lunes', precio: '', jornada_id: 1 },
-                            { name: 'Martes', precio: '', jornada_id: 1 },
-                            { name: 'Miércoles', precio: '', jornada_id: 1 },
-                            { name: 'Jueves', precio: '', jornada_id: 1 },
-                            { name: 'Viernes', precio: '', jornada_id: 1 },
-                            { name: 'Sábado', precio: '', jornada_id: 2 },
-                        ]
+                    this.$refs.form.resetValidation()
 
-                        return
-                    }
+                    res.map((day) => {
+                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name);
 
-                    // Formatea los precios con comas y los muestra en la interfaz de usuario
-                    res.map(day => {
-                        day.precio = this.comaEnMiles(day.precio)
-                    })
+                        if (index !== -1) {
+                            this.week[index].precio = this.comaEnMiles(day.precio);
+                        }
+                    });
 
-                    this.week = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
          * Obtiene las jornadas disponibles.
          */
         getJornadas() {
-            roomService.getJornadas()
+            service.obtenerJornadas()
                 .then(res => {
                     this.jornadas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

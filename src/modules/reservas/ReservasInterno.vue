@@ -55,7 +55,7 @@
 <script>
 
 // import Swal from 'sweetalert2'
-import reservaService from './service/reservaService'
+import service from '@/services/service'
 
 export default {
     name: 'ReservasInterno',
@@ -67,12 +67,12 @@ export default {
     }),
     methods: {
         getRooms() {
-            reservaService.obtenerRooms()
+            service.obtenerRooms()
                 .then(res => {
                     this.rooms = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },

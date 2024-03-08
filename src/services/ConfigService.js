@@ -12,9 +12,9 @@ const LOCAL = {
     }
 }
 
-const configService = {
+const ConfigService = {
 
-    pagos(data) {
+    guardarMetodosPago(data) {
         let url = 'settings/pagos'
 
         return new Promise((resolve, reject) => {
@@ -28,13 +28,13 @@ const configService = {
         })
     },
 
-    obtener() {
-        let url = 'settings/read'
+    obtenerConfig() {
+        let url = 'settings'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
                 .then((res) => {
-                    resolve(res.data[0])
+                    resolve(res.data)
                 })
                 .catch((err) => {
                     reject(err)
@@ -42,7 +42,7 @@ const configService = {
         })
     },
 
-    reservar(data) {
+    guardarConfigReserva(data) {
         let url = 'settings/reservar'
 
         return new Promise((resolve, reject) => {
@@ -56,7 +56,7 @@ const configService = {
         })
     },
 
-    empresa(data) {
+    guardarEmpresa(data) {
         let url = 'settings/empresa'
 
         return new Promise((resolve, reject) => {
@@ -70,8 +70,8 @@ const configService = {
         })
     },
 
-    obtenerEmpresaTipos() {
-        let url = 'settings/empresa/types'
+    obtenerTiposEmpresa() {
+        let url = 'settings/empresa/tipos'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -84,7 +84,7 @@ const configService = {
         })
     },
 
-    valoresDefault(data) {
+    guardarValoresDefault(data) {
         let url = `default`
 
         return new Promise((resolve, reject) => {
@@ -112,7 +112,7 @@ const configService = {
         })
     },
 
-    metodoPago(data) {
+    crearMetodoPago(data) {
         let url = `metodoPago`
 
         return new Promise((resolve, reject) => {
@@ -125,8 +125,43 @@ const configService = {
                 })
         })
     },
+
+    /**
+     * Obtiene la lista de métodos de pago disponibles.
+     * 
+     * @function obtenerMetodosPago
+     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de los métodos de pago disponibles.
+     * @throws {Error} - Error si la obtención de métodos de pago falla.
+     */
+    obtenerMetodosPago() {
+        let url = 'pagos'
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    obtenerConfigReserva() {
+        let url = `reservar`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 LOCAL.Axios()
 
-export default configService
+export default ConfigService

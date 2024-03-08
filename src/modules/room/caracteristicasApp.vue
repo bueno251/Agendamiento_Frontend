@@ -1,63 +1,58 @@
 <template>
-    <div class="content">
-        <h1>
-            Caracteristicas
-        </h1>
-        <v-card width="90%" class="my-5">
-            <v-card-title>
-                <v-row>
-                    <v-col cols="12" md="10">
-                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                            hide-details></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="2">
-                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                            <v-icon>mdi-plus-circle</v-icon> agregar
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </v-card-title>
-            <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ninguna caraccteristica que coincida" no-data-text="No hay caracteristicas"
-                loading-text="Cargando... Por favor espera"
-                :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
-                <template v-slot:item="{ item }">
-                    <tr>
-                        <td>
-                            <v-menu :offset-x="true" transition="scale-transition">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn icon v-bind="attrs" v-on="on">
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item link @click="caracteristica = item, dialogUpdate = true">
-                                        <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="caracteristica = item, dialogDelete = true">
-                                        <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </td>
-                        <td>
-                            <v-avatar color="indigo" size="36">
-                                <v-icon dark>
-                                    mdi-{{ item.icon }}
-                                </v-icon>
-                            </v-avatar>
-                        </td>
-                        <td>{{ item.nombre }}</td>
-                        <td>{{ item.descripcion }}</td>
-                        <td>{{ item.estado }}</td>
-                        <td>{{ item.created_at }}</td>
-                    </tr>
-                </template>
-            </v-data-table>
-        </v-card>
+    <v-card width="90%" elevation="5" class="my-5">
+        <v-card-title>
+            <v-row>
+                <v-col cols="12" md="10" sm="8">
+                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                        hide-details></v-text-field>
+                </v-col>
+                <v-col cols="12" md="2" sm="4">
+                    <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                        <v-icon>mdi-plus-circle</v-icon> agregar
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-card-title>
+        <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
+            no-results-text="No hay ningúna caraccteristica que coincida" no-data-text="No hay caracteristicas"
+            loading-text="Cargando... Por favor espera"
+            :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
+            <template v-slot:item="{ item }">
+                <tr>
+                    <td>
+                        <v-menu :offset-x="true" transition="scale-transition">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon v-bind="attrs" v-on="on">
+                                    <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item link @click="caracteristica = item, dialogUpdate = true">
+                                    <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item link @click="caracteristica = item, dialogDelete = true">
+                                    <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </td>
+                    <td>
+                        <v-avatar color="indigo" size="36">
+                            <v-icon dark>
+                                mdi-{{ item.icon }}
+                            </v-icon>
+                        </v-avatar>
+                    </td>
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ item.estado }}</td>
+                    <td>{{ item.created_at }}</td>
+                </tr>
+            </template>
+        </v-data-table>
+
         <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
-            @create="getCaracteristicas(), dialogCreate = false">
-        </CreateCaracteristicRoom>
+            @create="getCaracteristicas(), dialogCreate = false" />
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
@@ -65,6 +60,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
                                 </template>
@@ -73,7 +69,9 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
-                                append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" outlined required>
+                                append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" outlined
+                                required>
+
                                 <template v-slot:label>
                                     Icono <span class="red--text">*</span>
                                 </template>
@@ -83,6 +81,7 @@
                         <v-col cols="12">
                             <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
                                 :rules="[rules.required]" item-text="estado" item-value="id" outlined>
+
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
                                 </template>
@@ -90,8 +89,9 @@
                         </v-col>
 
                         <v-col cols="12">
-                            <v-textarea v-model="descripcion" :rules="[rules.required]" auto-grow rows="5" dense outlined
-                                required>
+                            <v-textarea v-model="descripcion" :rules="[rules.required]" auto-grow rows="5" dense
+                                outlined required>
+
                                 <template v-slot:label>
                                     Descripción <span class="red--text">*</span>
                                 </template>
@@ -119,13 +119,14 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
-    </div>
+        
+    </v-card>
 </template>
 
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from "./service/roomService"
+import service from '@/services/service'
 import CreateCaracteristicRoom from './components/CreateCaracteristicRoom.vue'
 
 export default {
@@ -205,7 +206,7 @@ export default {
             }
 
             // Llama al servicio para crear una nueva característica de habitación
-            roomService.crearCaracteristica(data)
+            service.crearCaracteristica(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -222,7 +223,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -233,14 +234,14 @@ export default {
             this.caracteristica = {}
 
             // Llama al servicio para obtener la lista de características de habitación
-            roomService.obtenerCaracteristicas()
+            service.obtenerCaracteristicas()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -258,7 +259,7 @@ export default {
             }
 
             // Llama al servicio para actualizar una característica de habitación existente
-            roomService.actualizarCaracteristica(data, this.caracteristica.id)
+            service.actualizarCaracteristica(data, this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -274,7 +275,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -284,7 +285,7 @@ export default {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar una característica de habitación
-            roomService.eliminarCaracteristica(this.caracteristica.id)
+            service.eliminarCaracteristica(this.caracteristica.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -300,7 +301,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

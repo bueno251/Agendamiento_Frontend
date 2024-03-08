@@ -3,30 +3,70 @@
         <v-card class="pa-5">
             <v-form v-model="valid" @submit.prevent="save()">
                 <v-row>
+
                     <v-col cols="12">
-                        <v-text-field v-model="Adicional" label="Tarifa Personal" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Adicional" v-price :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Adicional', Adicional)" outlined required>
+
+                            <template v-slot:label>
+                                Tarifa Persona <span class="red--text">*</span>
+                            </template>
                         </v-text-field>
                     </v-col>
+
                     <v-col cols="12">
-                        <v-text-field v-model="Niños" label="Tarifa Niños" :rules="[rules.required, rules.numerico]"
+                        <v-text-field v-model="Niños" v-price :rules="[rules.required, rules.numerico]"
                             @input="formatNumber('Niños', Niños)" outlined required>
+
+                            <template v-slot:label>
+                                Tarifa Niños <span class="red--text">*</span>
+                            </template>
                         </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="6" sm="6">
+                        <div class="flex">
+                            <p>
+                                Tienen Un Impuesto?
+                            </p>
+                            <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                        </div>
+                    </v-col>
+
+                    <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                        <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+
+                            <template v-slot:label>
+                                Impuesto <span class="red--text">*</span>
+                            </template>
+
+                            <template v-slot:append-outer>
+                                <v-btn icon @click="createImpuestoDialog = true">
+                                    <v-icon>
+                                        mdi-plus-circle
+                                    </v-icon>
+                                </v-btn>
+                            </template>
+                        </v-select>
                     </v-col>
                 </v-row>
+
                 <div class="buttons pt-5">
                     <v-btn @click="close" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>
+
+        <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
     </v-dialog>
 </template>
 
 <script>
 
-import Swal from 'sweetalert2';
-import roomService from '../service/roomService';
+import Swal from 'sweetalert2'
+import service from '@/services/service'
 
 export default {
     name: 'PreciosExtra',
@@ -49,6 +89,10 @@ export default {
                     newItem.precios.map((day) => {
                         if (day.name == 'Adicional' || day.name == 'Niños') {
                             this[day.name] = this.comaEnMiles(day.precio)
+                            if (day.impuestoId) {
+                                this.impuesto = day.impuestoId
+                                this.hasIva = true
+                            }
                         }
                     })
                 }
@@ -75,8 +119,12 @@ export default {
         return {
             Adicional: '',
             Niños: '',
+            impuesto: '',
+            hasIva: false,
             valid: false,
             loading: false,
+            createImpuestoDialog: false,
+            impuestos: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 numerico: value => /^[0-9.]+$/.test(value) || "Solo se admiten números y puntos."
@@ -104,14 +152,17 @@ export default {
             ]
 
             let data = {
-                weekdays: week
+                impuesto: this.impuesto,
+                hasIva: this.hasIva,
+                tarifas: week
             }
 
             // Llamada al servicio para guardar los precios
-            roomService.savePrecios(data, this.room.id)
+            service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
+                    this.$emit('update')
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
@@ -123,18 +174,44 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split(',');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1.';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
+        },
+        /**
+         * Formatea el número de un día de la semana agregando comas para separar miles.
+         * @param {object} precio - Objeto que representa un día de la semana con un precio.
+         */
+        formatNumber(value, precio) {
+            let formattedNumber = precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
+            this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
+        },
+        getImpuestos() {
+            service.obtenerImpuestos()
+                .then(res => {
+                    this.impuestos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
         },
         /**
          * Cierra el componente emitiento un evento 'close'.
@@ -143,9 +220,26 @@ export default {
             // Emitir evento 'close'
             this.$emit('close')
         },
-    }
+    },
+    mounted() {
+        this.getImpuestos()
+    },
 
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.flex {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    gap: 10px;
+}
+
+.flex p {
+    padding: 0;
+    margin: 0;
+    text-wrap: balance;
+}
+</style>

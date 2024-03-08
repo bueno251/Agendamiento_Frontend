@@ -88,7 +88,7 @@ export default {
                     })
 
                     // Registrar detalles del error en la consola
-                    console.log(err);
+                    console.error(err)
                 })
         },
     },

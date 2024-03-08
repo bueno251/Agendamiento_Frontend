@@ -28,6 +28,21 @@ const routes = [
 				component: () => import('@/modules/reservas/ReservasApp.vue'),
 			},
 			{
+				path: 'reservas/aprovadas',
+				name: 'reservasAprovadas',
+				component: () => import('@/modules/reservas/ReservasAprovadas.vue'),
+			},
+			{
+				path: 'reservas/pendientes',
+				name: 'reservasPendientes',
+				component: () => import('@/modules/reservas/ReservasPendientes.vue'),
+			},
+			{
+				path: 'reservas/canceladas',
+				name: 'reservasCanceladas',
+				component: () => import('@/modules/reservas/ReservasCanceladas.vue'),
+			},
+			{
 				path: 'clientes',
 				name: 'clientes',
 				component: () => import('@/modules/client/clientApp.vue')
@@ -43,24 +58,19 @@ const routes = [
 				component: () => import('@/modules/room/roomSettings.vue')
 			},
 			{
+				path: 'habitaciones/tarifas',
+				name: 'habitacionesTarifas',
+				component: () => import('@/modules/room/roomTarifas.vue')
+			},
+			{
 				path: 'configuracion',
 				name: 'configuracion',
 				component: () => import('@/modules/settings/settingsApp.vue')
 			},
 			{
-				path: 'desayunos',
-				name: 'desayunos',
-				component: () => import('@/modules/room/desayunosApp.vue')
-			},
-			{
-				path: 'decoraciones',
-				name: 'decoraciones',
-				component: () => import('@/modules/room/decoracionesApp.vue')
-			},
-			{
-				path: 'caracteristicas',
-				name: 'caracteristicas',
-				component: () => import('@/modules/room/caracteristicasApp.vue')
+				path: 'impuestos',
+				name: 'impuestos',
+				component: () => import('@/modules/impuestos/impuestosApp.vue')
 			},
 		]
 	},

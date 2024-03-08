@@ -38,6 +38,9 @@
                                 Normal
                             </th>
                             <th>
+                                Con Iva
+                            </th>
+                            <th>
                                 Jornada
                             </th>
                         </tr>
@@ -46,7 +49,8 @@
                         <tr v-for="(day, i) in room.precios" :key="day.name">
                             <template v-if="i < 7">
                                 <td>{{ day.name }}</td>
-                                <td>$ {{ comaEnMiles(day.precio) }} COP</td>
+                                <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
+                                <td>$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}</td>
                                 <td>{{ day.jornada }}</td>
                             </template>
                         </tr>
@@ -60,6 +64,7 @@
                 </h2>
 
                 <div class="caracteristics">
+
                     <template v-for="(item, index) in caracteristicas">
                         <div v-if="includeCaracteristic(item, room)" class="caracteristic"
                             :key="`room${room.index}caracteris${index}`">
@@ -82,8 +87,8 @@
             </article>
         </section>
 
-        <section class="calendar pa-5">
-            <v-card class="pa-5 sticky" elevation="5">
+        <section class="calendar sticky pa-5">
+            <v-card class="pa-5" elevation="5">
                 <v-form v-model="valid" ref="fechas">
                     <v-row>
 
@@ -94,56 +99,125 @@
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="12" md="6">
-                            <label>Fecha De LLegada <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
-                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
-                            </v-text-field>
+                        <v-col cols="6">
+                            <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
+                                transition="scale-transition" offset-y min-width="auto">
+
+                                <template v-slot:activator="{ on, attrs }">
+                                    <label>Fecha De LLegada <span class="red--text">*</span></label>
+                                    <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
+                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly dense
+                                        outlined required>
+                                    </v-text-field>
+                                </template>
+
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    @change="save('menu1', dates)" event-color="red lighten-1" locale="es" range
+                                    no-title scrollable>
+                                </v-date-picker>
+                            </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6">
-                            <label>Fecha De Salida <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
-                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
-                            </v-text-field>
+                        <v-col cols="6">
+                            <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
+                                transition="scale-transition" offset-y min-width="auto">
+
+                                <template v-slot:activator="{ on, attrs }">
+                                    <label>Fecha De Salida <span class="red--text">*</span></label>
+                                    <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
+                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly dense
+                                        outlined required>
+                                    </v-text-field>
+                                </template>
+
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    @change="save('menu2', dates)" event-color="red lighten-1" locale="es" range
+                                    no-title scrollable>
+                                </v-date-picker>
+                            </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.has_desayuno">
+                        <v-col cols="12" md="6" sm="6" v-if="room.hasDesayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                item-text="desayuno" item-value="id" dense outlined>
+                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
+                                return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" v-if="room.has_decoracion">
+                        <v-col cols="12" md="6" sm="6" v-if="room.hasDecoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                item-text="decoracion" item-value="id" dense outlined>
+                                :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
+                                return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Adultos<span class="red--text">*</span></label>
                             <v-select v-model="adultos" :items="selectAdultos"
-                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Niños<span class="red--text">*</span></label>
                             <v-select v-model="niños" :items="selectNiños"
-                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(item.val) : ''}`"
+                                :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
+                        <v-col cols="6">
+                            <label>Valor Adultos</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioAdultos) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <label>Valor Niños</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioNiños) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col v-if="room.hasDecoracion" cols="6">
+                            <label>Valor Decoración</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioDecoracion) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col v-if="room.hasDesayuno && !room.incluyeDesayuno" cols="6">
+                            <label>Valor Desayuno</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioDesayuno) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <label>Precio De La Alojamiento</label>
+                            <h4>
+                                $ {{ comaEnMiles(precioAlojamiento) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col v-if="porcentajeSeparacion" cols="6">
+                            <label>Valor Separación {{ porcentajeSeparacion }}%</label>
+                            <h4>
+                                $ {{ comaEnMiles(valorSeparacion) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+                            <h3>Precio Total De La Reserva <span v-if="room.iva">IVA: ({{ room.iva }}%)</span></h3>
+                            <h1>
+                                $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
+                            </h1>
+                        </v-col>
                     </v-row>
-
-                    <h2>
-                        $ {{ comaEnMiles(precio) }} COP
-                    </h2>
-
 
                     <div class="buttons mt-5">
                         <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
@@ -164,12 +238,6 @@
                                 hide-spin-buttons dense outlined required>
                             </v-text-field>
                         </v-col>
-
-                        <v-col cols="12">
-                            <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" label="Telefono" dense
-                                outlined required>
-                            </v-text-field>
-                        </v-col>
                     </v-row>
                     <div class="buttons mt-5">
                         <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
@@ -185,8 +253,8 @@
 
 <script>
 
+import service from '@/services/service'
 import colombiaHolidays from 'colombia-holidays'
-import reservaService from './service/reservaService'
 
 export default {
     name: 'RoomInfo',
@@ -212,25 +280,46 @@ export default {
         /**
          * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida, así como el número de adultos y niños.
          */
-        precio() {
+        precioAlojamiento() {
             let precio = 0
 
             if (this.dates.length === 2) {
                 let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
-                // Calcula el precio acumulado por cada día de estancia
-                while (fechaInicio <= fechaFinal) {
-                    precio += this.room.precios[fechaInicio.getDay()].precio
+                // Calcula el precio acumulado por cada día de alojamiento
+                while (fechaInicio < fechaFinal) {
+                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
                 }
             }
 
-            // Agrega el precio de los adultos y niños adicionales
-            precio += this.adultos.val
-            precio += this.niños.val
+            return Number(precio.toFixed(2))
+        },
+        precioAdultos() {
+            return Number(this.precioToDolar(this.adultos.val))
+        },
+        precioNiños() {
+            return Number(this.precioToDolar(this.niños.val))
+        },
+        precioDecoracion() {
+            return Number(this.precioToDolar(this.decoracion.precioConIva))
+        },
+        precioDesayuno() {
+            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva)) : 0
+        },
+        valorSeparacion() {
+            return this.precioAlojamiento ? (this.precioAlojamiento * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+        },
+        precioTotal() {
+            let precio = 0
 
+            precio += this.precioAlojamiento
+            precio += this.precioAdultos
+            precio += this.precioNiños
+            precio += this.precioDecoracion
+            precio += this.precioDesayuno
             return precio
         },
         /**
@@ -247,7 +336,8 @@ export default {
 
                 // Asigna el valor del precio de adultos adicionales si está disponible
                 if (this.room.precios.length > 7) {
-                    value = i > 1 ? this.room.precios[7].precio : 0
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.room.precios[7].precioConIva
+                    value = i > 1 ? precio : 0
                 }
 
                 let cantidad = i + 1
@@ -279,7 +369,8 @@ export default {
 
                 // Asigna el valor del precio de niños adicionales si está disponible
                 if (this.room.precios.length > 7) {
-                    value = i > 1 ? this.room.precios[8].precio : 0
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.room.precios[8].precioConIva
+                    value = i > 1 ? precio : 0
                 }
 
                 let cantidad = i + 1
@@ -312,22 +403,36 @@ export default {
                 let sortDates = this.dates.toSorted()
                 this.dates = sortDates
             }
-        }
+        },
     },
     data() {
         return {
             cedula: '',
-            telefono: '',
-            desayuno: null,
-            decoracion: null,
+            desayuno: {
+                id: null,
+                nombre: 'Ninguno',
+                precioConIva: 0,
+            },
+            decoracion: {
+                id: null,
+                nombre: 'Ninguna',
+                precioConIva: 0,
+            },
             maxDate: '',
             cantidadRooms: 1,
             model: 0,
+            porcentajeSeparacion: 0,
+            dolarPrice: 0,
+            priceInDolar: false,
+            dolarPriceAuto: true,
             valid: false,
             validDatosCliente: false,
             loading: false,
             loadingbtn: false,
             datosCliente: false,
+            useGenerales: false,
+            menu1: false,
+            menu2: false,
             file: null,
             dates: [],
             datesInvalid: [],
@@ -341,16 +446,21 @@ export default {
                 cantidad: 0,
                 val: 0
             },
+            divisa: {
+                codigo: '',
+            },
             desayunos: [
                 {
                     id: null,
-                    desayuno: 'Ninguno'
+                    nombre: 'Ninguno',
+                    precio: 0,
                 }
             ],
             decoraciones: [
                 {
                     id: null,
-                    decoracion: 'Ninguna'
+                    nombre: 'Ninguna',
+                    precio: 0,
                 }
             ],
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -390,10 +500,6 @@ export default {
 
                     return true;
                 },
-                phone: value => {
-                    const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
-                    return pattern.test(value) || 'Número de teléfono inválido.'
-                },
             },
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
@@ -407,12 +513,12 @@ export default {
         getRoom() {
             let id = this.$route.params.id
 
-            reservaService.obtenerRoom(id)
+            service.obtenerRoom(id)
                 .then(res => {
                     this.room = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.$router.push({ name: 'viewRooms' })
                 })
         },
@@ -430,9 +536,14 @@ export default {
                 room: this.room,
                 adultos: this.adultos.cantidad,
                 niños: this.niños.cantidad,
-                precio: this.precio,
+                precioAlojamiento: this.precioAlojamiento,
+                precioAdultos: this.precioAdultos,
+                precioNiños: this.precioNiños,
+                precioDecoracion: this.precioDecoracion,
+                precioDesayuno: this.precioDesayuno,
+                valorSeparacion: this.valorSeparacion,
+                precioTotal: this.precioTotal,
                 cedula: this.cedula,
-                telefono: this.telefono,
                 cantidad_rooms: this.cantidadRooms,
             }
 
@@ -449,14 +560,30 @@ export default {
             this.$router.push({ name: 'pagar' })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split(',');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1.';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
+        },
+        precioToDolar(numero) {
+            if (!this.priceInDolar) {
+                return numero
+            }
+
+            return parseFloat((numero / this.dolarPrice).toFixed(2))
         },
         /**
          * Obtiene los días festivos en Colombia.
@@ -503,12 +630,12 @@ export default {
         getDates() {
             let id = this.$route.params.id
 
-            reservaService.getFechasRoom(id)
+            service.getFechasRoom(id)
                 .then(res => {
                     this.datesInvalid = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -525,33 +652,65 @@ export default {
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
          */
         getDatos() {
-            reservaService.obtenerDesayunos()
+            service.obtenerDesayunos()
                 .then(res => {
                     this.desayunos = [...this.desayunos, ...res]
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
-            reservaService.obtenerDecoraciones()
+            service.obtenerDecoraciones()
                 .then(res => {
                     this.decoraciones = [...this.decoraciones, ...res]
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
 
-            reservaService.obtenerCaracteristicas()
+            service.obtenerCaracteristicas()
                 .then(res => {
                     this.caracteristicas = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         },
+        async getDefault() {
+
+            service.obtenerConfigReserva()
+                .then(res => {
+                    this.porcentajeSeparacion = res.porcentajeSeparacion
+                    this.useGenerales = res.tarifasGenerales
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            try {
+                let res = await service.obtenerValoresDefault()
+                this.divisa = res.divisa
+                this.priceInDolar = res.priceInDolar
+                this.dolarPriceAuto = res.dolarPriceAuto
+                this.dolarPrice = res.dolarPrice
+
+                if (this.dolarPriceAuto) {
+                    res = await service.valorDolar()
+                    this.dolarPrice = res.valor
+                }
+            } catch (err) {
+                this.priceInDolar = false
+                console.error(err)
+            }
+
+        },
+        save(menu, date) {
+            this.$refs[menu].save(date)
+        },
     },
-    mounted() {
+    async mounted() {
         this.getRoom()
+        await this.getDefault()
         this.getDates()
         this.getDatos()
         this.getFestivos()
@@ -561,7 +720,9 @@ export default {
 
 <style scoped>
 .contenido {
+    position: relative;
     display: flex;
+    flex-wrap: wrap;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -590,10 +751,14 @@ h2 {
     text-wrap: pretty;
 }
 
+.portrait {
+    width: 100%;
+    aspect-ratio: 3/2;
+}
+
 .calendar {
     width: min(95%, 500px);
-    height: 100%;
-    position: relative;
+    height: fit-content;
 }
 
 .sticky {

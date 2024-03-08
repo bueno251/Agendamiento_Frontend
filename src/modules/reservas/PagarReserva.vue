@@ -4,32 +4,32 @@
             <h2>Información de contacto</h2>
             <v-form v-model="validInfo">
                 <v-row>
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Cedula <span class="red--text">*</span></label>
                         <v-text-field v-model="cedula" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Nombre <span class="red--text">*</span></label>
                         <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Apellido <span class="red--text">*</span></label>
                         <v-text-field v-model="apellido" :rules="[rules.required]" dense outlined required>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
-                        <label>Correo <span class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" type="email" dense outlined
-                            required>
+                    <v-col cols="12" md="6" sm="6">
+                        <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
+                        <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired" dense
+                            outlined>
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6">
+                    <v-col cols="12" md="6" sm="6">
                         <label>Telefono <span class="red--text">*</span></label>
                         <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" dense outlined required>
                         </v-text-field>
@@ -72,11 +72,32 @@
                     {{ reserva.niños }}
                 </p>
             </div>
-            <h2>
-                <strong>
-                    $ {{ comaEnMiles(reserva.precio) }} COP
-                </strong>
-            </h2>
+            <div class="d-flex flex-column">
+                <span v-if="reserva.precioAdultos">
+                    Adultos Extra: ${{ comaEnMiles(reserva.precioAdultos) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioNiños">
+                    Niños: ${{ comaEnMiles(reserva.precioNiños) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioDecoracion">
+                    Decoración: ${{ comaEnMiles(reserva.precioDecoracion) }} {{ divisa.codigo }}
+                </span>
+                <span v-if="reserva.precioDesayuno">
+                    Desayuno: ${{ comaEnMiles(reserva.precioDesayuno) }} {{ divisa.codigo }}
+                </span>
+                <span>
+                    Alojamiento: ${{ comaEnMiles(reserva.precioAlojamiento) }} {{ divisa.codigo }}
+                </span>
+                <span>
+                    Valor Separación ({{ porcentajeSeparacion }}%): ${{ comaEnMiles(reserva.valorSeparacion) }} {{
+                        divisa.codigo }}
+                </span>
+                <h2 style="text-wrap: balance;">
+                    <strong>
+                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }}
+                    </strong>
+                </h2>
+            </div>
         </v-card>
 
         <v-card class="pa-5 column2" elevation="5">
@@ -94,14 +115,13 @@
                             <label>Número para transacciones: 123456789</label>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Monto <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" v-price readonly dense outlined
-                                required>
+                            <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6">
+                        <v-col cols="12" md="6" sm="6">
                             <label>Comprobante de pago <span class="red--text">*</span></label>
                             <v-file-input v-model="file" :rules="[rules.file]" :clearable="false" accept="image/*,.pdf"
                                 truncate-length="15" chips outlined dense required></v-file-input>
@@ -128,29 +148,11 @@
 
 import vuex from "@/store"
 import Swal from "sweetalert2"
-import reservaService from './service/reservaService'
+import service from "@/services/service"
+import ClienteService from "@/services/ClienteService"
 
 export default {
-    name: 'DialogUpdate',
-    directives: {
-        'price': {
-            // Se ejecuta cuando la directiva es vinculada al elemento
-            bind(el) {
-                // Agrega un event listener al evento 'input'
-                el.addEventListener('input', (event) => {
-                    // Obtiene el nuevo valor eliminando cualquier caracter que no sea un dígito
-                    const newValue = event.target.value.replace(/\D/g, '')
-
-                    // Expresión regular para agregar puntos como separadores de miles
-                    let exp = /(\d)(?=(\d{3})+(?!\d))/g
-                    let rep = '$1.'
-
-                    // Asigna el nuevo valor formateado al campo de entrada
-                    event.target.value = newValue.toString().replace(exp, rep)
-                })
-            }
-        },
-    },
+    name: 'PagarReserva',
     data() {
         return {
             reserva: vuex.state.reserva,
@@ -160,19 +162,29 @@ export default {
             apellido: '',
             correo: '',
             telefono: vuex.state.reserva.telefono,
-            monto: this.comaEnMiles(vuex.state.reserva.precio),
+            monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
             metodoPago: 1,
+            porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
             modalTransferencia: false,
             loading: false,
+            correoRequired: true,
             file: null,
             metodosPago: [],
+            divisa: {
+                codigo: '',
+            },
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 email: value => {
                     const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    return pattern.test(value) || 'Correo inválido.'
+
+                    if (this.correoRequired) {
+                        return !!value || 'Campo requerido.'
+                    }
+
+                    return (pattern.test(value) || !value) || 'Correo inválido.'
                 },
                 phone: value => {
                     const pattern = /^(\+?[0-9]{1,3}[-.\s]?)?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{1,10}$/
@@ -220,7 +232,7 @@ export default {
             data.room = data.room.id
 
             // Realiza la llamada al servicio para reservar
-            reservaService.reservar(data)
+            service.reservar(data)
                 .then(res => {
                     this.loading = false
                     // Muestra un mensaje de éxito y regresa a la página anterior
@@ -230,36 +242,78 @@ export default {
                     }).then(this.$router.back())
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loading = false
                 })
         },
         /**
-         * Formatea un número agregando comas para separar miles.
+         * Formatea un número agregando comas para separar miles y acepta decimales.
          * @param {number} numero - Número que se formateará.
          * @returns {string} Número formateado con comas.
          */
         comaEnMiles(numero) {
-            let exp = /(\d)(?=(\d{3})+(?!\d))/g //* expresión regular que busca tres dígitos
-            let rep = '$1.' //parámetro especial para splice porque los números no son menores a 100
-            return numero.toString().replace(exp, rep)
+            // Convertir el número a cadena y dividir la parte entera de la parte decimal
+            let partes = numero.toString().split(',');
+
+            // Expresión regular para agregar comas a la parte entera
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
+            let repParteEntera = '$1.';
+
+            // Formatear la parte entera y agregar la parte decimal si existe
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
+
+            return resultado;
         },
         /**
          * Obtiene los métodos de pago disponibles.
          * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable metodosPago.
          */
         getMetodosPago() {
-            reservaService.obtenerMetodosPago()
+            service.obtenerMetodosPago()
                 .then(res => {
                     this.metodosPago = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
+                })
+        },
+        getDatos() {
+            service.obtenerConfigReserva()
+                .then(res => {
+                    this.correoRequired = res.correoObligatorio
+                    this.porcentajeSeparacion = res.porcentajeSeparacion
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            ClienteService.encontrarDocumento(this.cedula)
+                .then(res => {
+                    if ('id' in res) {
+                        this.nombre = res.nombre1 + ' ' + res.nombre2
+                        this.apellido = res.apellido1 + ' ' + res.apellido2
+                        this.telefono = res.telefono
+                    }
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
+        getDivisaDefault() {
+            service.obtenerValoresDefault()
+                .then(res => {
+                    this.divisa = res.divisa
+                })
+                .catch(err => {
+                    console.error(err)
                 })
         },
     },
     mounted() {
+        this.getDatos()
         this.getMetodosPago()
+        this.getDivisaDefault()
     },
 }
 </script>
@@ -277,7 +331,7 @@ export default {
 
 .main .v-card {
     justify-self: center;
-    width: 90%;
+    width: 100%;
 }
 
 @media only screen and (max-width: 900px) {

@@ -24,7 +24,7 @@
 
 <script>
 
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'estadosRoom',
@@ -67,14 +67,14 @@ export default {
         obtener() {
             this.loading = true
 
-            roomService.bitacora(this.id)
+            service.bitacora(this.id)
                 .then(res => {
                     this.loading = false
                     this.bitacora = res
                 })
                 .catch(err => {
                     this.loading = false
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**

@@ -1,5 +1,5 @@
 <template>
-    <v-card class="my-5">
+    <v-card width="90%" class="my-5" elevation="5">
         <v-card-title>
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details></v-text-field>
             <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
@@ -7,7 +7,7 @@
             </v-btn>
         </v-card-title>
         <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-            no-results-text="No hay ninguna habitacion que coincida" no-data-text="No hay habitaciones"
+            no-results-text="No hay ningún estado de habitacion que coincida" no-data-text="No hay habitaciones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -40,6 +40,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="newestado" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
                                 </template>
@@ -60,6 +61,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
                                 </template>
@@ -92,7 +94,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import roomService from '../service/roomService'
+import service from '@/services/service'
 
 export default {
     name: 'estadoSettings',
@@ -140,7 +142,7 @@ export default {
                 estado: this.newestado,
             }
 
-            roomService.crearRoomEstado(data)
+            service.crearEstadoRoom(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -157,7 +159,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -166,13 +168,13 @@ export default {
         getEstados() {
             this.loading = true
 
-            roomService.obtenerRoomEstados()
+            service.obtenerEstadosRoom()
                 .then(res => {
                     this.loading = false
                     this.desserts = res
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                     this.loading = false
                 })
         },
@@ -187,7 +189,7 @@ export default {
                 estado: this.estado,
             }
 
-            roomService.actualizarRoomEstado(data, this.estate.id)
+            service.actualizarEstadoRoom(data, this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -203,7 +205,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
         /**
@@ -213,7 +215,7 @@ export default {
         deleted() {
             this.loadingbtn = true
 
-            roomService.eliminarRoomEstado(this.estate.id)
+            service.eliminarEstadoRoom(this.estate.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -229,7 +231,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    console.log(err)
+                    console.error(err)
                 })
         },
     },
