@@ -172,8 +172,8 @@
 
 <script>
 
-import Swal from 'sweetalert2';
-import reservaService from './service/reservaService';
+import Swal from 'sweetalert2'
+import service from '@/services/service'
 
 export default {
     name: 'ReservasPendientes',
@@ -219,7 +219,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            reservaService.obtenerReservas('No Confirmada')
+            service.obtenerReservas('No Confirmada')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res
@@ -275,17 +275,17 @@ export default {
          */
         comaEnMiles(numero) {
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split(',');
+            let partes = numero.toString().split(',')
 
             // Expresión regular para agregar comas a la parte entera
-            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1.';
+            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g
+            let repParteEntera = '$1.'
 
             // Formatear la parte entera y agregar la parte decimal si existe
-            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
+            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera)
+            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada
 
-            return resultado;
+            return resultado
         },
         /**
          * Aprueba una reserva.
@@ -294,7 +294,7 @@ export default {
         aprobar() {
             this.loadingbtn = true
 
-            reservaService.aprobarReserva(this.reserva.id)
+            service.aprobarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
@@ -320,7 +320,7 @@ export default {
         rechazar() {
             this.loadingbtn = true
 
-            reservaService.rechazarReserva(this.reserva.id)
+            service.rechazarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false

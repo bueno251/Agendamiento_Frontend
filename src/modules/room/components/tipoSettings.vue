@@ -1,5 +1,5 @@
 <template>
-    <v-card class="my-5">
+    <v-card width="90%" class="my-5" elevation="5">
         <v-card-title>
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details></v-text-field>
             <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
@@ -40,6 +40,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="newtipo" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
                                 </template>
@@ -60,6 +61,7 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="tipo" :rules="[rules.required]" outlined required>
+
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
                                 </template>

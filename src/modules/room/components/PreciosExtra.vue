@@ -58,6 +58,8 @@
                 </div>
             </v-form>
         </v-card>
+
+        <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
     </v-dialog>
 </template>
 
@@ -121,6 +123,7 @@ export default {
             hasIva: false,
             valid: false,
             loading: false,
+            createImpuestoDialog: false,
             impuestos: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
@@ -149,9 +152,9 @@ export default {
             ]
 
             let data = {
-                impuesto: this.room.impuestoId,
-                hasIva: this.room.hasIva,
-                weekdays: week
+                impuesto: this.impuesto,
+                hasIva: this.hasIva,
+                tarifas: week
             }
 
             // Llamada al servicio para guardar los precios

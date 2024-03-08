@@ -127,7 +127,7 @@
 
 <script>
 
-import reservaService from './service/reservaService'
+import service from '@/services/service'
 import CancelacionReserva from './components/CancelacionReserva.vue'
 
 export default {
@@ -178,7 +178,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            reservaService.obtenerReservas('Confirmada')
+            service.obtenerReservas('Confirmada')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res

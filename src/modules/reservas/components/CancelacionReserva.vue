@@ -131,7 +131,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import reservaService from '../service/reservaService';
+import service from '@/services/service'
 
 export default {
     name: 'CancelacionReserva',
@@ -168,7 +168,7 @@ export default {
                 motivo: this.motivo,
             }
 
-            reservaService.cancelarReserva(data, this.reserva.id)
+            service.cancelarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loading = false
                     this.$emit('update')
@@ -193,7 +193,7 @@ export default {
                 tipo: this.nombre
             }
 
-            reservaService.crearCancelacionTipo(data)
+            service.crearTipoCancelacion(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -221,7 +221,7 @@ export default {
                 tipo: this.nombre
             }
 
-            reservaService.actualizarCancelacionTipo(data, this.opcion.id)
+            service.actualizarTipoCancelacion(data, this.opcion.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -244,7 +244,7 @@ export default {
         eliminar() {
             this.loadingbtn = true
 
-            reservaService.eliminarCancelacionTipo(this.opcion.id)
+            service.eliminarTipoCancelacion(this.opcion.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -264,7 +264,7 @@ export default {
                 })
         },
         getTipos() {
-            reservaService.obtenerCancelacionTipos()
+            service.obtenerTiposCancelacion()
                 .then(res => {
                     this.tipos = res
                 })

@@ -126,6 +126,27 @@ const ConfigService = {
         })
     },
 
+    /**
+     * Obtiene la lista de métodos de pago disponibles.
+     * 
+     * @function obtenerMetodosPago
+     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de los métodos de pago disponibles.
+     * @throws {Error} - Error si la obtención de métodos de pago falla.
+     */
+    obtenerMetodosPago() {
+        let url = 'pagos'
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
     obtenerConfigReserva() {
         let url = `reservar`
 

@@ -124,7 +124,7 @@ export default {
             let data = {
                 impuesto: this.room.impuestoId,
                 hasIva: this.room.hasIva,
-                weekdays: week,
+                tarifas: week,
             }
 
             // Llama al servicio para guardar los precios en el servidor

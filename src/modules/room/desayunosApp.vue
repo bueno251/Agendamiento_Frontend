@@ -1,55 +1,50 @@
 <template>
-    <div class="content">
-        <h1>
-            Desayunos
-        </h1>
-        <v-card width="90%" class="my-5">
-            <v-card-title>
-                <v-row>
-                    <v-col cols="12" md="10" sm="8">
-                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                            hide-details></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="2" sm="4">
-                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                            <v-icon>mdi-plus-circle</v-icon> agregar
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </v-card-title>
-            <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
-                no-results-text="No hay ningún desayuno que coincida" no-data-text="No hay desayunos"
-                loading-text="Cargando... Por favor espera"
-                :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
-                <template v-slot:item="{ item }">
-                    <tr>
-                        <td>
-                            <v-menu :offset-x="true" transition="scale-transition">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn icon v-bind="attrs" v-on="on">
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item link @click="breakfast = item, dialogUpdate = true">
-                                        <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item link @click="breakfast = item, dialogDelete = true">
-                                        <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </td>
-                        <td>{{ item.nombre }}</td>
-                        <td>$ {{ comaEnMiles(item.precio) }}</td>
-                        <td>$ {{ comaEnMiles(item.precioConIva) }}</td>
-                        <td>{{ item.impuesto }} %</td>
-                        <td>$ {{ comaEnMiles(item.precioIva) }}</td>
-                        <td>{{ item.created_at }}</td>
-                    </tr>
-                </template>
-            </v-data-table>
-        </v-card>
+    <v-card width="90%" class="my-5" elevation="5">
+        <v-card-title>
+            <v-row>
+                <v-col cols="12" md="10" sm="8">
+                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                        hide-details></v-text-field>
+                </v-col>
+                <v-col cols="12" md="2" sm="4">
+                    <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                        <v-icon>mdi-plus-circle</v-icon> agregar
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-card-title>
+        <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
+            no-results-text="No hay ningún desayuno que coincida" no-data-text="No hay desayunos"
+            loading-text="Cargando... Por favor espera"
+            :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
+            <template v-slot:item="{ item }">
+                <tr>
+                    <td>
+                        <v-menu :offset-x="true" transition="scale-transition">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon v-bind="attrs" v-on="on">
+                                    <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item link @click="breakfast = item, dialogUpdate = true">
+                                    <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item link @click="breakfast = item, dialogDelete = true">
+                                    <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </td>
+                    <td>{{ item.nombre }}</td>
+                    <td>$ {{ comaEnMiles(item.precio) }}</td>
+                    <td>$ {{ comaEnMiles(item.precioConIva) }}</td>
+                    <td>{{ item.impuesto }} %</td>
+                    <td>$ {{ comaEnMiles(item.precioIva) }}</td>
+                    <td>{{ item.created_at }}</td>
+                </tr>
+            </template>
+        </v-data-table>
 
         <v-dialog :value="dialogCreate" width="90%" max-width="600px" persistent>
             <v-card class="pa-5">
@@ -278,7 +273,7 @@
 
         <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
 
-    </div>
+    </v-card>
 </template>
 
 <script>

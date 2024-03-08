@@ -144,7 +144,7 @@
 
 <script>
 
-import reservaService from './service/reservaService'
+import service from '@/services/service'
 
 export default {
     name: 'ReservasAprobadas',
@@ -196,7 +196,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            reservaService.obtenerReservas('Cancelada')
+            service.obtenerReservas('Cancelada')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res

@@ -73,9 +73,7 @@
 <script>
 
 // import Swal from 'sweetalert2'
-import ConfigService from '@/services/ConfigService'
-import reservaService from './service/reservaService'
-import SocrataService from '@/services/SocrataService'
+import service from '@/services/service'
 
 export default {
     name: 'ReservasInterno',
@@ -100,7 +98,7 @@ export default {
          * Actualiza la variable 'rooms' con la información de las habitaciones.
          */
         getRooms() {
-            reservaService.obtenerRooms()
+            service.obtenerRooms()
                 .then(res => {
                     res.forEach(room => {
                         room.precios = Object.groupBy(room.precios, (price) => price.jornada)
@@ -157,7 +155,7 @@ export default {
          * Obtiene la información de las características disponibles y actualiza la variable 'caracteristicas'.
          */
         getCaracteristicas() {
-            reservaService.obtenerCaracteristicas()
+            service.obtenerCaracteristicas()
                 .then(res => {
                     this.caracteristicas = res
                 })
@@ -167,14 +165,14 @@ export default {
         },
         async getDefault() {
             try {
-                let res = await ConfigService.obtenerValoresDefault()
+                let res = await service.obtenerValoresDefault()
                 this.divisa = res.divisa
                 this.priceInDolar = res.priceInDolar
                 this.dolarPriceAuto = res.dolarPriceAuto
                 this.dolarPrice = res.dolarPrice
 
                 if (this.dolarPriceAuto) {
-                    res = await SocrataService.valorDolar()
+                    res = await service.valorDolar()
                     this.dolarPrice = res.valor
                 }
             } catch (err) {

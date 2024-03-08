@@ -3,17 +3,12 @@
         <h1>
             Tarifas Habitaciones
         </h1>
-        <v-card width="90%" class="my-5">
+        <v-card width="90%" elevation="5" class="my-5">
             <v-card-title>
                 <v-row>
-                    <v-col cols="12" md="10" sm="8">
+                    <v-col cols="12">
                         <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
                             hide-details></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="2" sm="4">
-                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                            <v-icon>mdi-plus-circle</v-icon> agregar
-                        </v-btn>
                     </v-col>
                 </v-row>
             </v-card-title>
@@ -34,8 +29,11 @@
                                     <v-list-item link @click="room = item, dialogPrecios = true">
                                         <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="room = item, dialogTarifasExtra = true">
+                                    <v-list-item link @click="room = item, dialogExtra = true">
                                         <v-list-item-title v-text="'Tarifas Adicionales'"></v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item link @click="room = item, dialogEspeciales = true">
+                                        <v-list-item-title v-text="'Tarifas Especiales'"></v-list-item-title>
                                     </v-list-item>
                                 </v-list>
                             </v-menu>
@@ -64,9 +62,11 @@
         </v-card>
 
         <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false"
-            @update="getRooms(), dialogPrecios = false"></PreciosRoom>
-        <PreciosExtra :show="dialogTarifasExtra" :room="room" @close="dialogTarifasExtra = false"
-            @update="getRooms(), dialogTarifasExtra = false" />
+            @update="getRooms(), dialogPrecios = false" />
+        <PreciosExtra :show="dialogExtra" :room="room" @close="dialogExtra = false"
+            @update="getRooms(), dialogExtra = false" />
+        <tarifasEspeciales :show="dialogEspeciales" :room="room" @close="dialogEspeciales = false"
+            @update="getRooms(), dialogEspeciales = false" />
     </div>
 </template>
 
@@ -74,6 +74,7 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
+import tarifasEspeciales from './components/tarifasEspeciales'
 import PreciosRoom from './components/PreciosRoom.vue'
 import PreciosExtra from './components/PreciosExtra.vue'
 
@@ -82,6 +83,7 @@ export default {
     components: {
         PreciosRoom,
         PreciosExtra,
+        tarifasEspeciales,
     },
     directives: {
         'price': {
@@ -107,7 +109,8 @@ export default {
             search: '',
             loading: false,
             dialogPrecios: false,
-            dialogTarifasExtra: false,
+            dialogExtra: false,
+            dialogEspeciales: false,
             room: {},
             rooms: [],
             headers: [
@@ -138,7 +141,7 @@ export default {
             this.room = {}
 
             // Llama al servicio para obtener la lista de habitaciones
-            service.obtenerRooms()
+            service.obtenerAllRooms()
                 .then(res => {
                     this.loading = false
                     this.rooms = res
@@ -207,7 +210,7 @@ export default {
                 jornada: jornada,
             }
 
-            service.gurdarTarifa(data)
+            service.guardarTarifa(data)
                 .then(res => {
                     this.getRooms()
                     Swal.fire({

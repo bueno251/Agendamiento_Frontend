@@ -143,7 +143,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import reservaService from './service/reservaService'
+import service from '@/services/service'
 import CancelacionReserva from './components/CancelacionReserva.vue'
 
 export default {
@@ -185,7 +185,7 @@ export default {
          */
         getReservas() {
             this.loading = true
-            reservaService.obtenerReservas()
+            service.obtenerReservas()
                 .then(res => {
                     this.loading = false
                     this.reservas = res
@@ -220,7 +220,7 @@ export default {
          */
         aprobar() {
             this.loadingbtn = true
-            reservaService.aprobarReserva(this.reserva.id)
+            service.aprobarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
@@ -245,7 +245,7 @@ export default {
          */
         rechazar() {
             this.loadingbtn = true
-            reservaService.rechazarReserva(this.reserva.id)
+            service.rechazarReserva(this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false

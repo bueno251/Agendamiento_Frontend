@@ -1,7 +1,17 @@
 import axios from "axios"
 import vuex from "@/store"
 
+/**
+ * Objeto LOCAL para gestionar las solicitudes y configuración de la API de reservas.
+ * @namespace LOCAL
+ * @type {Object}
+ */
 const LOCAL = {
+    /**
+     * Configura Axios con la URL base de la API de reservas y el token de autorización.
+     * @memberof LOCAL
+     * @function Axios
+     */
     Axios() {
         LOCAL.api = axios.create({
             baseURL: process.env.VUE_APP_URL_BASE + "/api",
@@ -12,24 +22,15 @@ const LOCAL = {
     }
 }
 
-const TarifaService = {
+/**
+ * Servicio para realizar operaciones relacionadas con las reservas utilizando la API externa.
+ * @namespace TipoCancelacionService
+ * @type {Object}
+ */
+const TipoCancelacionService = {
 
-    gurdarTarifa(data) {
-        let url = 'tarifa'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
-    guardarTarifas(data, id) {
-        let url = `tarifas/${id}`
+    crearTipoCancelacion(data) {
+        let url = `cancelar/tipo`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -42,15 +43,8 @@ const TarifaService = {
         })
     },
 
-    /**
-     * Obtiene los precios asociados a una habitación específica mediante una solicitud GET a la API.
-     * @function
-     * @memberof RoomService
-     * @param {number} id - Identificador único de la habitación.
-     * @returns {Promise} Promesa que se resuelve con la lista de precios o se rechaza con un error.
-    */
-    obtenerTarifas(id) {
-        let url = `tarifas/${id}`
+    obtenerTiposCancelacion() {
+        let url = `cancelar/tipos`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -63,8 +57,22 @@ const TarifaService = {
         })
     },
 
-    eliminarTarifa(id) {
-        let url = `tarifa/${id}`
+    actualizarTipoCancelacion(data, id) {
+        let url = `cancelar/tipo${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarTipoCancelacion(id) {
+        let url = `cancelar/tipo${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -76,29 +84,8 @@ const TarifaService = {
                 })
         })
     },
-
-    /**
-    * Obtiene la lista de jornadas disponibles mediante una solicitud GET a la API.
-    * @function
-    * @memberof RoomService
-    * @returns {Promise} Promesa que se resuelve con la lista de jornadas o se rechaza con un error.
-    */
-    obtenerJornadas() {
-        let url = 'jornadas'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
 }
 
 LOCAL.Axios()
 
-export default TarifaService
+export default TipoCancelacionService

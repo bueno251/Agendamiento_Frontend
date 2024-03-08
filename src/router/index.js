@@ -68,21 +68,6 @@ const routes = [
 				component: () => import('@/modules/settings/settingsApp.vue')
 			},
 			{
-				path: 'desayunos',
-				name: 'desayunos',
-				component: () => import('@/modules/room/desayunosApp.vue')
-			},
-			{
-				path: 'decoraciones',
-				name: 'decoraciones',
-				component: () => import('@/modules/room/decoracionesApp.vue')
-			},
-			{
-				path: 'caracteristicas',
-				name: 'caracteristicas',
-				component: () => import('@/modules/room/caracteristicasApp.vue')
-			},
-			{
 				path: 'impuestos',
 				name: 'impuestos',
 				component: () => import('@/modules/impuestos/impuestosApp.vue')

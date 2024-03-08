@@ -38,6 +38,9 @@
                                 Normal
                             </th>
                             <th>
+                                Con Iva
+                            </th>
+                            <th>
                                 Jornada
                             </th>
                         </tr>
@@ -47,6 +50,7 @@
                             <template v-if="i < 7">
                                 <td>{{ day.name }}</td>
                                 <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
+                                <td>$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}</td>
                                 <td>{{ day.jornada }}</td>
                             </template>
                         </tr>
@@ -60,6 +64,7 @@
                 </h2>
 
                 <div class="caracteristics">
+
                     <template v-for="(item, index) in caracteristicas">
                         <div v-if="includeCaracteristic(item, room)" class="caracteristic"
                             :key="`room${room.index}caracteris${index}`">
@@ -94,24 +99,48 @@
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Fecha De LLegada <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
-                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
-                            </v-text-field>
+                        <v-col cols="6">
+                            <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
+                                transition="scale-transition" offset-y min-width="auto">
+
+                                <template v-slot:activator="{ on, attrs }">
+                                    <label>Fecha De LLegada <span class="red--text">*</span></label>
+                                    <v-text-field v-model="fechaLlegada" :rules="[rules.required, rules.date]"
+                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly dense
+                                        outlined required>
+                                    </v-text-field>
+                                </template>
+
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    @change="save('menu1', dates)" event-color="red lighten-1" locale="es" range
+                                    no-title scrollable>
+                                </v-date-picker>
+                            </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Fecha De Salida <span class="red--text">*</span></label>
-                            <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
-                                prepend-inner-icon="mdi-calendar" readonly dense outlined required>
-                            </v-text-field>
+                        <v-col cols="6">
+                            <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
+                                transition="scale-transition" offset-y min-width="auto">
+
+                                <template v-slot:activator="{ on, attrs }">
+                                    <label>Fecha De Salida <span class="red--text">*</span></label>
+                                    <v-text-field v-model="fechaSalida" :rules="[rules.required, rules.date]"
+                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly dense
+                                        outlined required>
+                                    </v-text-field>
+                                </template>
+
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    @change="save('menu2', dates)" event-color="red lighten-1" locale="es" range
+                                    no-title scrollable>
+                                </v-date-picker>
+                            </v-menu>
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6" v-if="room.hasDesayuno">
                             <label>Desayunos<span class="red--text">*</span></label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precio > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precio)) : ''}`"
+                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
@@ -119,7 +148,7 @@
                         <v-col cols="12" md="6" sm="6" v-if="room.hasDecoracion">
                             <label>Decoraciones<span class="red--text">*</span></label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :item-text="item => `${item.nombre} ${item.precio > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precio)) : ''}`"
+                                :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
@@ -183,7 +212,7 @@
                         </v-col>
 
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
-                            <h3>Precio Total De La Reserva</h3>
+                            <h3>Precio Total De La Reserva <span v-if="room.iva">IVA: ({{ room.iva }}%)</span></h3>
                             <h1>
                                 $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
                             </h1>
@@ -224,10 +253,8 @@
 
 <script>
 
+import service from '@/services/service'
 import colombiaHolidays from 'colombia-holidays'
-import ConfigService from '@/services/ConfigService'
-import reservaService from './service/reservaService'
-import SocrataService from '@/services/SocrataService'
 
 export default {
     name: 'RoomInfo',
@@ -262,7 +289,7 @@ export default {
 
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
-                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precio)
+                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
                 }
@@ -277,10 +304,10 @@ export default {
             return Number(this.precioToDolar(this.niños.val))
         },
         precioDecoracion() {
-            return Number(this.precioToDolar(this.decoracion.precio))
+            return Number(this.precioToDolar(this.decoracion.precioConIva))
         },
         precioDesayuno() {
-            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precio)) : 0
+            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva)) : 0
         },
         valorSeparacion() {
             return this.precioAlojamiento ? (this.precioAlojamiento * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
@@ -309,7 +336,8 @@ export default {
 
                 // Asigna el valor del precio de adultos adicionales si está disponible
                 if (this.room.precios.length > 7) {
-                    value = i > 1 ? this.room.precios[7].precio : 0
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.room.precios[7].precioConIva
+                    value = i > 1 ? precio : 0
                 }
 
                 let cantidad = i + 1
@@ -341,7 +369,8 @@ export default {
 
                 // Asigna el valor del precio de niños adicionales si está disponible
                 if (this.room.precios.length > 7) {
-                    value = i > 1 ? this.room.precios[8].precio : 0
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.room.precios[8].precioConIva
+                    value = i > 1 ? precio : 0
                 }
 
                 let cantidad = i + 1
@@ -374,7 +403,7 @@ export default {
                 let sortDates = this.dates.toSorted()
                 this.dates = sortDates
             }
-        }
+        },
     },
     data() {
         return {
@@ -382,12 +411,12 @@ export default {
             desayuno: {
                 id: null,
                 nombre: 'Ninguno',
-                precio: 0,
+                precioConIva: 0,
             },
             decoracion: {
                 id: null,
                 nombre: 'Ninguna',
-                precio: 0,
+                precioConIva: 0,
             },
             maxDate: '',
             cantidadRooms: 1,
@@ -401,6 +430,9 @@ export default {
             loading: false,
             loadingbtn: false,
             datosCliente: false,
+            useGenerales: false,
+            menu1: false,
+            menu2: false,
             file: null,
             dates: [],
             datesInvalid: [],
@@ -481,7 +513,7 @@ export default {
         getRoom() {
             let id = this.$route.params.id
 
-            reservaService.obtenerRoom(id)
+            service.obtenerRoom(id)
                 .then(res => {
                     this.room = res
                 })
@@ -598,7 +630,7 @@ export default {
         getDates() {
             let id = this.$route.params.id
 
-            reservaService.getFechasRoom(id)
+            service.getFechasRoom(id)
                 .then(res => {
                     this.datesInvalid = res
                 })
@@ -620,7 +652,7 @@ export default {
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
          */
         getDatos() {
-            reservaService.obtenerDesayunos()
+            service.obtenerDesayunos()
                 .then(res => {
                     this.desayunos = [...this.desayunos, ...res]
                 })
@@ -628,7 +660,7 @@ export default {
                     console.error(err)
                 })
 
-            reservaService.obtenerDecoraciones()
+            service.obtenerDecoraciones()
                 .then(res => {
                     this.decoraciones = [...this.decoraciones, ...res]
                 })
@@ -636,7 +668,7 @@ export default {
                     console.error(err)
                 })
 
-            reservaService.obtenerCaracteristicas()
+            service.obtenerCaracteristicas()
                 .then(res => {
                     this.caracteristicas = res
                 })
@@ -646,23 +678,24 @@ export default {
         },
         async getDefault() {
 
-            ConfigService.obtenerConfigReserva()
+            service.obtenerConfigReserva()
                 .then(res => {
                     this.porcentajeSeparacion = res.porcentajeSeparacion
+                    this.useGenerales = res.tarifasGenerales
                 })
                 .catch(err => {
                     console.error(err)
                 })
 
             try {
-                let res = await ConfigService.obtenerValoresDefault()
+                let res = await service.obtenerValoresDefault()
                 this.divisa = res.divisa
                 this.priceInDolar = res.priceInDolar
                 this.dolarPriceAuto = res.dolarPriceAuto
                 this.dolarPrice = res.dolarPrice
 
                 if (this.dolarPriceAuto) {
-                    res = await SocrataService.valorDolar()
+                    res = await service.valorDolar()
                     this.dolarPrice = res.valor
                 }
             } catch (err) {
@@ -670,6 +703,9 @@ export default {
                 console.error(err)
             }
 
+        },
+        save(menu, date) {
+            this.$refs[menu].save(date)
         },
     },
     async mounted() {

@@ -138,7 +138,7 @@ export default {
             this.room = {}
 
             // Llama al servicio para obtener la lista de habitaciones
-            service.obtenerRooms()
+            service.obtenerAllRooms()
                 .then(res => {
                     this.loading = false
                     this.rooms = res

@@ -52,8 +52,52 @@ const roomService = {
      * @memberof RoomService
      * @returns {Promise} Promesa que se resuelve con la lista de habitaciones o se rechaza con un error.
      */
-    obtenerRooms() {
+    obtenerAllRooms() {
         let url = 'rooms/read'
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    /**
+     * Obtiene la lista de habitaciones disponibles para el cliente.
+     * 
+     * @memberof reservaService
+     * @function obtenerRooms
+     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la respuesta.
+     * @throws {Error} - Error si la obtención de habitaciones falla.
+     */
+    obtenerRooms() {
+        let url = 'rooms'
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    /**
+     * Obtiene información detallada de una habitación por su ID.
+     * 
+     * @function obtenerRoom
+     * @param {string} id - Identificador único de la habitación.
+     * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la habitación.
+     * @throws {Error} - Error si la obtención de la habitación falla.
+     */
+    obtenerRoom(id) {
+        let url = `room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)

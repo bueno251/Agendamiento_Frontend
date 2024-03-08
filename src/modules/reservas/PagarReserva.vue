@@ -148,8 +148,7 @@
 
 import vuex from "@/store"
 import Swal from "sweetalert2"
-import ConfigService from '@/services/ConfigService'
-import reservaService from './service/reservaService'
+import service from "@/services/service"
 import ClienteService from "@/services/ClienteService"
 
 export default {
@@ -233,7 +232,7 @@ export default {
             data.room = data.room.id
 
             // Realiza la llamada al servicio para reservar
-            reservaService.reservar(data)
+            service.reservar(data)
                 .then(res => {
                     this.loading = false
                     // Muestra un mensaje de éxito y regresa a la página anterior
@@ -271,7 +270,7 @@ export default {
          * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable metodosPago.
          */
         getMetodosPago() {
-            reservaService.obtenerMetodosPago()
+            service.obtenerMetodosPago()
                 .then(res => {
                     this.metodosPago = res
                 })
@@ -280,7 +279,7 @@ export default {
                 })
         },
         getDatos() {
-            reservaService.obtenerConfigReserva()
+            service.obtenerConfigReserva()
                 .then(res => {
                     this.correoRequired = res.correoObligatorio
                     this.porcentajeSeparacion = res.porcentajeSeparacion
@@ -302,7 +301,7 @@ export default {
                 })
         },
         getDivisaDefault() {
-            ConfigService.obtenerValoresDefault()
+            service.obtenerValoresDefault()
                 .then(res => {
                     this.divisa = res.divisa
                 })
