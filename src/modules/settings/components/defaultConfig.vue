@@ -10,31 +10,32 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>País</label>
                         <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" return-object outlined
-                            dense required>
+                            @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento</label>
                         <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione pais"
-                            @change="getMunicipios" :rules="[rules.required]" :loading="loadingDepartamentos"
-                            item-text="nombre" return-object outlined dense required>
+                            @change="getCiudades" :rules="[rules.required]" :loading="loadingDepartamentos"
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Municipio</label>
-                        <v-select v-model="municipio" :items="municipios" no-data-text="Seleccione departamento"
-                            :rules="[rules.required]" :loading="loadingMunicipios" item-text="nombre" return-object outlined
-                            dense required>
+                        <label>Ciudad</label>
+                        <v-select v-model="ciudad" :items="ciudades" no-data-text="Seleccione departamento"
+                            :rules="[rules.required]" :loading="loadingCiudades" item-text="nombre" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Divisa</label>
                         <v-select v-model="divisa" :items="divisas" no-data-text="No hay divisas"
-                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id" :disabled="priceInDolar" outlined dense>
+                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id"
+                            :disabled="priceInDolar" outlined dense>
                         </v-select>
                     </v-col>
 
@@ -55,8 +56,8 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Tipo Responsabilidad</label>
                         <v-select v-model="tipoResponsabilidad" :items="responsabilidades"
-                            no-data-text="Espere un momento..." :rules="[rules.required]" item-text="tipo" item-value="id"
-                            outlined dense required>
+                            no-data-text="Espere un momento..." :rules="[rules.required]" item-text="tipo"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -87,7 +88,8 @@
 
                     <v-col v-if="priceInDolar && !dolarPriceAuto" cols="12" md="3" sm="6">
                         <label>Valor de $1 dolar = ${{ comaEnMiles(dolarPrice) }}</label>
-                        <v-text-field v-model="dolarPrice" type="number" min="0" hide-spin-buttons outlined dense required>
+                        <v-text-field v-model="dolarPrice" type="number" min="0" hide-spin-buttons outlined dense
+                            required>
                         </v-text-field>
                     </v-col>
 
@@ -106,7 +108,6 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import UbicacionService from '@/services/UbicacionService'
 
 export default {
     name: 'defaultConfig',
@@ -127,8 +128,8 @@ export default {
     data() {
         return {
             pais: '',
-            departamento: null,
-            municipio: '',
+            departamento: '',
+            ciudad: '',
             divisa: '',
             tipoDocumento: '',
             tipoPersona: '',
@@ -145,13 +146,13 @@ export default {
             loading: false,
             loadingbtn: false,
             loadingDepartamentos: false,
-            loadingMunicipios: false,
+            loadingCiudades: false,
             dialogCreateDivisa: false,
             dialogUpdateDivisa: false,
             dialogDeleteDivisa: false,
             paises: [],
             departamentos: [],
-            municipios: [],
+            ciudades: [],
             divisas: [],
             documentos: [],
             personas: [],
@@ -173,9 +174,9 @@ export default {
             // Objeto de datos que se enviará al servicio para establecer los valores predeterminados
             let data = {
                 configuracionId: this.id,
-                pais: this.pais.nombre,
-                departamento: this.departamento.nombre,
-                municipio: this.municipio.nombre,
+                pais: this.pais,
+                departamento: this.departamento,
+                ciudad: this.ciudad,
                 priceInDolar: this.priceInDolar,
                 dolarPriceAuto: this.dolarPriceAuto,
                 dolarPrice: Number(this.dolarPrice),
@@ -216,11 +217,11 @@ export default {
                         this.priceInDolar = res.priceInDolar
                         this.dolarPriceAuto = res.dolarPriceAuto
                         this.dolarPrice = res.dolarPrice
-                        this.pais = this.paises.find((item) => item.nombre == res.pais)
-                        await this.getDepartamentos()
-                        this.departamento = this.departamentos.find((item) => item.nombre == res.departamento)
-                        await this.getMunicipios()
-                        this.municipio = this.municipios.find((item) => item.nombre == res.municipio)
+                        this.pais = res.paisId
+                        this.getDepartamentos()
+                        this.departamento = res.departamentoId
+                        this.getCiudades()
+                        this.ciudad = res.ciudadId
                     }
                 })
                 .catch(err => {
@@ -256,7 +257,7 @@ export default {
          * Obtiene la lista de países desde el servicio.
          */
         getPaises() {
-            UbicacionService.obtenerPaises()
+            service.obtenerPaises()
                 .then(res => {
                     this.paises = res
                 })
@@ -269,11 +270,11 @@ export default {
          */
         async getDepartamentos() {
             this.loadingDepartamentos = true
-            this.departamento = null
-            this.municipio = ''
-            this.municipios = []
+            this.departamento = ''
+            this.ciudad = ''
+            this.ciudades = []
 
-            await UbicacionService.obtenerDepartamentos(this.pais.id)
+            await service.obtenerDepartamentos(this.pais)
                 .then(res => {
                     this.departamentos = res
                     this.loadingDepartamentos = false
@@ -284,20 +285,20 @@ export default {
                 })
         },
         /**
-         * Obtiene la lista de municipios para el departamento seleccionado.
+         * Obtiene la lista de ciudades para el departamento seleccionado.
          */
-        async getMunicipios() {
-            this.loadingMunicipios = true
-            this.municipio = ''
+        async getCiudades() {
+            this.loadingCiudades = true
+            this.ciudad = ''
 
-            await UbicacionService.obtenerMunicipios(this.departamento.id)
+            await service.obtenerCiudades(this.departamento)
                 .then(res => {
-                    this.municipios = res
-                    this.loadingMunicipios = false
+                    this.ciudades = res
+                    this.loadingCiudades = false
                 })
                 .catch(err => {
                     console.error(err)
-                    this.loadingMunicipios = false
+                    this.loadingCiudades = false
                 })
         },
         /**

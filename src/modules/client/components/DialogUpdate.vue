@@ -86,7 +86,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="pais" :items="countries" item-text="country_name" item-value="country_name"
+                        <v-select v-model="pais" :items="paises" item-text="nombre" item-value="id"
                             :rules="[rules.required]" @change="getDepartamentos" no-data-text="Espere un momento..."
                             dense outlined required>
                             <template v-slot:label>
@@ -96,8 +96,8 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="departamento" :items="departamentos" item-text="state_name"
-                            item-value="state_name" :loading="loadingDepartamentos" @change="getMunicipios"
+                        <v-select v-model="departamento" :items="departamentos" item-text="nombre"
+                            item-value="id" :loading="loadingDepartamentos" @change="getCiudades"
                             no-data-text="Seleccione un pais" dense outlined>
                             <template v-slot:label>
                                 Departamento <span class="red--text">*</span>
@@ -106,10 +106,10 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="municipio" :items="municipios" item-text="city_name" item-value="city_name"
-                            :loading="loadingMunicipio" no-data-text="Seleccione un departamento" dense outlined>
+                        <v-select v-model="ciudad" :items="ciudades" item-text="nombre" item-value="id"
+                            :loading="loadingCiudad" no-data-text="Seleccione un departamento" dense outlined>
                             <template v-slot:label>
-                                Municipio <span class="red--text">*</span>
+                                Ciudad <span class="red--text">*</span>
                             </template>
                         </v-select>
                     </v-col>
@@ -164,7 +164,6 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import UbicacionService from '../services/UbicacionService'
 
 export default {
     name: 'DialogUpdate',
@@ -190,15 +189,15 @@ export default {
                 this.tipoObligacion = newclient.tipo_obligacion_id
                 this.tipoRegimen = newclient.tipo_regimen_id
                 this.observacion = newclient.observacion
-                if (newclient.pais != this.pais) {
-                    this.pais = newclient.pais
+                if (newclient.paisId != this.pais) {
+                    this.pais = newclient.paisId
                     this.getDepartamentos()
                 }
-                if (newclient.departamento != this.departamento) {
-                    this.departamento = newclient.departamento
-                    this.getMunicipios()
+                if (newclient.departamentoId != this.departamento) {
+                    this.departamento = newclient.departamentoId
+                    this.getCiudades()
                 }
-                this.municipio = newclient.ciudad
+                this.ciudad = newclient.ciudadId
             },
             immediate: true,
         }
@@ -214,7 +213,7 @@ export default {
             direccion: '',
             pais: '',
             departamento: '',
-            municipio: '',
+            ciudad: '',
             telefono: '',
             telefonoAlt: '',
             tipoPersona: '',
@@ -224,13 +223,13 @@ export default {
             valid: false,
             loadingbtn: false,
             loadingDepartamentos: false,
-            loadingMunicipio: false,
+            loadingCiudad: false,
             tipoDocuments: [],
             tipoObligations: [],
             tipoPeople: [],
             tipoRegimens: [],
-            countries: [],
-            municipios: [],
+            paises: [],
+            ciudades: [],
             departamentos: [],
             rules: {
                 required: value => !!value || 'Campo requerido.',
@@ -267,7 +266,7 @@ export default {
                 direccion: this.direccion,
                 pais: this.pais,
                 departamento: this.departamento,
-                ciudad: this.municipio,
+                ciudad: this.ciudad,
                 telefono: this.telefono,
                 telefonoAlt: this.telefonoAlt,
                 tipoPersona: this.tipoPersona,
@@ -318,14 +317,14 @@ export default {
         },
         /**
          * Obtiene la lista de países desde el servicio de ubicación
-         * y la asigna a la variable 'countries'.
+         * y la asigna a la variable 'paises'.
          */
-        getCountries() {
+        getPaises() {
             // Obtener la lista de países
-            UbicacionService.paises()
+            service.obtenerPaises()
                 .then(res => {
-                    // Asignar la lista de países a la variable 'countries'
-                    this.countries = res
+                    // Asignar la lista de países a la variable 'paises'
+                    this.paises = res
                 })
                 .catch(err => {
                     console.error(err)
@@ -339,11 +338,11 @@ export default {
             // Habilitar la animación de carga y restablecer las variables relacionadas con el departamento
             this.loadingDepartamentos = true
             this.departamento = ''
-            this.municipio = ''
-            this.municipios = []
+            this.ciudad = ''
+            this.ciudades = []
 
             // Obtener la lista de estados para el país seleccionado
-            UbicacionService.departamentos(this.pais)
+            service.obtenerDepartamentos(this.pais)
                 .then(res => {
                     // Asignar la lista de estados a la variable 'departamentos' y desactivar la animación de carga
                     this.departamentos = res
@@ -356,23 +355,23 @@ export default {
         },
         /**
         * Obtiene la lista de ciudades para el departamento seleccionado
-        * desde el servicio de ubicación y la asigna a la variable 'municipios'.
+        * desde el servicio de ubicación y la asigna a la variable 'ciudades'.
         */
-        getMunicipios() {
+        getCiudades() {
             // Habilitar la animación de carga y restablecer la variable relacionada con la ciudad
-            this.loadingMunicipio = true
-            this.municipio = ''
+            this.loadingCiudad = true
+            this.ciudad = ''
 
             // Obtener la lista de ciudades para el departamento seleccionado
-            UbicacionService.ciudades(this.departamento)
+            service.obtenerCiudades(this.departamento)
                 .then(res => {
-                    // Asignar la lista de ciudades a la variable 'municipios' y desactivar la animación de carga
-                    this.municipios = res
-                    this.loadingMunicipio = false
+                    // Asignar la lista de ciudades a la variable 'ciudades' y desactivar la animación de carga
+                    this.ciudades = res
+                    this.loadingCiudad = false
                 })
                 .catch(err => {
                     console.error(err)
-                    this.loadingMunicipio = false
+                    this.loadingCiudad = false
                 })
         },
         /**
@@ -403,7 +402,7 @@ export default {
     },
     mounted() {
         this.getTypes()
-        this.getCountries()
+        this.getPaises()
     },
 }
 </script>

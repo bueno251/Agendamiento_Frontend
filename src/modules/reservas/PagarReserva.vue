@@ -2,7 +2,7 @@
     <div class="main">
         <v-card class="pa-5 column2" elevation="5">
             <h2>Información de contacto</h2>
-            <v-form v-model="validInfo">
+            <v-form ref="form" v-model="validInfo">
                 <v-row>
 
                     <v-col cols="12" md="6" sm="6">
@@ -17,7 +17,8 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <label>Número Documento <span class="red--text">*</span></label>
-                        <v-text-field v-model="cedula" :rules="[rules.required]" dense outlined required>
+                        <v-text-field v-model="cedula" :rules="[rules.required]" type="number" hide-spin-buttons dense
+                            outlined required>
                         </v-text-field>
                     </v-col>
 
@@ -42,8 +43,30 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <label>Telefono <span class="red--text">*</span></label>
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" dense outlined required>
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
+                            hide-spin-buttons dense outlined required>
                         </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="6" sm="6">
+                        <label>Motivo <span class="red--text">*</span></label>
+                        <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
+                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
+                        <label>Ciudad De Residencia <span class="red--text">*</span></label>
+                        <v-select v-model="ciudadResidencia" :items="ciudades" no-data-text="No hay ciudades"
+                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
+                        </v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
+                        <label>Ciudad De Procedencia <span class="red--text">*</span></label>
+                        <v-select v-model="ciudadProcedencia" :items="ciudades" no-data-text="No hay ciudades"
+                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
+                        </v-select>
                     </v-col>
 
                 </v-row>
@@ -176,6 +199,9 @@ export default {
             correo: '',
             telefono: vuex.state.reserva.telefono,
             monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
+            motivo: 1,
+            ciudadResidencia: '',
+            ciudadProcedencia: '',
             metodoPago: 1,
             porcentajeSeparacion: 0,
             validPagos: false,
@@ -186,6 +212,8 @@ export default {
             file: null,
             metodosPago: [],
             tipoDocuments: [],
+            ciudades: [],
+            motivos: [],
             divisa: {
                 codigo: '',
             },
@@ -231,19 +259,23 @@ export default {
 
             // Construye el objeto de datos para la reserva
             let data = {
+                tipoDocumento: this.tipoDocumento,
                 cedula: this.cedula,
                 nombre: this.nombre,
                 apellido: this.apellido,
                 correo: this.correo,
                 telefono: this.telefono,
+                dateIn: this.reserva.dateIn,
+                dateOut: this.reserva.dateOut,
+                room: this.reserva.room.id,
+                adultos: this.reserva.adultos,
+                niños: this.reserva.niños,
+                precio: this.reserva.precioTotal,
+                motivo: this.motivo,
+                ciudadResidencia: this.ciudadResidencia,
+                ciudadProcedencia: this.ciudadProcedencia,
                 verificacion_pago: this.metodoPago == 1 ? 0 : 1,
             }
-
-            // Combina los datos de la reserva con la información del formulario
-            data = { ...this.reserva, ...data }
-
-            // Asigna el ID de la habitación seleccionada
-            data.room = data.room.id
 
             // Realiza la llamada al servicio para reservar
             service.reservar(data)
@@ -279,11 +311,7 @@ export default {
 
             return resultado;
         },
-        /**
-         * Obtiene los métodos de pago disponibles.
-         * Realiza una llamada al servicio para obtener las formas de pago y las asigna a la variable metodosPago.
-         */
-        getMetodosPago() {
+        async getDatos() {
             service.obtenerMetodosPago()
                 .then(res => {
                     this.metodosPago = res
@@ -291,33 +319,67 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        getDatos() {
+
             service.obtenerConfigReserva()
                 .then(res => {
                     this.correoRequired = res.correoObligatorio
                     this.porcentajeSeparacion = res.porcentajeSeparacion
+                    this.$refs.form.resetValidation()
                 })
                 .catch(err => {
                     console.error(err)
                 })
 
-            service.encontrarClienteDocumento(this.cedula)
+            service.obtenerTiposDocumentoCliente()
+                .then(res => {
+                    this.tipoDocuments = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerMotivosReserva()
+                .then(res => {
+                    this.motivos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            await service.encontrarClienteDocumento(this.cedula)
                 .then(res => {
                     if ('id' in res) {
+                        this.tipoDocumento = res.tipo_documento_id
                         this.nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
                         this.apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
                         this.telefono = res.telefono
+                        this.ciudadProcedencia = res.ciudadId
+                        this.ciudadResidencia = res.ciudadId
+                        service.obtenerCiudades(res.departamentoId)
+                            .then(res => {
+                                this.ciudades = res
+                            })
+                            .catch(err => {
+                                console.error(err)
+                            })
                     }
                 })
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        getDivisaDefault() {
+
             service.obtenerValoresDefault()
                 .then(res => {
                     this.divisa = res.divisa
+                    if (!this.ciudades.length) {
+                        service.obtenerCiudades(res.departamentoId)
+                            .then(res => {
+                                this.ciudades = res
+                            })
+                            .catch(err => {
+                                console.error(err)
+                            })
+                    }
                 })
                 .catch(err => {
                     console.error(err)
@@ -326,8 +388,6 @@ export default {
     },
     mounted() {
         this.getDatos()
-        this.getMetodosPago()
-        this.getDivisaDefault()
     },
 }
 </script>

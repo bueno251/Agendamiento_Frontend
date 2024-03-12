@@ -139,6 +139,7 @@ export default {
                     this.loading = false
                     this.imgsToUpload = []
                     this.imgsToDelete = []
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',

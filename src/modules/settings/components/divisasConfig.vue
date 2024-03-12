@@ -131,8 +131,7 @@
 <script>
 
 import Swal from 'sweetalert2'
-import DivisasService from '@/services/DivisasService'
-import UbicacionService from '@/services/UbicacionService'
+import service from '@/services/service'
 
 export default {
     name: 'divisasConfig',
@@ -182,7 +181,7 @@ export default {
                 pais: this.pais,
             }
 
-            DivisasService.crearDivisa(data)
+            service.crearDivisa(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
@@ -211,7 +210,7 @@ export default {
                 pais: this.pais,
             }
 
-            DivisasService.actualizarDivisa(data, this.divisaSelected.id)
+            service.actualizarDivisa(data, this.divisaSelected.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
@@ -234,7 +233,7 @@ export default {
         eliminar() {
             this.loadingbtn = true
 
-            DivisasService.eliminarDivisa(this.divisaSelected.id)
+            service.eliminarDivisa(this.divisaSelected.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -256,7 +255,7 @@ export default {
         },
         getDivisas() {
             this.$emit('updateDivisas')
-            DivisasService.obtenerDivisas()
+            service.obtenerDivisas()
                 .then(res => {
                     this.divisas = res
                 })
@@ -268,7 +267,7 @@ export default {
          * Obtiene la lista de países desde el servicio.
          */
         getPaises() {
-            UbicacionService.obtenerPaises()
+            service.obtenerPaises()
                 .then(res => {
                     this.paises = res
                 })

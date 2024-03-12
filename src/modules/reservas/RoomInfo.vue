@@ -35,9 +35,9 @@
                                 Día
                             </th>
                             <th>
-                                Normal
+                                Precios
                             </th>
-                            <th>
+                            <th v-if="room.tieneIva">
                                 Con Iva
                             </th>
                             <th>
@@ -50,7 +50,8 @@
                             <template v-if="i < 7">
                                 <td>{{ day.name }}</td>
                                 <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
-                                <td>$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}</td>
+                                <td v-if="room.tieneIva">$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{
+                        divisa.codigo }}</td>
                                 <td>{{ day.jornada }}</td>
                             </template>
                         </tr>
@@ -92,14 +93,14 @@
                 <v-form v-model="valid" ref="fechas">
                     <v-row>
 
-                        <v-col cols="12">
+                        <v-col cols="12" class="py-0">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
                                 :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
                                 no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
@@ -118,7 +119,7 @@
                             </v-menu>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
@@ -137,74 +138,74 @@
                             </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6" v-if="room.hasDesayuno">
-                            <label>Desayunos<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDesayuno">
+                            <label>Desayunos</label>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
                                 :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
-                                return-object dense outlined>
+                                :readonly="room.incluyeDesayuno" return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6" v-if="room.hasDecoracion">
-                            <label>Decoraciones<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDecoracion">
+                            <label>Decoraciones</label>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
                                 :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Adultos<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0">
+                            <label>Adultos</label>
                             <v-select v-model="adultos" :items="selectAdultos"
                                 :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Niños<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0">
+                            <label>Niños ({{ edadNiños }} {{ edadNiños > 1 ? 'Años' : 'Año' }} en adelante)</label>
                             <v-select v-model="niños" :items="selectNiños"
                                 :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <label>Valor Adultos</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAdultos) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <label>Valor Niños</label>
                             <h4>
                                 $ {{ comaEnMiles(precioNiños) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="room.hasDecoracion" cols="6">
+                        <v-col v-if="room.tieneDecoracion" cols="6" class="py-0">
                             <label>Valor Decoración</label>
                             <h4>
                                 $ {{ comaEnMiles(precioDecoracion) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="room.hasDesayuno && !room.incluyeDesayuno" cols="6">
+                        <v-col v-if="room.tieneDesayuno && !room.incluyeDesayuno" cols="6" class="py-0">
                             <label>Valor Desayuno</label>
                             <h4>
                                 $ {{ comaEnMiles(precioDesayuno) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <label>Precio De La Alojamiento</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAlojamiento) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="porcentajeSeparacion" cols="6">
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
                             <label>Valor Separación {{ porcentajeSeparacion }}%</label>
                             <h4>
                                 $ {{ comaEnMiles(valorSeparacion) }} {{ divisa.codigo }}
@@ -289,9 +290,17 @@ export default {
 
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
-                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
+                    let precioNormal = this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
+
+                    let precioFestivo = this.precioToDolar(this.room.precios[0].precioConIva)
+
+                    if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
+                        precio += precioFestivo
+                    } else {
+                        precio += precioNormal
+                    }
                 }
             }
 
@@ -310,7 +319,7 @@ export default {
             return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva)) : 0
         },
         valorSeparacion() {
-            return this.precioAlojamiento ? (this.precioAlojamiento * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            return this.precioAlojamiento ? (this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
         },
         precioTotal() {
             let precio = 0
@@ -370,14 +379,14 @@ export default {
                 // Asigna el valor del precio de niños adicionales si está disponible
                 if (this.room.precios.length > 7) {
                     let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.room.precios[8].precioConIva
-                    value = i > 1 ? precio : 0
+                    value = precio
                 }
 
                 let cantidad = i + 1
 
                 niños.push({
                     cantidad: cantidad,
-                    val: value * (cantidad - 2),
+                    val: value * (cantidad),
                 })
             }
 
@@ -423,6 +432,7 @@ export default {
             model: 0,
             porcentajeSeparacion: 0,
             dolarPrice: 0,
+            edadNiños: 1,
             priceInDolar: false,
             dolarPriceAuto: true,
             valid: false,
@@ -516,6 +526,14 @@ export default {
             service.obtenerRoom(id)
                 .then(res => {
                     this.room = res
+                    if (res.incluyeDesayuno) {
+                        this.desayunos[0].nombre = 'Incluido'
+                        this.desayuno = {
+                            id: null,
+                            nombre: 'Incluido',
+                            precioConIva: 0,
+                        }
+                    }
                 })
                 .catch(err => {
                     console.error(err)
@@ -682,6 +700,7 @@ export default {
                 .then(res => {
                     this.porcentajeSeparacion = res.porcentajeSeparacion
                     this.useGenerales = res.tarifasGenerales
+                    this.edadNiños = res.edadTarifaNiños
                 })
                 .catch(err => {
                     console.error(err)
@@ -763,7 +782,7 @@ h2 {
 
 .sticky {
     position: sticky;
-    top: 20px;
+    top: 0px;
 }
 
 .caracteristics {

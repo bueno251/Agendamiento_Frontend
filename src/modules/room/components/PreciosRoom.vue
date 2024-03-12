@@ -131,6 +131,7 @@ export default {
             service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
                     Swal.fire({
                         icon: 'success',

@@ -10,8 +10,8 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Tipo Documento <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="tipoDocumento" :items="documentos" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -31,8 +31,8 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Nombre <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="nombre" :rules="[rules.required]" :disabled="empresa !== null" outlined dense
-                            required>
+                        <v-text-field v-model="nombre" :rules="[rules.required]" :disabled="empresa !== null" outlined
+                            dense required>
                         </v-text-field>
                     </v-col>
 
@@ -45,15 +45,15 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Correo <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]" :disabled="empresa !== null"
-                            type="email" outlined dense required>
+                        <v-text-field v-model="correo" :rules="[rules.required, rules.email]"
+                            :disabled="empresa !== null" type="email" outlined dense required>
                         </v-text-field>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Telefono <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" :disabled="empresa !== null"
-                            type="number" hide-spin-buttons outlined dense required>
+                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]"
+                            :disabled="empresa !== null" type="number" hide-spin-buttons outlined dense required>
                         </v-text-field>
                     </v-col>
 
@@ -75,24 +75,23 @@
                         <label>País <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
                             @change="getDepartamentos" :rules="[rules.required]" :disabled="empresa !== null"
-                            item-text="country_name" item-value="country_name" outlined dense required>
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione un pais"
-                            @change="getMunicipios" :rules="[rules.required]" :disabled="empresa !== null"
-                            :loading="loadingDepartamentos" item-text="state_name" item-value="state_name" outlined dense
-                            required>
+                            @change="getCiudades" :rules="[rules.required]" :disabled="empresa !== null"
+                            :loading="loadingDepartamentos" item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Municipio <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-select v-model="municipio" :items="municipios" no-data-text="Seleccione un departamento"
-                            :rules="[rules.required]" :disabled="empresa !== null" :loading="loadingMunicipios"
-                            item-text="city_name" item-value="city_name" outlined dense required>
+                        <label>Ciudad <span v-if="empresa === null" class="red--text">*</span></label>
+                        <v-select v-model="ciudad" :items="ciudades" no-data-text="Seleccione un departamento"
+                            :rules="[rules.required]" :disabled="empresa !== null" :loading="loadingCiudades"
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -106,40 +105,40 @@
                     <v-col cols="12" md="4" sm="6">
                         <label>Tipo Operación <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="operacion" :items="operaciones" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="4" sm="6">
                         <label>Tipo Entorno <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="entorno" :items="entornos" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="4" sm="6">
                         <label>Tipo Organización <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="organizacion" :items="organizaciones" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="4" sm="6">
                         <label>Tipo Responsabilidad <span v-if="empresa === null" class="red--text">*</span></label>
-                        <v-select v-model="responsabilidad" :items="responsabilidades" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                        <v-select v-model="responsabilidad" :items="responsabilidades"
+                            no-data-text="Espere un momento..." :rules="[rules.required]" :disabled="empresa !== null"
+                            item-text="tipo" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="4" sm="6">
                         <label>Tipo Regimen <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="regimen" :items="regimenes" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id" outlined
-                            dense required>
+                            :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
+                            outlined dense required>
                         </v-select>
                     </v-col>
 
@@ -158,7 +157,6 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import UbicacionService from '@/modules/client/services/UbicacionService'
 
 export default {
     name: 'EmpresaComponent',
@@ -185,15 +183,15 @@ export default {
                     this.organizacion = newitem.idOrganizacion
                     this.responsabilidad = newitem.idResponsabilidad
                     this.regimen = newitem.idRegimen
-                    if (this.pais != newitem.pais) {
-                        this.pais = newitem.pais
+                    if (this.pais != newitem.paisId) {
+                        this.pais = newitem.paisId
                         this.getDepartamentos()
                     }
-                    if (this.departamento != newitem.departamento) {
-                        this.departamento = newitem.departamento
-                        this.getMunicipios()
+                    if (this.departamento != newitem.departamentoId) {
+                        this.departamento = newitem.departamentoId
+                        this.getCiudades()
                     }
-                    this.municipio = newitem.municipio
+                    this.ciudad = newitem.ciudadId
                 }
             },
             immediate: true,
@@ -206,7 +204,7 @@ export default {
             identificacion: '',
             pais: '',
             departamento: '',
-            municipio: '',
+            ciudad: '',
             dv: '',
             registro: '',
             direccion: '',
@@ -222,10 +220,10 @@ export default {
             valid: false,
             loading: false,
             loadingDepartamentos: false,
-            loadingMunicipios: false,
+            loadingCiudades: false,
             paises: [],
             departamentos: [],
-            municipios: [],
+            ciudades: [],
             impuestos: [],
             operaciones: [],
             documentos: [],
@@ -267,7 +265,7 @@ export default {
                 registro: this.registro,
                 pais: this.pais,
                 departamento: this.departamento,
-                municipio: this.municipio,
+                ciudad: this.ciudad,
                 direccion: this.direccion,
                 correo: this.correo,
                 telefono: this.telefono,
@@ -321,7 +319,7 @@ export default {
          * Obtiene la lista de países desde el servicio.
          */
         getPaises() {
-            UbicacionService.paises()
+            service.obtenerPaises()
                 .then(res => {
                     this.paises = res
                 })
@@ -335,10 +333,10 @@ export default {
         getDepartamentos() {
             this.loadingDepartamentos = true
             this.departamento = ''
-            this.municipio = ''
-            this.municipios = []
+            this.ciudad = ''
+            this.ciudades = []
 
-            UbicacionService.departamentos(this.pais)
+            service.obtenerDepartamentos(this.pais)
                 .then(res => {
                     this.departamentos = res
                     this.loadingDepartamentos = false
@@ -349,20 +347,20 @@ export default {
                 })
         },
         /**
-         * Obtiene la lista de municipios para el departamento seleccionado.
+         * Obtiene la lista de ciudades para el departamento seleccionado.
          */
-        getMunicipios() {
-            this.loadingMunicipios = true
-            this.municipio = ''
+        getCiudades() {
+            this.loadingCiudades = true
+            this.ciudad = ''
 
-            UbicacionService.ciudades(this.departamento)
+            service.obtenerCiudades(this.departamento)
                 .then(res => {
-                    this.municipios = res
-                    this.loadingMunicipios = false
+                    this.ciudades = res
+                    this.loadingCiudades = false
                 })
                 .catch(err => {
                     console.error(err)
-                    this.loadingMunicipios = false
+                    this.loadingCiudades = false
                 })
         },
     },

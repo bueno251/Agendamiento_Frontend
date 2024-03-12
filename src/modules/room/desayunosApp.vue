@@ -177,7 +177,8 @@
                                 <p>
                                     Tiene Un Impuesto?
                                 </p>
-                                <v-switch v-model="tieneIvaUpdate" :label="tieneIvaUpdate ? 'Si' : 'No'" inset></v-switch>
+                                <v-switch v-model="tieneIvaUpdate" :label="tieneIvaUpdate ? 'Si' : 'No'"
+                                    inset></v-switch>
                             </div>
                         </v-col>
 
@@ -257,7 +258,7 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
+                        <v-btn @click="dialogUpdate = false, closeUpdate()" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
                             color="light-green">actualizar</v-btn>
                     </div>
@@ -582,10 +583,10 @@ export default {
             this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
         closeUpdate() {
-            if (this.decoration.media == null) {
+            if (this.breakfast.media == null) {
                 this.mediaToSee = []
             } else {
-                this.mediaToSee = Array.from(this.decoration.media)
+                this.mediaToSee = Array.from(this.breakfast.media)
             }
 
             this.mediaFilesToUpload = []

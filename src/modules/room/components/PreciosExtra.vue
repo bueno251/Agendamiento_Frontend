@@ -24,6 +24,16 @@
                         </v-text-field>
                     </v-col>
 
+                    <v-col cols="12">
+                        <v-text-field v-model="edadNiños" :rules="[rules.required]" type="number" hide-spin-buttons
+                            dense outlined required>
+
+                            <template v-slot:label>
+                                Edad de los Niños para pagar <span class="red--text">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+
                     <v-col cols="12" md="6" sm="6">
                         <div class="flex">
                             <p>
@@ -35,18 +45,22 @@
 
                     <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
-                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined required>
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
+                            required>
 
                             <template v-slot:label>
                                 Impuesto <span class="red--text">*</span>
                             </template>
 
-                            <template v-slot:append-outer>
-                                <v-btn icon @click="createImpuestoDialog = true">
-                                    <v-icon>
-                                        mdi-plus-circle
-                                    </v-icon>
-                                </v-btn>
+                            <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
                     </v-col>
@@ -125,6 +139,7 @@ export default {
             Adicional: '',
             Niños: '',
             impuesto: '',
+            edadNiños: '',
             tieneIva: false,
             valid: false,
             loading: false,
@@ -167,6 +182,7 @@ export default {
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',

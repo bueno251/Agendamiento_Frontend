@@ -97,12 +97,15 @@
                                 Impuesto <span class="red--text">*</span>
                             </template>
 
-                            <template v-slot:append-outer>
-                                <v-btn icon @click="createImpuestoDialog = true">
-                                    <v-icon>
-                                        mdi-plus-circle
-                                    </v-icon>
-                                </v-btn>
+                            <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
                     </v-col>

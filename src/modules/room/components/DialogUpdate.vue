@@ -97,12 +97,15 @@
                                 Impuesto <span class="red--text">*</span>
                             </template>
 
-                            <template v-slot:append-outer>
-                                <v-btn icon @click="createImpuestoDialog = true">
-                                    <v-icon>
-                                        mdi-plus-circle
-                                    </v-icon>
-                                </v-btn>
+                            <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
                     </v-col>
@@ -157,6 +160,8 @@
 
         <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false" @update="getCaracteristicas" />
 
+        <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos()" />
+
     </v-dialog>
 </template>
 
@@ -166,6 +171,7 @@ import vuex from "@/store"
 import Swal from 'sweetalert2'
 import service from "@/services/service"
 import CreateCaracteristicRoom from './CreateCaracteristicRoom.vue'
+import createImpuesto from '@/modules/impuestos/components/createImpuesto.vue'
 
 export default {
     name: 'DialogUpdate',
@@ -175,6 +181,7 @@ export default {
     },
     components: {
         CreateCaracteristicRoom,
+        createImpuesto,
     },
     computed: {
         noSelectedCaracteristicas() {
@@ -198,8 +205,9 @@ export default {
                     this.cantidad = newRoom.countRooms
                     this.estado = newRoom.estadoId
                     this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
-                    this.desayuno = newRoom.hasDesayuno ? 1 : 0
-                    this.decoracion = newRoom.hasDecoracion ? 1 : 0
+                    this.desayuno = newRoom.tieneDesayuno ? 1 : 0
+                    this.decoracion = newRoom.tieneDecoracion ? 1 : 0
+                    this.incluyeDesayuno = newRoom.incluyeDesayuno ? 1 : 0
                     this.getCaracteristicas()
                 }
             },
@@ -222,6 +230,7 @@ export default {
             valid: false,
             loading: false,
             dialogCreate: false,
+            createImpuestoDialog: false,
             tipos: [],
             estados: [],
             caracteristicas: [],
@@ -282,6 +291,7 @@ export default {
             service.actualizarRoom(data, this.room.id)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',

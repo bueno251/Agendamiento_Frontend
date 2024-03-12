@@ -29,7 +29,7 @@ const UbicacionService = {
     },
     
     obtenerDepartamentos(id) {
-        let url = `departamentos/${id}`
+        let url = `departamentos-${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -42,8 +42,8 @@ const UbicacionService = {
         })
     },
     
-    obtenerMunicipios(id) {
-        let url = `municipios/${id}`
+    obtenerCiudades(id) {
+        let url = `ciudades-${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)

@@ -177,7 +177,8 @@
                                 <p>
                                     Tiene Un Impuesto?
                                 </p>
-                                <v-switch v-model="tieneIvaUpdate" :label="tieneIvaUpdate ? 'Si' : 'No'" inset></v-switch>
+                                <v-switch v-model="tieneIvaUpdate" :label="tieneIvaUpdate ? 'Si' : 'No'"
+                                    inset></v-switch>
                             </div>
                         </v-col>
 
@@ -219,7 +220,7 @@
                             <div class="grid my-5">
 
                                 <template v-for="(file, index) in mediaFilesToUpload">
-                                    <v-menu :key="index" offset-y style="max-width: 600px">
+                                    <v-menu :key="'toUp' + index" offset-y style="max-width: 600px">
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-card class="portrait"
                                                 :style="{ 'background-image': `url('${isImg(file) ? file.preview : require('@/assets/file-video.png')}')`, 'background-size': isImg(file) ? 'cover' : 'contain', 'background-position': 'center' }"

@@ -78,6 +78,20 @@ const ClienteService = {
         })
     },
 
+    obtenerTiposDocumentoCliente() {
+        let url = 'cliente-tipo-documentos'
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
     /**
      * Encuentra un cliente por su número de documento.
      * @memberof ClienteService

@@ -116,6 +116,7 @@ export default {
                     this.loading = false
 
                     // Emite el evento 'update' para notificar a otros componentes sobre la actualización
+                    this.$emit('close')
                     this.$emit('update')
 
                     // Muestra un mensaje de éxito
@@ -163,6 +164,7 @@ export default {
                     this.dialogDelete = false
 
                     // Emite el evento 'update' para notificar a otros componentes sobre la actualización
+                    this.$emit('close')
                     this.$emit('update')
 
                     // Muestra un mensaje de éxito

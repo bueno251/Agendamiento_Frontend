@@ -5,6 +5,14 @@
         </v-card-title>
         <v-container fluid>
             <v-row class="ma-0">
+
+                <v-col cols="12"  md="3" sm="6">
+                    <label>Edad de los Niños para pagar <span class="red--text">*</span></label>
+                    <v-text-field v-model="edadNiños" :rules="[rules.required]" type="number" hide-spin-buttons dense outlined
+                        required>
+                    </v-text-field>
+                </v-col>
+
                 <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
@@ -103,15 +111,15 @@
                                 </template>
 
                                 <template v-slot:prepend-item>
-                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            Añadir Impuesto
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </v-list-item>
-                                <v-divider class="mt-2"></v-divider>
-                            </template>
+                                    <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                Añadir Impuesto
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-divider class="mt-2"></v-divider>
+                                </template>
                             </v-select>
                         </v-col>
                     </v-row>
@@ -152,6 +160,7 @@ export default {
                     this.correoRequired = newItem.correoObligatorio
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
+                    this.edadNiños = newItem.edadTarifaNiños
                 }
             },
             immediate: true,
@@ -177,6 +186,7 @@ export default {
             Niños: '',
             impuesto: '',
             porcentSeparacion: 0,
+            edadNiños: 2,
             canReservar: true,
             correoRequired: true,
             tarifasGenerales: false,
@@ -211,6 +221,7 @@ export default {
                 correo: this.correoRequired,
                 tarifasGenerales: this.tarifasGenerales,
                 porcentaje: this.porcentSeparacion,
+                edadTarifaNiños: this.edadNiños,
             }
 
             // Llama al servicio para actualizar la configuración de reserva

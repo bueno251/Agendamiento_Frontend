@@ -112,6 +112,7 @@ export default {
             service.guardarMetodosPago(data)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',

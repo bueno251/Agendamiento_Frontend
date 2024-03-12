@@ -8,6 +8,7 @@ import DivisasService from './DivisasService'
 import EstadoRoomService from './EstadoRoom'
 import ImpuestoService from './ImpuestoService'
 import ReservaService from './ReservaService'
+import ReservaMotivosService from './ReservaMotivosService'
 import RoomService from './RoomService'
 import SocrataService from './SocrataService'
 import TarifaService from './Tarifa'
@@ -28,6 +29,7 @@ const service = {
     ...EstadoRoomService,
     ...ImpuestoService,
     ...ReservaService,
+    ...ReservaMotivosService,
     ...RoomService,
     ...SocrataService,
     ...TarifaService,
