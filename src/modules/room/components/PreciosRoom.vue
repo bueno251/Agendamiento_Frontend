@@ -87,13 +87,13 @@ export default {
             valid: false,
             loading: false,
             week: [
-                { name: 'Domingo', precio: '', jornada_id: 2 },
-                { name: 'Lunes', precio: '', jornada_id: 1 },
-                { name: 'Martes', precio: '', jornada_id: 1 },
-                { name: 'Miércoles', precio: '', jornada_id: 1 },
-                { name: 'Jueves', precio: '', jornada_id: 1 },
-                { name: 'Viernes', precio: '', jornada_id: 1 },
-                { name: 'Sábado', precio: '', jornada_id: 2 },
+                { name: 'Domingo', precio: '330.000', jornada_id: 2 },
+                { name: 'Lunes', precio: '250.000', jornada_id: 1 },
+                { name: 'Martes', precio: '250.000', jornada_id: 1 },
+                { name: 'Miércoles', precio: '250.000', jornada_id: 1 },
+                { name: 'Jueves', precio: '250.000', jornada_id: 1 },
+                { name: 'Viernes', precio: '250.000', jornada_id: 1 },
+                { name: 'Sábado', precio: '330.000', jornada_id: 2 },
             ],
             jornadas: [],
             rules: {
@@ -172,13 +172,13 @@ export default {
             service.obtenerTarifas(this.room.id)
                 .then(res => {
                     this.week = [
-                        { name: 'Domingo', precio: '', jornada_id: 2 },
-                        { name: 'Lunes', precio: '', jornada_id: 1 },
-                        { name: 'Martes', precio: '', jornada_id: 1 },
-                        { name: 'Miércoles', precio: '', jornada_id: 1 },
-                        { name: 'Jueves', precio: '', jornada_id: 1 },
-                        { name: 'Viernes', precio: '', jornada_id: 1 },
-                        { name: 'Sábado', precio: '', jornada_id: 2 },
+                        { name: 'Domingo', precio: '330.000', jornada_id: 2 },
+                        { name: 'Lunes', precio: '250.000', jornada_id: 1 },
+                        { name: 'Martes', precio: '250.000', jornada_id: 1 },
+                        { name: 'Miércoles', precio: '250.000', jornada_id: 1 },
+                        { name: 'Jueves', precio: '250.000', jornada_id: 1 },
+                        { name: 'Viernes', precio: '250.000', jornada_id: 1 },
+                        { name: 'Sábado', precio: '330.000', jornada_id: 2 },
                     ]
 
                     this.$refs.form.resetValidation()

@@ -49,7 +49,7 @@
                     </v-col>
 
                     <v-col cols="12" md="6" sm="6">
-                        <label>Motivo <span class="red--text">*</span></label>
+                        <label>Motivo De Viaje <span class="red--text">*</span></label>
                         <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
                             :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
@@ -109,7 +109,7 @@
             </div>
             <div class="d-flex flex-column">
                 <span v-if="reserva.precioAdultos">
-                    Adultos Extra: ${{ comaEnMiles(reserva.precioAdultos) }} {{ divisa.codigo }}
+                    Adultos Extra: ${{ comaEnMiles(reserva.precioAdultos) }} {{ divisa.codigo }} <span ></span>
                 </span>
                 <span v-if="reserva.precioNiños">
                     Niños: ${{ comaEnMiles(reserva.precioNiños) }} {{ divisa.codigo }}
@@ -129,7 +129,7 @@
                 </span>
                 <h2 style="text-wrap: balance;">
                     <strong>
-                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }}
+                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }} <span v-if="reserva.room.tieneIva">IVA: ({{ reserva.room.iva }}%)</span>
                     </strong>
                 </h2>
             </div>

@@ -46,7 +46,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(day, i) in room.precios" :key="day.name">
+                        <tr v-for="(day, i) in precios" :key="day.name">
                             <template v-if="i < 7">
                                 <td>{{ day.name }}</td>
                                 <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
@@ -290,11 +290,11 @@ export default {
 
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
-                    let precioNormal = this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
+                    let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precioConIva)
 
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
 
-                    let precioFestivo = this.precioToDolar(this.room.precios[0].precioConIva)
+                    let precioFestivo = this.precioToDolar(this.precios[0].precioConIva)
 
                     if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
                         precio += precioFestivo
@@ -344,8 +344,8 @@ export default {
                 let value = 0
 
                 // Asigna el valor del precio de adultos adicionales si está disponible
-                if (this.room.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.room.precios[7].precioConIva
+                if (this.precios.length > 7) {
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.precios[7].precioConIva
                     value = i > 1 ? precio : 0
                 }
 
@@ -377,8 +377,8 @@ export default {
                 let value = 0
 
                 // Asigna el valor del precio de niños adicionales si está disponible
-                if (this.room.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.room.precios[8].precioConIva
+                if (this.precios.length > 7) {
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.precios[8].precioConIva
                     value = precio
                 }
 
@@ -448,6 +448,7 @@ export default {
             datesInvalid: [],
             festivos: [],
             caracteristicas: [],
+            precios: [],
             adultos: {
                 cantidad: 2,
                 val: 0
@@ -520,10 +521,10 @@ export default {
          * Si la obtención es exitosa, actualiza la variable 'room' con la información de la habitación.
          * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
          */
-        getRoom() {
+        async getRoom() {
             let id = this.$route.params.id
 
-            service.obtenerRoom(id)
+            await service.obtenerRoom(id)
                 .then(res => {
                     this.room = res
                     if (res.incluyeDesayuno) {
@@ -693,6 +694,14 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
+
+            service.obtenerTarifas(this.room.id)
+                .then(res => {
+                    this.precios = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
         },
         async getDefault() {
 
@@ -728,7 +737,7 @@ export default {
         },
     },
     async mounted() {
-        this.getRoom()
+        await this.getRoom()
         await this.getDefault()
         this.getDates()
         this.getDatos()

@@ -12,10 +12,10 @@ const LOCAL = {
     }
 }
 
-const ImpuestoService = {
+const DescuentosService = {
 
-    crearImpuesto(data) {
-        let url = `impuesto`
+    crearDescuento(data) {
+        let url = `descuento`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -28,8 +28,8 @@ const ImpuestoService = {
         })
     },
 
-    obtenerTiposImpuesto() {
-        let url = `impuesto-tipos`
+    obtenerTiposDescuento() {
+        let url = `descuento-tipos`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -42,8 +42,8 @@ const ImpuestoService = {
         })
     },
 
-    obtenerImpuestos() {
-        let url = `impuestos`
+    obtenerRoomsDescuento() {
+        let url = `descuento-rooms`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
@@ -56,8 +56,22 @@ const ImpuestoService = {
         })
     },
 
-    actualizarImpuesto(data, id) {
-        let url = `impuesto/${id}`
+    obtenerDescuentos() {
+        let url = `descuentos`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.get(url)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    actualizarDescuento(data, id) {
+        let url = `descuento/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -70,8 +84,8 @@ const ImpuestoService = {
         })
     },
 
-    eliminarImpuesto(id) {
-        let url = `impuesto/${id}`
+    eliminarDescuento(id) {
+        let url = `descuento/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -87,4 +101,4 @@ const ImpuestoService = {
 
 LOCAL.Axios()
 
-export default ImpuestoService
+export default DescuentosService

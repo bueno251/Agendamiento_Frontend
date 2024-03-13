@@ -4,6 +4,7 @@ import ClienteService from './ClienteService'
 import ConfigService from './ConfigService'
 import DecoracionService from './DecoracionService'
 import DesayunoService from './DesayunoService'
+import DescuentosService from './DescuentosService'
 import DivisasService from './DivisasService'
 import EstadoRoomService from './EstadoRoom'
 import ImpuestoService from './ImpuestoService'
@@ -25,6 +26,7 @@ const service = {
     ...ConfigService,
     ...DecoracionService,
     ...DesayunoService,
+    ...DescuentosService,
     ...DivisasService,
     ...EstadoRoomService,
     ...ImpuestoService,

@@ -24,16 +24,6 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12">
-                        <v-text-field v-model="edadNiños" :rules="[rules.required]" type="number" hide-spin-buttons
-                            dense outlined required>
-
-                            <template v-slot:label>
-                                Edad de los Niños para pagar <span class="red--text">*</span>
-                            </template>
-                        </v-text-field>
-                    </v-col>
-
                     <v-col cols="12" md="6" sm="6">
                         <div class="flex">
                             <p>
@@ -100,20 +90,21 @@ export default {
             handler(newItem) {
                 // Verifica si 'precios' está presente en 'newItem'
                 if ("precios" in newItem) {
-                    // Reinicia los valores de 'Adicional' y 'Niños'
-                    this.Adicional = 0
-                    this.Niños = 0
+                    this.tieneIva = false
+                    this.impuesto = ''
 
                     // Itera sobre los precios y actualiza los valores si son 'Adicional' o 'Niños'
-                    newItem.precios.map((day) => {
-                        if (day.name == 'Adicional' || day.name == 'Niños') {
-                            this[day.name] = this.comaEnMiles(day.precio)
-                            if (day.impuestoId) {
-                                this.impuesto = day.impuestoId
+                    newItem.precios.map((tarifa) => {
+
+                        if (tarifa.name == 'Adicional' || tarifa.name == 'Niños') {
+                            this[tarifa.name] = this.comaEnMiles(tarifa.precio)
+                            if (tarifa.impuestoId) {
+                                this.impuesto = tarifa.impuestoId
                                 this.tieneIva = true
                             }
                         }
                     })
+
                 }
             },
             // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
@@ -233,13 +224,6 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        /**
-         * Cierra el componente emitiento un evento 'close'.
-         */
-        close() {
-            // Emitir evento 'close'
-            this.$emit('close')
         },
     },
     mounted() {

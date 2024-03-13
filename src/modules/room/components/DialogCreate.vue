@@ -4,7 +4,7 @@
             <v-form ref="form" v-model="valid" @submit.prevent="newRoom">
                 <v-row>
 
-                    <v-col cols="12" md="6" sm="6">
+                    <v-col cols="12" md="6" sm="6" class="py-0">
                         <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                             <template v-slot:label>
                                 Nombre <span class="red--text">*</span>
@@ -12,7 +12,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
+                    <v-col cols="12" md="6" sm="6" class="py-0">
                         <v-text-field v-model="capacidad" :rules="[rules.required]" dense outlined required>
 
                             <template v-slot:label>
@@ -21,7 +21,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
+                    <v-col cols="12" md="6" sm="6" class="py-0">
                         <v-select v-model="tipo" :items="tipos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="tipo" item-value="id" dense outlined>
 
@@ -31,7 +31,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
+                    <v-col cols="12" md="6" sm="6" class="py-0">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
                             :rules="[rules.required]" item-text="estado" item-value="id" dense outlined>
 
@@ -41,7 +41,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3" sm="6">
+                    <v-col cols="12" md="3" sm="6" class="py-0">
                         <v-text-field v-model="cantidad" :rules="[rules.required]" dense outlined required>
 
                             <template v-slot:label>
@@ -50,7 +50,7 @@
                         </v-text-field>
                     </v-col>
 
-                    <v-col cols="12" md="3" sm="6">
+                    <v-col cols="12" md="3" sm="6" class="py-0">
                         <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" dense
                             outlined>
 
@@ -60,7 +60,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3" sm="6">
+                    <v-col cols="12" md="3" sm="6" class="py-0">
                         <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" dense outlined>
 
                             <template v-slot:label>
@@ -69,7 +69,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="3" sm="6" v-if="desayuno">
+                    <v-col cols="12" md="3" sm="6" v-if="desayuno" class="py-0">
                         <v-select v-model="incluyeDesayuno" :items="yesNo" item-text="text" item-value="value" dense
                             outlined>
 
@@ -79,7 +79,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
+                    <v-col cols="12" md="6" sm="6" class="py-0">
                         <div class="flex">
                             <p>
                                 Tiene Un Impuesto?
@@ -88,7 +88,7 @@
                         </div>
                     </v-col>
 
-                    <v-col v-if="tieneIva" cols="12" md="6" sm="6">
+                    <v-col v-if="tieneIva" cols="12" md="6" sm="6" class="py-0">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
                             :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
                             required>

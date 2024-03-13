@@ -59,6 +59,10 @@
                         <v-list-item router :to="{ name: 'habitacionesTarifas' }">
                             <v-list-item-title>Tarifas De Habitaciones</v-list-item-title>
                         </v-list-item>
+                        
+                        <v-list-item router :to="{ name: 'descuentosCupones' }">
+                            <v-list-item-title>Descuentos/Cupones</v-list-item-title>
+                        </v-list-item>
                     </v-list-group>
 
                     <v-list-item router :to="{ name: 'impuestos' }">
