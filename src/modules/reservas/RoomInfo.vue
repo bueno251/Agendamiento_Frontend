@@ -38,7 +38,13 @@
                                 Precios
                             </th>
                             <th v-if="room.tieneIva">
-                                Con Iva
+                                Precio Con Iva
+                            </th>
+                            <th>
+                                Previo A Festivo
+                            </th>
+                            <th v-if="room.tieneIva">
+                                Previo A Festivo Con Iva
                             </th>
                             <th>
                                 Jornada
@@ -48,11 +54,24 @@
                     <tbody>
                         <tr v-for="(day, i) in precios" :key="day.name">
                             <template v-if="i < 7">
-                                <td>{{ day.name }}</td>
-                                <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
-                                <td v-if="room.tieneIva">$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{
-                        divisa.codigo }}</td>
-                                <td>{{ day.jornada }}</td>
+                                <td>
+                                    {{ day.name }}
+                                </td>
+                                <td>
+                                    $ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}
+                                </td>
+                                <td v-if="room.tieneIva">
+                                    $ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}
+                                </td>
+                                <td>
+                                    $ {{ comaEnMiles(precioToDolar(day.previoFestivo)) }} {{ divisa.codigo }}
+                                </td>
+                                <td v-if="room.tieneIva">
+                                    $ {{ comaEnMiles(precioToDolar(day.previoFestivoConIva)) }} {{ divisa.codigo }}
+                                </td>
+                                <td>
+                                    {{ day.jornada }}
+                                </td>
                             </template>
                         </tr>
                     </tbody>
@@ -88,7 +107,7 @@
             </article>
         </section>
 
-        <section class="calendar sticky pa-5">
+        <section class="calendar sticky py-5">
             <v-card class="pa-5" elevation="5">
                 <v-form v-model="valid" ref="fechas">
                     <v-row>
@@ -199,10 +218,27 @@
                         </v-col>
 
                         <v-col cols="6" class="py-0">
-                            <label>Precio De La Alojamiento</label>
+                            <label>Precio Del Alojamiento</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAlojamiento) }} {{ divisa.codigo }}
                             </h4>
+                        </v-col>
+
+                        <v-col cols="6" class="py-0">
+                            <label>Descuento</label>
+                            <h4>
+                                $ {{ comaEnMiles(valorDescuento) }} {{ divisa.codigo }}
+                            </h4>
+                        </v-col>
+
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+                            <div class="d-flex flex-column">
+                                <label v-for="item in descuentosActive" :key="item.id">
+                                    {{ item.nombre }} :
+                                    <span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
+                                        v-if="item.tipoId == 1">%</span>
+                                </label>
+                            </div>
                         </v-col>
 
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
@@ -215,7 +251,7 @@
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
                             <h3>Precio Total De La Reserva <span v-if="room.iva">IVA: ({{ room.iva }}%)</span></h3>
                             <h1>
-                                $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
+                                $ {{ comaEnMiles(precioNeto) }} {{ divisa.codigo }}
                             </h1>
                         </v-col>
                     </v-row>
@@ -292,9 +328,9 @@ export default {
                 while (fechaInicio < fechaFinal) {
                     let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precioConIva)
 
-                    fechaInicio.setDate(fechaInicio.getDate() + 1)
+                    let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivoConIva)
 
-                    let precioFestivo = this.precioToDolar(this.precios[0].precioConIva)
+                    fechaInicio.setDate(fechaInicio.getDate() + 1)
 
                     if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
                         precio += precioFestivo
@@ -316,10 +352,25 @@ export default {
             return Number(this.precioToDolar(this.decoracion.precioConIva))
         },
         precioDesayuno() {
-            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva)) : 0
+            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes)) : 0
         },
         valorSeparacion() {
-            return this.precioAlojamiento ? (this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            return this.precioAlojamiento ? (this.precioNeto * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+        },
+        valorDescuento() {
+            let descuento = 0
+
+            this.descuentos.forEach(discount => {
+                if (this.fechaLlegada <= discount.fechaInicio && discount.fechaFin <= this.fechaSalida) {
+                    if (discount.tipo == 'Porcentaje') {
+                        descuento += (this.precioTotal * discount.descuento / 100)
+                    } else {
+                        descuento += discount.descuento
+                    }
+                }
+            });
+
+            return descuento
         },
         precioTotal() {
             let precio = 0
@@ -329,6 +380,13 @@ export default {
             precio += this.precioNiños
             precio += this.precioDecoracion
             precio += this.precioDesayuno
+            return precio
+        },
+        precioNeto() {
+            let precio = 0
+
+            precio += this.precioTotal
+            precio -= this.valorDescuento
             return precio
         },
         /**
@@ -392,6 +450,17 @@ export default {
 
             return niños
         },
+        descuentosActive() {
+            let array = []
+
+            this.descuentos.map(discount => {
+                if (this.fechaLlegada <= discount.fechaInicio && discount.fechaFin <= this.fechaSalida) {
+                    array.push(discount)
+                }
+            });
+
+            return array
+        }
     },
     watch: {
         /**
@@ -443,12 +512,12 @@ export default {
             useGenerales: false,
             menu1: false,
             menu2: false,
-            file: null,
             dates: [],
             datesInvalid: [],
             festivos: [],
             caracteristicas: [],
             precios: [],
+            descuentos: [],
             adultos: {
                 cantidad: 2,
                 val: 0
@@ -497,20 +566,6 @@ export default {
 
                     return true
                 },
-                file: file => {
-                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
-                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
-
-                    if (!file) {
-                        return 'Campo requerido.'
-                    }
-
-                    if (!allowedFormats.includes(file.type) && !allowedExtensions.includes(file.name.slice(-4).toLowerCase())) {
-                        return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
-                    }
-
-                    return true;
-                },
             },
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
@@ -526,7 +581,33 @@ export default {
 
             await service.obtenerRoom(id)
                 .then(res => {
+                    let week = [
+                        { name: 'Domingo' },
+                        { name: 'Lunes' },
+                        { name: 'Martes' },
+                        { name: 'Miércoles' },
+                        { name: 'Jueves' },
+                        { name: 'Viernes' },
+                        { name: 'Sábado' },
+                        { name: 'Adicional' },
+                        { name: 'Niños' },
+                    ]
+
+                    res.precios.map((day) => {
+                        const index = week.findIndex((weekDay) => weekDay.name === day.name)
+
+                        if (index !== -1) {
+                            week[index].precio = day.precio
+                            week[index].precioConIva = day.precioConIva
+                            week[index].previoFestivo = day.previoFestivo
+                            week[index].previoFestivoConIva = day.previoFestivoConIva
+                            week[index].jornada = day.jornada
+                        }
+                    })
+
                     this.room = res
+                    this.precios = week
+
                     if (res.incluyeDesayuno) {
                         this.desayunos[0].nombre = 'Incluido'
                         this.desayuno = {
@@ -561,7 +642,7 @@ export default {
                 precioDecoracion: this.precioDecoracion,
                 precioDesayuno: this.precioDesayuno,
                 valorSeparacion: this.valorSeparacion,
-                precioTotal: this.precioTotal,
+                precioTotal: this.precioNeto,
                 cedula: this.cedula,
                 cantidad_rooms: this.cantidadRooms,
             }
@@ -695,9 +776,9 @@ export default {
                     console.error(err)
                 })
 
-            service.obtenerTarifas(this.room.id)
+            service.obtenerDescuentos(this.room.id)
                 .then(res => {
-                    this.precios = res
+                    this.descuentos = res
                 })
                 .catch(err => {
                     console.error(err)

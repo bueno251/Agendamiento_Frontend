@@ -39,7 +39,8 @@
                     <td>{{ item.nombre }}</td>
                     <td>{{ item.fechaInicio }}</td>
                     <td>{{ item.fechaFin }}</td>
-                    <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span v-if="item.tipoId == 1">%</span></td>
+                    <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
+                            v-if="item.tipoId == 1">%</span></td>
                     <td>{{ item.created_at }}</td>
                 </tr>
             </template>
@@ -104,7 +105,7 @@
                                 </template>
 
                                 <template v-slot:prepend-item>
-                                    <v-list-item ripple @mousedown.prevent @click="toggleSelect">
+                                    <v-list-item ripple @mousedown.prevent @click="toggleSelect('create')">
                                         <v-list-item-action>
                                             <v-icon :color="habitacionesSelected.length > 0 ? 'indigo darken-4' : ''">
                                                 {{ icon }}
@@ -476,7 +477,7 @@ export default {
         crear() {
             this.loadingbtn = true
 
-            if(typeof(this.descuento) == 'string'){
+            if (typeof (this.descuento) == 'string') {
                 this.descuento = parseInt(this.descuento.replace(/\./g, ''))
             }
 
@@ -536,7 +537,7 @@ export default {
         actualizar() {
             this.loadingbtn = true
 
-            if(typeof(this.descuentoUpdate) == 'string'){
+            if (typeof (this.descuentoUpdate) == 'string') {
                 this.descuentoUpdate = parseInt(this.descuentoUpdate.replace(/\./g, ''))
             }
 
@@ -579,7 +580,7 @@ export default {
         eliminar() {
             this.loadingbtn = true
 
-            // Llama al servicio para eliminar un descuento
+                // Llama al servicio para eliminar un descuento
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
@@ -635,19 +636,19 @@ export default {
         save(menu, date) {
             this.$refs[menu].save(date)
         },
-        toggleSelect(metodo = 'crear') {
+        toggleSelect(metodo) {
             this.$nextTick(() => {
-                if (metodo == 'crear') {
+                if (metodo == 'create') {
                     if (this.selectAllRooms) {
                         this.habitacionesSelected = []
                     } else {
-                        this.habitacionesSelected = this.habitaciones.slice()
+                        this.habitacionesSelected = this.habitaciones.map(habitacion => habitacion.id)
                     }
-                } else {
+                } else if (metodo == 'update') {
                     if (this.selectAllRoomsUpdate) {
                         this.habitacionesSelectedUpdate = []
                     } else {
-                        this.habitacionesSelectedUpdate = this.habitaciones.slice()
+                        this.habitacionesSelectedUpdate = this.habitaciones.map(habitacion => habitacion.id)
                     }
                 }
             })

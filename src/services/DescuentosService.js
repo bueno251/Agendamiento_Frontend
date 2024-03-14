@@ -56,8 +56,13 @@ const DescuentosService = {
         })
     },
 
-    obtenerDescuentos() {
+    obtenerDescuentos(id = '') {
+
         let url = `descuentos`
+
+        if (id) {
+            url += `/${id}`
+        }
 
         return new Promise((resolve, reject) => {
             LOCAL.api.get(url)
