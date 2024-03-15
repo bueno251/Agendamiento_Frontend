@@ -2,6 +2,7 @@
 import CaracteristicasService from './CaracacteristicasService'
 import ClienteService from './ClienteService'
 import ConfigService from './ConfigService'
+import CuponesService from './CuponesService'
 import DecoracionService from './DecoracionService'
 import DesayunoService from './DesayunoService'
 import DescuentosService from './DescuentosService'
@@ -24,6 +25,7 @@ const service = {
     ...CaracteristicasService,
     ...ClienteService,
     ...ConfigService,
+    ...CuponesService,
     ...DecoracionService,
     ...DesayunoService,
     ...DescuentosService,

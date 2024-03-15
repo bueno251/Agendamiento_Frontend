@@ -15,6 +15,11 @@
                         <DescuentosApp />
                     </div>
                 </v-window-item>
+                <v-window-item>
+                    <div class="d-flex justify-center">
+                        <CuponesApp />
+                    </div>
+                </v-window-item>
             </v-window>
         </v-card>
     </div>
@@ -23,10 +28,12 @@
 <script>
 
 import DescuentosApp from './DescuentosApp'
+import CuponesApp from './CuponesApp.vue';
 
 export default {
     components: {
         DescuentosApp,
+        CuponesApp
     },
     data() {
         return {

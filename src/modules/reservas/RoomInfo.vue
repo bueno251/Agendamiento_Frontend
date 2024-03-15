@@ -46,31 +46,25 @@
                             <th v-if="room.tieneIva">
                                 Previo A Festivo Con Iva
                             </th>
-                            <th>
-                                Jornada
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(day, i) in precios" :key="day.name">
+                        <tr v-for="(tarifa, i) in precios" :key="tarifa.name">
                             <template v-if="i < 7">
                                 <td>
-                                    {{ day.name }}
+                                    {{ tarifa.name }}
                                 </td>
                                 <td>
-                                    $ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.precio)) }} {{ divisa.codigo }}
                                 </td>
                                 <td v-if="room.tieneIva">
-                                    $ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.precioConIva)) }} {{ divisa.codigo }}
                                 </td>
                                 <td>
-                                    $ {{ comaEnMiles(precioToDolar(day.previoFestivo)) }} {{ divisa.codigo }}
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.previoFestivo)) }} {{ divisa.codigo }}
                                 </td>
                                 <td v-if="room.tieneIva">
-                                    $ {{ comaEnMiles(precioToDolar(day.previoFestivoConIva)) }} {{ divisa.codigo }}
-                                </td>
-                                <td>
-                                    {{ day.jornada }}
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.previoFestivoConIva)) }} {{ divisa.codigo }}
                                 </td>
                             </template>
                         </tr>
@@ -361,7 +355,7 @@ export default {
             let descuento = 0
 
             this.descuentos.forEach(discount => {
-                if (this.fechaLlegada <= discount.fechaInicio && discount.fechaFin <= this.fechaSalida) {
+                if (this.fechaLlegada <= discount.fechaInicio && this.fechaSalida >= discount.fechaFin) {
                     if (discount.tipo == 'Porcentaje') {
                         descuento += (this.precioTotal * discount.descuento / 100)
                     } else {

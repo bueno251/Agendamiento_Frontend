@@ -165,6 +165,7 @@ export default {
 
                                 if (index !== -1) {
                                     week[index].precio = this.comaEnMiles(day.precio);
+                                    week[index].jornada_id = day.jornada_id;
                                     week[index].impuestoId = day.impuestoId;
                                 }
                             })

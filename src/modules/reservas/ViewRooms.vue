@@ -29,13 +29,12 @@
                             <p v-if="jornada != 'null'" :key="`${jornada} - ${index}`"
                                 class="d-flex flex-column text-center w-100">
                                 De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
-                                <sub>Previo A Festivos</sub>
+                                <sub v-if="jornada == 'Semana'">Dias no previos a festivos</sub>
                             </p>
                         </template>
 
                         <v-divider class="my-2" />
 
-                        <p>Incluye</p>
                         <div class="caracteristics">
 
                             <template v-for="(item, index) in caracteristicas">
@@ -104,8 +103,39 @@ export default {
             service.obtenerRooms()
                 .then(res => {
                     res.forEach(room => {
-                        room.precios = Object.groupBy(room.precios, (price) => price.jornada)
+                        let week = [
+                            { name: 'Lunes', precio: 0, jornada: '' },
+                            { name: 'Martes', precio: 0, jornada: '' },
+                            { name: 'Miércoles', precio: 0, jornada: '' },
+                            { name: 'Jueves', precio: 0, jornada: '' },
+                            { name: 'Viernes', precio: 0, jornada: '' },
+                            { name: 'Sábado', precio: 0, jornada: '' },
+                            { name: 'Adicional', precio: 0, jornada: null },
+                            { name: 'Niños', precio: 0, jornada: null },
+                        ]
+
+                        if (room.precios) {
+                            room.precios.map(day => {
+                                const index = week.findIndex((weekDay) => weekDay.name === day.name)
+
+                                if (index !== -1) {
+                                    week[index].precio = this.comaEnMiles(day.precio);
+                                    week[index].jornada = day.jornada
+                                }
+
+                                if (day.name == 'Domingo') {
+                                    if (day.jornada == 'Semana') {
+                                        week.unshift(day)
+                                    } else {
+                                        week.push(day)
+                                    }
+                                }
+                            })
+                        }
+
+                        room.precios = Object.groupBy(week, (tarifas) => tarifas.jornada)
                     })
+
                     this.rooms = res
                 })
                 .catch(err => {

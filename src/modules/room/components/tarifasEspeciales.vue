@@ -357,7 +357,7 @@ export default {
             let data = {
                 fechaInicio: this.fechaInicio,
                 fechaFin: this.fechaFinal,
-                precio: this.precio,
+                precio: parseInt(this.precio.replace(/\./g, '')),
                 descripcion: this.descripcion,
                 room: this.room.id,
                 impuesto: this.room.impuestoId,
@@ -402,8 +402,8 @@ export default {
 
             let data = {
                 fechaInicio: this.fechaInicioUpd,
-                fechaFin: this.fechaFinalUpd,
-                precio: this.precioUpd,
+                fechaFin: this.fechasUpd[1],
+                precio: parseInt(this.precioUpd.replace(/\./g, '')),
                 descripcion: this.descripcionUpd,
             }
 

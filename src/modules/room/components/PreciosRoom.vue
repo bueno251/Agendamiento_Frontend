@@ -196,6 +196,8 @@ export default {
 
                         if (index !== -1) {
                             this.week[index].precio = this.comaEnMiles(day.precio)
+                            this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
+                            this.week[index].jornada_id = day.jornada_id
                         }
                     });
 

@@ -13,8 +13,8 @@
                 </v-col>
             </v-row>
         </v-card-title>
-        <v-data-table :headers="headers" :items="descuentos" :search="search" :loading="loading"
-            no-results-text="No hay ningún descuento que coincida" no-data-text="No hay descuentos"
+        <v-data-table :headers="headers" :items="cupones" :search="search" :loading="loading"
+            no-results-text="No hay ningún cupón que coincida" no-data-text="No hay cupones"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -27,10 +27,13 @@
                                 </v-btn>
                             </template>
                             <v-list>
-                                <v-list-item link @click="discount = item, dialogUpdate = true">
+                                <v-list-item link @click="coupon = item, dialogCodigos = true">
+                                    <v-list-item-title v-text="'Ver Códigos'"></v-list-item-title>
+                                </v-list-item>
+                                <v-list-item link @click="coupon = item, dialogUpdate = true">
                                     <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                 </v-list-item>
-                                <v-list-item link @click="discount = item, dialogDelete = true">
+                                <v-list-item link @click="coupon = item, dialogDelete = true">
                                     <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                 </v-list-item>
                             </v-list>
@@ -88,8 +91,9 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="habitacionesSelected" :items="habitaciones" :rules="[rules.arrayRequired]"
-                                item-text="nombre" item-value="id" multiple outlined required>
+                            <v-select v-model="habitacionesSelected" :items="habitaciones"
+                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined
+                                required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -163,6 +167,16 @@
                             </v-menu>
                         </v-col>
 
+                        <v-col cols="12" md="6" sm="6">
+                            <v-text-field v-model="cantidad" :rules="[rules.required]" type="number" hide-spin-buttons
+                                outlined required>
+
+                                <template v-slot:label>
+                                    Cantidad <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
                     </v-row>
 
                     <div class="buttons">
@@ -221,7 +235,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="habitacionesSelectedUpdate" :items="habitaciones"
-                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined required>
+                                :rules="[rules.required]" item-text="nombre" item-value="id" multiple outlined required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -297,6 +311,16 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-text-field v-model="cantidadUpdate" :rules="[rules.required, rules.min]" type="number"
+                                hide-spin-buttons outlined required>
+
+                                <template v-slot:label>
+                                    Cantidad <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
                             <div class="flex">
                                 <p>
                                     Activo
@@ -320,13 +344,42 @@
         <v-dialog :value="dialogDelete" width="90%" max-width="600px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar el descuento {{ discount.nombre }}?</h3>
+                    <h3>Eliminar el cupón {{ coupon.nombre }}?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
                         <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
                     </div>
                 </v-sheet>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="dialogCodigos" width="90%" max-width="600px" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3"
+                        @click="dialogCodigos = false, saveCodigos()"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-data-table :headers="headersCode" :items="coupon.codigos" :loading="loading"
+                    no-data-text="No hay ningún código" loading-text="Cargando... Por favor espera"
+                    :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }"
+                    :items-per-page="5">
+                    <template v-slot:item="{ item }">
+                        <tr>
+                            <td>{{ item.codigo }}</td>
+                            <td>{{ item.usado ? 'Si' : 'No' }}</td>
+                            <td>
+                                <div class="flex pa-0 ma-0">
+                                    <p>
+                                        Activo
+                                    </p>
+                                    <v-switch v-model="item.activo" :label="item.activo ? 'Si' : 'No'" inset></v-switch>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </v-data-table>
             </v-card>
         </v-dialog>
 
@@ -340,7 +393,7 @@ import Swal from 'sweetalert2'
 import service from '@/services/service'
 
 export default {
-    name: 'DescuentosApp',
+    name: 'CuponesApp',
     computed: {
         fechaInicio() {
             return this.fechas[0] || ''
@@ -378,8 +431,8 @@ export default {
         },
     },
     watch: {
-        discount: {
-            // Función que se ejecuta cuando hay cambios en descuento
+        coupon: {
+            // Función que se ejecuta cuando hay cambios en el cupón
             handler(newItem) {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
@@ -389,6 +442,7 @@ export default {
                     this.fechasUpd[0] = newItem.fechaInicio
                     this.fechasUpd[1] = newItem.fechaFin
                     this.activo = newItem.activo
+                    this.cantidadUpdate = newItem.codigos.length
                 }
             },
             // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
@@ -405,7 +459,7 @@ export default {
                     this.fechas[1] = fecha2.toISOString().slice(0, 10)
                 }
 
-                // Ordena las fechas de llegada y salida
+                // Ordena las fechas de Inicio y Fin
                 let sortfechas = this.fechas.toSorted()
                 this.fechas = sortfechas
             }
@@ -421,7 +475,7 @@ export default {
                     this.fechasUpd[1] = fecha2.toISOString().slice(0, 10)
                 }
 
-                // Ordena las fechasUpd de llegada y salida
+                // Ordena las fechasUpd de Inicio y Fin
                 let sortfechasUpd = this.fechasUpd.toSorted()
                 this.fechasUpd = sortfechasUpd
             }
@@ -444,15 +498,19 @@ export default {
     data() {
         return {
             search: '',
+            codigo: '',
             nombre: '',
+            cantidad: 1,
             fechas: [],
             descuento: '',
             tipo: 1,
             habitacionesSelected: '',
+            codigoUpdate: '',
             nombreUpdate: '',
             descuentoUpdate: '',
             activo: '',
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            cantidadUpdate: '',
             fechasUpd: [],
             habitacionesSelectedUpdate: '',
             tipoUpdate: '',
@@ -461,14 +519,15 @@ export default {
             dialogCreate: false,
             dialogUpdate: false,
             dialogDelete: false,
+            dialogCodigos: false,
             validCreate: false,
             validUpdate: false,
             menu1: false,
             menu2: false,
             menu3: false,
             menu4: false,
-            discount: {},
-            descuentos: [],
+            coupon: {},
+            cupones: [],
             habitaciones: [],
             tipos: [],
             headers: [
@@ -479,9 +538,15 @@ export default {
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
+            headersCode: [
+                { text: 'Codigo', key: 'codigo', value: 'codigo' },
+                { text: 'Usado', key: 'usado', value: 'usado' },
+                { text: 'Activo', key: 'activo', value: 'activo', sortable: false },
+            ],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 arrayRequired: value => !!value.length || 'Mínimo uno selecionado.',
+                min: value => value >= this.coupon.codigos.length || 'No puede ser menor a la cantidad anterior.'
             },
         }
     },
@@ -500,16 +565,17 @@ export default {
                 descuento: this.descuento,
                 habitaciones: this.habitacionesSelected,
                 tipo: this.tipo,
+                cantidad: this.cantidad,
                 user: vuex.state.user.id,
             }
 
-            // Llama al servicio para crear un nuevo descuento
-            service.crearDescuento(data)
+            // Llama al servicio para crear un nuevo cupón
+            service.crearCupon(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
 
-                    this.getDescuentos() // Actualiza la lista de descuentos después de crear un nuevo
+                    this.getCupones()
 
                     Swal.fire({
                         icon: 'success',
@@ -526,17 +592,17 @@ export default {
                 })
         },
         /**
-         * Obtiene la lista de descuentos.
+         * Obtiene la lista de cupones.
          */
-        getDescuentos() {
+        getCupones() {
             this.loading = true
-            this.discount = {}
+            this.coupon = {}
 
-            // Llama al servicio para obtener la lista de descuentos
-            service.obtenerDescuentos()
+            // Llama al servicio para obtener la lista de cupones
+            service.obtenerCupones()
                 .then(res => {
                     this.loading = false
-                    this.descuentos = res
+                    this.cupones = res
                 })
                 .catch(err => {
                     this.loading = false
@@ -544,7 +610,7 @@ export default {
                 })
         },
         /**
-         * Actualiza un descuento existente.
+         * Actualiza un cupón existente.
          */
         actualizar() {
             this.loadingbtn = true
@@ -562,16 +628,17 @@ export default {
                 activo: this.activo,
                 habitaciones: this.habitacionesSelectedUpdate,
                 tipo: this.tipoUpdate,
+                cantidad: this.cantidadUpdate,
                 user: vuex.state.user.id,
             }
 
-            // Llama al servicio para actualizar un descuento existente
-            service.actualizarDescuento(data, this.discount.id)
+            // Llama al servicio para actualizar un cupón existente
+            service.actualizarCupon(data, this.coupon.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
 
-                    this.getDescuentos() // Actualiza la lista de descuentos después de la actualización
+                    this.getCupones()
 
                     Swal.fire({
                         icon: 'success',
@@ -588,17 +655,17 @@ export default {
                 })
         },
         /**
-         * Elimina un descuento.
+         * Elimina un cupón.
          */
         eliminar() {
             this.loadingbtn = true
 
-                // Llama al servicio para eliminar un descuento
+                // Llama al servicio para eliminar un cupón
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
 
-                    this.getDescuentos() // Actualiza la lista de descuentos después de la eliminación
+                    this.getCupones()
 
                     Swal.fire({
                         icon: 'success',
@@ -649,6 +716,26 @@ export default {
         save(menu, date) {
             this.$refs[menu].save(date)
         },
+        saveCodigos() {
+            let data = {
+                codigos: this.coupon.codigos
+            }
+
+            service.actualizarCodigosCupon(data)
+                .then(() => {
+                    this.getCupones()
+                })
+                .catch(err => {
+                    this.dialogCodigos = true
+
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
+                    
+                    console.error(err)
+                })
+        },
         toggleSelect(metodo) {
             this.$nextTick(() => {
                 if (metodo == 'create') {
@@ -685,7 +772,7 @@ export default {
         },
     },
     mounted() {
-        this.getDescuentos()
+        this.getCupones()
         this.getDatos()
     },
 }
