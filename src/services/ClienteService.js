@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -14,6 +15,10 @@ const LOCAL = {
         })
     }
 }
+
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const ClienteService = {
 
@@ -47,51 +52,27 @@ const ClienteService = {
     obtenerClientes() {
         let url = 'clientes'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('clientes', url)
     },
-
+    
     /**
      * Obtiene los tipos de clientes.
      * @memberof ClienteService
      * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la respuesta.
      * @throws {Error} - Error si la obtención de tipos de clientes falla.
-     */
+    */
     obtenerTiposCliente() {
         let url = 'cliente-tipos'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        
+        return cacheManager.obtenerDatos('cliente-tipos', url)
     },
-
+    
     obtenerTiposDocumentoCliente() {
         let url = 'cliente-tipo-documentos'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        
+        return cacheManager.obtenerDatos('cliente-tipo-documentos', url)
     },
-
+    
     /**
      * Encuentra un cliente por su número de documento.
      * @memberof ClienteService
@@ -101,16 +82,8 @@ const ClienteService = {
      */
     encontrarClienteDocumento(documento) {
         let url = `cliente/documento/${documento}`
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        
+        return cacheManager.obtenerDatos(`cliente/documento/${documento}`, url)
     },
 
     /**
@@ -156,7 +129,5 @@ const ClienteService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default ClienteService

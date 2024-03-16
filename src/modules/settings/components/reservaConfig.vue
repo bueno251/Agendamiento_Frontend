@@ -3,13 +3,18 @@
         <v-card-title class="blue lighten-2 white--text">
             Reservas
         </v-card-title>
-        <v-container fluid>
+        <template v-if="loadingcard">
+            <div class="text-center my-5 w-100">
+                <v-progress-circular class="text-center" color="primary" indeterminate></v-progress-circular>
+            </div>
+        </template>
+        <v-container fluid v-else>
             <v-row class="ma-0">
 
-                <v-col cols="12"  md="3" sm="6">
+                <v-col cols="12" md="3" sm="6">
                     <label>Edad de los Niños para pagar <span class="red--text">*</span></label>
-                    <v-text-field v-model="edadNiños" :rules="[rules.required]" type="number" hide-spin-buttons dense outlined
-                        required>
+                    <v-text-field v-model="edadNiños" :rules="[rules.required]" type="number" hide-spin-buttons dense
+                        outlined required>
                     </v-text-field>
                 </v-col>
 
@@ -161,6 +166,7 @@ export default {
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
                     this.edadNiños = newItem.edadTarifaNiños
+                    this.loadingcard = false
                 }
             },
             immediate: true,
@@ -191,11 +197,12 @@ export default {
             correoRequired: true,
             tarifasGenerales: false,
             loading: false,
+            loadingcard: true,
+            loadingbtn: false,
             tarifasGeneralesDialog: false,
             createImpuestoDialog: false,
             tieneIva: false,
             valid: false,
-            loadingbtn: false,
             impuestos: [],
             tarifas: [
                 'Adicional',
@@ -243,32 +250,47 @@ export default {
                     console.error(err)
                 })
         },
+        /**
+         * Guarda las tarifas generales y muestra un mensaje de éxito o error.
+         */
         saveTarifas() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Crea un nuevo array de tarifas con los nombres y precios correspondientes
             let tarifas = this.tarifas.map(nombre => ({ nombre: nombre, precio: parseInt(this[nombre].replace(/\./g, '')) }));
 
+            // Prepara los datos para guardar las tarifas generales
             let data = {
                 tieneIva: this.tieneIva,
                 impuesto: this.impuesto,
                 tarifas: tarifas,
             }
 
+            // Llama al servicio para guardar las tarifas generales
             service.guardarTarifasGenerales(data)
                 .then(res => {
+                    // Oculta el diálogo de tarifas generales y establece la variable de carga como falsa
                     this.tarifasGeneralesDialog = false
                     this.loadingbtn = false
+
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
+                    // Establece la variable de carga como falsa
                     this.loadingbtn = false
+
+                    // Muestra un mensaje de error con el mensaje proporcionado por el servidor
                     Swal.fire({
                         icon: 'error',
                         text: err.response.data.message,
                     })
+
+                    // Registra el error en la consola
                     console.error(err)
                 })
         },
@@ -299,22 +321,41 @@ export default {
             let formattedNumber = precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
             this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
+        /**
+         * Obtiene la lista de impuestos del servicio y asigna los resultados a la propiedad 'impuestos'.
+         */
         getImpuestos() {
+            // Llama al servicio para obtener la lista de impuestos
             service.obtenerImpuestos()
                 .then(res => {
+                    // Asigna los impuestos obtenidos a la propiedad 'impuestos'
                     this.impuestos = res
                 })
                 .catch(err => {
+                    // Maneja el error imprimiendo un mensaje en la consola
                     console.error(err)
                 })
         },
+        /**
+         * Obtiene las tarifas generales del servicio y asigna los resultados a las propiedades correspondientes.
+         * @function getTarifasGenerales
+         * @memberof NombreDeLaClase
+         * @returns {void}
+         */
         getTarifasGenerales() {
+            // Llama al servicio para obtener las tarifas generales
             service.obtenerTarifasGenerales()
                 .then(res => {
+                    // Mapea las tarifas obtenidas para procesarlas
                     res.map((day) => {
+                        // Verifica si la tarifa es 'Adicional' o 'Niños'
                         if (day.nombre == 'Adicional' || day.nombre == 'Niños') {
+                            // Asigna el precio formateado a la propiedad correspondiente, utilizando comaEnMiles para formatear el número
                             this[day.nombre] = this.comaEnMiles(day.precio)
+
+                            // Verifica si la tarifa tiene un impuesto asociado
                             if (day.impuestoId) {
+                                // Asigna el ID del impuesto y establece la propiedad 'tieneIva' como verdadera
                                 this.impuesto = day.impuestoId
                                 this.tieneIva = true
                             }
@@ -322,6 +363,7 @@ export default {
                     })
                 })
                 .catch(err => {
+                    // Maneja el error imprimiendo un mensaje en la consola
                     console.error(err)
                 })
         },

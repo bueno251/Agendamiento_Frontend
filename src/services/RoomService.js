@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -16,6 +17,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const roomService = {
 
@@ -55,15 +59,7 @@ const roomService = {
     obtenerAllRooms() {
         let url = 'rooms/read'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('rooms/read', url)
     },
 
     /**
@@ -77,15 +73,7 @@ const roomService = {
     obtenerRooms() {
         let url = 'rooms'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('rooms', url)
     },
 
     /**
@@ -99,15 +87,7 @@ const roomService = {
     obtenerRoom(id) {
         let url = `room/${id}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(`room/${id}`, url)
     },
 
     /**
@@ -163,15 +143,7 @@ const roomService = {
     bitacora(id) {
         let url = `room/bitacora/${id}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(`room/bitacora/${id}`, url)
     },
 
     /**
@@ -237,7 +209,5 @@ const roomService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default roomService

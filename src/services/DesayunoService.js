@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -16,6 +17,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const DesayunoService = {
 
@@ -49,15 +53,7 @@ const DesayunoService = {
     obtenerDesayunos() {
         let url = 'desayunos'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('desayunos', url)
     },
 
     /**
@@ -104,7 +100,5 @@ const DesayunoService = {
     },
 
 }
-
-LOCAL.Axios()
 
 export default DesayunoService

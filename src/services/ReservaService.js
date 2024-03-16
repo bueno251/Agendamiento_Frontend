@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 /**
  * Objeto LOCAL para gestionar las solicitudes y configuración de la API de reservas.
@@ -21,6 +22,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 /**
  * Servicio para realizar operaciones relacionadas con las reservas utilizando la API externa.
@@ -95,15 +99,7 @@ const ReservaService = {
             url += `/${estado}`
         }
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(url, url)
     },
 
     /**
@@ -161,15 +157,7 @@ const ReservaService = {
     getFechasRoom(id) {
         let url = `reserva/room/${id}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(url, url)
     },
 
     cancelarReserva(data, id) {
@@ -187,7 +175,5 @@ const ReservaService = {
     },
 
 }
-
-LOCAL.Axios()
 
 export default ReservaService

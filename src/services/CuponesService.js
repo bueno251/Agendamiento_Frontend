@@ -1,5 +1,6 @@
-import axios from "axios";
-import vuex from "@/store";
+import axios from "axios"
+import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -11,6 +12,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const CuponesService = {
 
@@ -28,23 +32,11 @@ const CuponesService = {
         })
     },
 
-    obtenerCupones(id = '') {
+    obtenerCupones() {
 
         let url = `cupones`
 
-        if (id) {
-            url += `/${id}`
-        }
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('cupones', url)
     },
 
     actualizarCupon(data, id) {
@@ -89,7 +81,5 @@ const CuponesService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default CuponesService

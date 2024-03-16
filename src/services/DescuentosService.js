@@ -1,5 +1,6 @@
-import axios from "axios";
-import vuex from "@/store";
+import axios from "axios"
+import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -11,6 +12,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const DescuentosService = {
 
@@ -31,29 +35,13 @@ const DescuentosService = {
     obtenerTiposDescuento() {
         let url = `descuento-tipos`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('descuento-tipos', url)
     },
 
     obtenerRoomsDescuento() {
         let url = `descuento-rooms`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('descuento-rooms', url)
     },
 
     obtenerDescuentos(id = '') {
@@ -64,15 +52,7 @@ const DescuentosService = {
             url += `/${id}`
         }
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(url, url)
     },
 
     actualizarDescuento(data, id) {
@@ -103,7 +83,5 @@ const DescuentosService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default DescuentosService

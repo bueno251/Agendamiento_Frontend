@@ -1,5 +1,6 @@
 import axios from "axios";
 import vuex from "@/store";
+import CacheManager from "./CacheManager/CacheManager";
 
 const LOCAL = {
     Axios() {
@@ -12,51 +13,29 @@ const LOCAL = {
     }
 }
 
+LOCAL.Axios()
+
+const cacheManager = new CacheManager(LOCAL.api)
+
 const UbicacionService = {
 
     obtenerPaises() {
         let url = `paises`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('paises', url)
     },
     
     obtenerDepartamentos(id) {
         let url = `departamentos-${id}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(`departamentos-${id}`, url)
     },
     
     obtenerCiudades(id) {
         let url = `ciudades-${id}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos(`ciudades-${id}`, url)
     },
 }
-
-LOCAL.Axios()
 
 export default UbicacionService

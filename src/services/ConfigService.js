@@ -1,5 +1,6 @@
-import axios from "axios";
-import vuex from "@/store";
+import axios from "axios"
+import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -11,6 +12,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const ConfigService = {
 
@@ -31,15 +35,7 @@ const ConfigService = {
     obtenerConfig() {
         let url = 'settings'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('settings', url)
     },
 
     guardarConfigReserva(data) {
@@ -73,15 +69,7 @@ const ConfigService = {
     obtenerTiposEmpresa() {
         let url = 'settings/empresa/tipos'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('settings/empresa/tipos', url)
     },
 
     guardarValoresDefault(data) {
@@ -101,15 +89,7 @@ const ConfigService = {
     obtenerValoresDefault() {
         let url = `default`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('default', url)
     },
 
     crearMetodoPago(data) {
@@ -136,32 +116,14 @@ const ConfigService = {
     obtenerMetodosPago() {
         let url = 'pagos'
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('pagos', url)
     },
 
     obtenerConfigReserva() {
         let url = `reservar`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('reservar', url)
     },
 }
-
-LOCAL.Axios()
 
 export default ConfigService

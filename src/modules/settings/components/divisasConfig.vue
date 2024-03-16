@@ -172,94 +172,149 @@ export default {
         }
     },
     methods: {
+        /**
+         * Crea una nueva divisa con los datos proporcionados y muestra un mensaje de éxito o error.
+         */
         crear() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Prepara los datos para crear una nueva divisa
             let data = {
                 nombre: this.nombre,
                 codigo: this.codigo.toUpperCase(),
                 pais: this.pais,
             }
 
+            // Llama al servicio para crear una nueva divisa
             service.crearDivisa(data)
                 .then(res => {
+                    // Establece la variable de carga como falsa y cierra el diálogo de creación de divisa
                     this.loadingbtn = false
                     this.dialogCreate = false
+
+                    // Actualiza la lista de divisas llamando a la función getDivisas()
                     this.getDivisas()
 
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
+                    // Establece la variable de carga como falsa
                     this.loadingbtn = false
+
+                    // Muestra un mensaje de error con el mensaje proporcionado por el servidor
                     Swal.fire({
                         icon: 'error',
                         text: err.response.data.message,
                     })
+
+                    // Registra el error en la consola
                     console.error(err)
                 })
         },
+        /**
+         * Actualiza la divisa seleccionada con los datos proporcionados y muestra un mensaje de éxito o error.
+         */
         actualizar() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Prepara los datos para actualizar la divisa seleccionada
             let data = {
                 nombre: this.nombre,
                 codigo: this.codigo.toUpperCase(),
                 pais: this.pais,
             }
 
+            // Llama al servicio para actualizar la divisa seleccionada
             service.actualizarDivisa(data, this.divisaSelected.id)
                 .then(res => {
+                    // Establece la variable de carga como falsa y cierra el diálogo de actualización de divisa
                     this.loadingbtn = false
                     this.dialogUpdate = false
+
+                    // Actualiza la lista de divisas llamando a la función getDivisas()
                     this.getDivisas()
 
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
+                    // Establece la variable de carga como falsa
                     this.loadingbtn = false
+
+                    // Muestra un mensaje de error con el mensaje proporcionado por el servidor
                     Swal.fire({
                         icon: 'error',
                         text: err.response.data.message,
                     })
+
+                    // Registra el error en la consola
                     console.error(err)
                 })
         },
+        /**
+         * Elimina la divisa seleccionada y muestra un mensaje de éxito o error.
+         * @function eliminar
+         * @memberof NombreDeLaClase
+         * @returns {void}
+         */
         eliminar() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Llama al servicio para eliminar la divisa seleccionada
             service.eliminarDivisa(this.divisaSelected.id)
                 .then(res => {
+                    // Establece la variable de carga como falsa y cierra el diálogo de eliminación de divisa
                     this.loadingbtn = false
                     this.dialogDelete = false
+
+                    // Actualiza la lista de divisas llamando a la función getDivisas()
                     this.getDivisas()
 
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
+                    // Establece la variable de carga como falsa
                     this.loadingbtn = false
+
+                    // Muestra un mensaje de error con el mensaje proporcionado por el servidor
                     Swal.fire({
                         icon: 'error',
                         text: err.response.data.message,
                     })
+
+                    // Registra el error en la consola
                     console.error(err)
                 })
         },
+        /**
+         * Obtiene la lista de divisas del servicio y actualiza la lista local de divisas.
+         */
         getDivisas() {
+            // Emite un evento para actualizar las divisas en componentes padres, si es necesario
             this.$emit('updateDivisas')
+
+            // Llama al servicio para obtener la lista de divisas
             service.obtenerDivisas()
                 .then(res => {
+                    // Asigna las divisas obtenidas a la lista local de divisas
                     this.divisas = res
                 })
                 .catch(err => {
+                    // Maneja el error imprimiendo un mensaje en la consola
                     console.error(err)
                 })
         },

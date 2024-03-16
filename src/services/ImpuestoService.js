@@ -1,5 +1,6 @@
-import axios from "axios";
-import vuex from "@/store";
+import axios from "axios"
+import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -11,6 +12,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const ImpuestoService = {
 
@@ -31,29 +35,13 @@ const ImpuestoService = {
     obtenerTiposImpuesto() {
         let url = `impuesto-tipos`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('impuesto-tipos', url)
     },
 
     obtenerImpuestos() {
         let url = `impuestos`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('impuestos', url)
     },
 
     actualizarImpuesto(data, id) {
@@ -84,7 +72,5 @@ const ImpuestoService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default ImpuestoService

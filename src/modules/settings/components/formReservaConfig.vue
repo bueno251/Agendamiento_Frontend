@@ -3,99 +3,64 @@
         <v-card-title class="blue lighten-2 mb-5 white--text">
             Valores Por Defecto
         </v-card-title>
-        <template v-if="loadingcard">
-            <div class="text-center my-5 w-100">
-                <v-progress-circular class="text-center" color="primary" indeterminate></v-progress-circular>
-            </div>
-        </template>
-        <v-card-text v-else>
+        <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="guardar">
                 <v-row>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>País</label>
-                        <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" item-value="id"
+                        <label>Tipo Documento <span class="red--text">*</span></label>
+                        <v-select v-model="tipoDocumento" :items="documentos" no-data-text="Espere un momento..."
+                            :rules="[rules.required]" item-text="tipo" item-value="id"
                             outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Departamento</label>
-                        <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione pais"
-                            @change="getCiudades" :rules="[rules.required]" :loading="loadingDepartamentos"
+                        <label>País De Residencia <span class="red--text">*</span></label>
+                        <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
+                            @change="getDepartamentos" :rules="[rules.required]"
                             item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Ciudad</label>
-                        <v-select v-model="ciudad" :items="ciudades" no-data-text="Seleccione departamento"
-                            :rules="[rules.required]" :loading="loadingCiudades" item-text="nombre" item-value="id"
-                            outlined dense required>
+                        <label>Departamento De Residencia <span class="red--text">*</span></label>
+                        <v-select v-model="departamentoResidencia" :items="departamentos" no-data-text="Seleccione un pais"
+                            @change="getCiudades" :rules="[rules.required]"
+                            :loading="loadingDepartamentos" item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Divisa</label>
-                        <v-select v-model="divisa" :items="divisas" no-data-text="No hay divisas"
-                            :item-text="item => item.nombre + ' - ' + item.codigo" item-value="id"
-                            :disabled="priceInDolar" outlined dense>
+                        <label>Ciudad De Residencia <span class="red--text">*</span></label>
+                        <v-select v-model="ciudadResidencia" :items="ciudades" no-data-text="Seleccione un departamento"
+                            :rules="[rules.required]" :loading="loadingCiudades"
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Tipo Documento</label>
-                        <v-select v-model="tipoDocumento" :items="documentos" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
+                        <label>País <span class="red--text">*</span></label>
+                        <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
+                            @change="getDepartamentos" :rules="[rules.required]"
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Tipo Persona</label>
-                        <v-select v-model="tipoPersona" :items="personas" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
+                        <label>Departamento <span class="red--text">*</span></label>
+                        <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione un pais"
+                            @change="getCiudades" :rules="[rules.required]"
+                            :loading="loadingDepartamentos" item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Tipo Responsabilidad</label>
-                        <v-select v-model="tipoResponsabilidad" :items="responsabilidades"
-                            no-data-text="Espere un momento..." :rules="[rules.required]" item-text="tipo"
-                            item-value="id" outlined dense required>
+                        <label>Ciudad <span class="red--text">*</span></label>
+                        <v-select v-model="ciudad" :items="ciudades" no-data-text="Seleccione un departamento"
+                            :rules="[rules.required]" :loading="loadingCiudades"
+                            item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="3" sm="6">
-                        <label>Tipo Regimen</label>
-                        <v-select v-model="tipoRegimen" :items="regimenes" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="3" sm="6">
-                        <div class="flex-switch">
-                            <p>
-                                Valores en dolares?
-                            </p>
-                            <v-switch v-model="priceInDolar" :label="priceInDolar ? 'Si' : 'No'" inset></v-switch>
-                        </div>
-                    </v-col>
-
-                    <v-col v-if="priceInDolar" cols="12" md="3" sm="6">
-                        <div class="flex-switch">
-                            <p>
-                                Valor del dolar por defecto?
-                            </p>
-                            <v-switch v-model="dolarPriceAuto" :label="dolarPriceAuto ? 'Si' : 'No'" inset></v-switch>
-                        </div>
-                    </v-col>
-
-                    <v-col v-if="priceInDolar && !dolarPriceAuto" cols="12" md="3" sm="6">
-                        <label>Valor de $1 dolar = ${{ comaEnMiles(dolarPrice) }}</label>
-                        <v-text-field v-model="dolarPrice" type="number" min="0" hide-spin-buttons outlined dense
-                            required>
-                        </v-text-field>
                     </v-col>
 
                 </v-row>
@@ -115,56 +80,29 @@ import Swal from 'sweetalert2'
 import service from '@/services/service'
 
 export default {
-    name: 'defaultConfig',
-    props: {
-        id: Number,
-        updateDivisas: Boolean,
-    },
-    watch: {
-        updateDivisas: {
-            handler(newItem) {
-                if (newItem) {
-                    this.getDivisas()
-                }
-            },
-            immediate: true,
-        },
-    },
+    name: 'defaultFormReservaConfig',
     data() {
         return {
-            pais: '',
-            departamento: '',
-            ciudad: '',
-            divisa: '',
+            paisProcedencia: '',
+            departamentoProcedencia: '',
+            ciudadProcedencia: '',
+            paisResidencia: '',
+            departamentoResidencia: '',
+            ciudadResidencia: '',
             tipoDocumento: '',
-            tipoPersona: '',
-            tipoRegimen: '',
-            tipoResponsabilidad: '',
-            nombre: '',
-            codigo: '',
-            dolarPrice: 0,
-            priceInDolar: false,
-            dolarPriceAuto: true,
             valid: false,
             validCreate: false,
             validUpdate: false,
             loading: false,
-            loadingcard: true,
             loadingbtn: false,
-            loadingDepartamentos: false,
-            loadingCiudades: false,
-            dialogCreateDivisa: false,
-            dialogUpdateDivisa: false,
-            dialogDeleteDivisa: false,
+            loadingDepartamentosProcedencia: false,
+            loadingCiudadesProcedencia: false,
+            loadingDepartamentosResidencia: false,
+            loadingCiudadesResidencia: false,
             paises: [],
             departamentos: [],
             ciudades: [],
-            divisas: [],
             documentos: [],
-            personas: [],
-            regimenes: [],
-            responsabilidades: [],
-            divisaSelected: {},
             rules: {
                 required: value => !!value || 'Campo requerido.'
             },
@@ -213,7 +151,6 @@ export default {
         getDefault() {
             service.obtenerValoresDefault()
                 .then(async res => {
-                    this.loadingcard = false
                     if ('id' in res) {
                         // Asigna los valores predeterminados obtenidos a las variables del componente
                         this.divisa = res.divisa.id
@@ -251,11 +188,7 @@ export default {
                     console.error(err)
                 })
         },
-        /**
-         * Obtiene la lista de divisas del servicio y actualiza la lista local de divisas.
-         */
         getDivisas() {
-            // Llama al servicio para obtener la lista de divisas
             service.obtenerDivisas()
                 .then(res => {
                     this.divisas = res
@@ -341,18 +274,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.flex-switch {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    gap: 10px;
-}
-
-p {
-    padding: 0;
-    margin: 0;
-    text-wrap: balance;
-}
-</style>
+<style scoped></style>

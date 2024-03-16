@@ -309,78 +309,134 @@ export default {
             return this.adultos.cantidad + this.niños.cantidad
         },
         /**
-         * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida, así como el número de adultos y niños.
+         * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida.
          */
         precioAlojamiento() {
+            // Inicializa el precio total
             let precio = 0
 
+            // Verifica si se han proporcionado fechas de entrada y salida
             if (this.dates.length === 2) {
+                // Convierte las fechas de entrada y salida en objetos Date
                 let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
+                    // Obtiene el precio normal y el precio festivo del día actual
                     let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precioConIva)
-
                     let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivoConIva)
 
+                    // Avanza al siguiente día
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
 
+                    // Verifica si el día actual es festivo
                     if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
+                        // Si es festivo, suma el precio festivo al total
                         precio += precioFestivo
                     } else {
+                        // Si no es festivo, suma el precio normal al total
                         precio += precioNormal
                     }
                 }
             }
 
+            // Devuelve el precio total, redondeado a 2 decimales
             return Number(precio.toFixed(2))
         },
+        /**
+         * Calcula el precio de los adultos.
+         */
         precioAdultos() {
+            // Convierte el precio de los adultos a dólares y lo devuelve
             return Number(this.precioToDolar(this.adultos.val))
         },
+        /**
+         * Calcula el precio de los niños.
+         */
         precioNiños() {
+            // Convierte el precio de los niños a dólares y lo devuelve
             return Number(this.precioToDolar(this.niños.val))
         },
+        /**
+         * Calcula el precio de la decoración.
+         */
         precioDecoracion() {
+            // Convierte el precio de la decoración a dólares y lo devuelve
             return Number(this.precioToDolar(this.decoracion.precioConIva))
         },
+        /**
+         * Calcula el precio del desayuno.
+         */
         precioDesayuno() {
+            // Verifica si el desayuno está incluido en la habitación
+            // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes y lo devuelve
+            // Si está incluido, devuelve 0
             return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes)) : 0
         },
+        /**
+         * Calcula el valor de la separación basado en el precio neto y el porcentaje de separación.
+         */
         valorSeparacion() {
-            return this.precioAlojamiento ? (this.precioNeto * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            // Verifica si hay un precio neto
+            // Si hay un precio neto, calcula y devuelve el valor de la separación en dólares, redondeado a 2 decimales
+            // Si no hay precio neto, devuelve 0
+            return this.precioNeto ? (this.precioNeto * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
         },
+        /**
+         * Calcula el valor total de descuento aplicado a la reserva.
+         */
         valorDescuento() {
+            // Inicializa el descuento total en 0
             let descuento = 0
 
+            // Itera sobre cada descuento
             this.descuentos.forEach(discount => {
+                // Verifica si las fechas de llegada y salida están dentro del rango de fechas del descuento
                 if (this.fechaLlegada <= discount.fechaInicio && this.fechaSalida >= discount.fechaFin) {
+                    // Aplica el descuento según el tipo (Porcentaje o Valor Fijo)
                     if (discount.tipo == 'Porcentaje') {
+                        // Si el descuento es de tipo porcentaje, calcula el descuento en base al precio total y lo agrega al descuento total
                         descuento += (this.precioTotal * discount.descuento / 100)
                     } else {
+                        // Si el descuento es de valor fijo, simplemente lo agrega al descuento total
                         descuento += discount.descuento
                     }
                 }
             });
 
+            // Devuelve el descuento total
             return descuento
         },
+        /**
+         * Calcula el precio total de la reserva sumando los precios individuales de alojamiento, adultos, niños, decoración y desayuno.
+         */
         precioTotal() {
+            // Inicializa el precio total en 0
             let precio = 0
 
+            // Suma los precios individuales de alojamiento, adultos, niños, decoración y desayuno al precio total
             precio += this.precioAlojamiento
             precio += this.precioAdultos
             precio += this.precioNiños
             precio += this.precioDecoracion
             precio += this.precioDesayuno
+
+            // Devuelve el precio total de la reserva
             return precio
         },
+        /**
+         * Calcula el precio neto de la reserva restando el valor total de descuento del precio total.
+         */
         precioNeto() {
+            // Inicializa el precio neto en 0
             let precio = 0
 
+            // Calcula el precio neto restando el valor total de descuento del precio total
             precio += this.precioTotal
             precio -= this.valorDescuento
+
+            // Devuelve el precio neto de la reserva
             return precio
         },
         /**
@@ -444,17 +500,23 @@ export default {
 
             return niños
         },
+        /**
+         * Filtra los descuentos activos que están dentro del rango de fechas de la reserva.
+         */
         descuentosActive() {
+            // Inicializa un array vacío para almacenar los descuentos activos
             let array = []
 
+            // Filtra los descuentos activos que están dentro del rango de fechas de la reserva
             this.descuentos.map(discount => {
                 if (this.fechaLlegada <= discount.fechaInicio && discount.fechaFin <= this.fechaSalida) {
                     array.push(discount)
                 }
             });
 
+            // Devuelve el array de descuentos activos
             return array
-        }
+        },
     },
     watch: {
         /**
@@ -571,59 +633,66 @@ export default {
          * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
          */
         async getRoom() {
+            // Obtiene el ID de la habitación de los parámetros de la ruta
             let id = this.$route.params.id
 
-            await service.obtenerRoom(id)
-                .then(res => {
-                    let week = [
-                        { name: 'Domingo' },
-                        { name: 'Lunes' },
-                        { name: 'Martes' },
-                        { name: 'Miércoles' },
-                        { name: 'Jueves' },
-                        { name: 'Viernes' },
-                        { name: 'Sábado' },
-                        { name: 'Adicional' },
-                        { name: 'Niños' },
-                    ]
+            try {
+                // Obtiene los detalles de la habitación del servicio
+                let res = await service.obtenerRoom(id)
 
-                    res.precios.map((day) => {
-                        const index = week.findIndex((weekDay) => weekDay.name === day.name)
+                // Define una lista de días de la semana con valores predeterminados
+                let week = [
+                    { name: 'Domingo' },
+                    { name: 'Lunes' },
+                    { name: 'Martes' },
+                    { name: 'Miércoles' },
+                    { name: 'Jueves' },
+                    { name: 'Viernes' },
+                    { name: 'Sábado' },
+                    { name: 'Adicional' },
+                    { name: 'Niños' },
+                ]
 
-                        if (index !== -1) {
-                            week[index].precio = day.precio
-                            week[index].precioConIva = day.precioConIva
-                            week[index].previoFestivo = day.previoFestivo
-                            week[index].previoFestivoConIva = day.previoFestivoConIva
-                            week[index].jornada = day.jornada
-                        }
-                    })
+                // Mapea los precios de la habitación y los asigna a los días correspondientes en la lista de la semana
+                res.precios.map((day) => {
+                    const index = week.findIndex((weekDay) => weekDay.name === day.name)
 
-                    this.room = res
-                    this.precios = week
-
-                    if (res.incluyeDesayuno) {
-                        this.desayunos[0].nombre = 'Incluido'
-                        this.desayuno = {
-                            id: null,
-                            nombre: 'Incluido',
-                            precioConIva: 0,
-                        }
+                    if (index !== -1) {
+                        week[index].precio = day.precio
+                        week[index].precioConIva = day.precioConIva
+                        week[index].previoFestivo = day.previoFestivo
+                        week[index].previoFestivoConIva = day.previoFestivoConIva
+                        week[index].jornada = day.jornada
                     }
                 })
-                .catch(err => {
-                    console.error(err)
-                    this.$router.push({ name: 'viewRooms' })
-                })
+
+                // Asigna los detalles de la habitación y los precios actualizados a las propiedades correspondientes
+                this.room = res
+                this.precios = week
+
+                // Verifica si la habitación incluye desayuno y actualiza la información del desayuno si es necesario
+                if (res.incluyeDesayuno) {
+                    this.desayunos[0].nombre = 'Incluido'
+                    this.desayuno = {
+                        id: null,
+                        nombre: 'Incluido',
+                        precioConIva: 0,
+                    }
+                }
+            } catch (err) {
+                // Maneja el error y redirige a la vista de habitaciones en caso de fallo
+                console.error(err)
+                this.$router.push({ name: 'viewRooms' })
+            }
         },
         /**
-         * Inicia el proceso de agendamiento.
-         * Prepara la información necesaria (fechas, habitación, cantidad de personas, etc.) y la almacena en el estado global.
-         * Luego, redirige al usuario a la vista de pago ('pagar').
+         * Inicia el proceso de agendamiento y redirige a la página de pago.
          */
         agendar() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Prepara los datos de la reserva
             let data = {
                 dateIn: this.fechaLlegada,
                 dateOut: this.fechaSalida,
@@ -636,21 +705,26 @@ export default {
                 precioDecoracion: this.precioDecoracion,
                 precioDesayuno: this.precioDesayuno,
                 valorSeparacion: this.valorSeparacion,
-                precioTotal: this.precioNeto,
+                precioTotal: this.precioTotal,
+                precioNeto: this.precioNeto,
                 cedula: this.cedula,
                 cantidad_rooms: this.cantidadRooms,
             }
 
+            // Verifica si se ha seleccionado un desayuno y lo agrega a los datos de la reserva si es necesario
             if (this.desayuno) {
                 data.desayuno = this.desayuno
             }
 
+            // Verifica si se ha seleccionado una decoración y la agrega a los datos de la reserva si es necesario
             if (this.decoracion) {
                 data.decoracion = this.decoracion
             }
 
+            // Despacha la acción para establecer los datos de la reserva en el almacenamiento global
             this.$store.dispatch('setReserva', data)
 
+            // Redirige a la página de pago
             this.$router.push({ name: 'pagar' })
         },
         /**
@@ -672,12 +746,20 @@ export default {
 
             return resultado;
         },
+        /**
+         * Convierte un precio de la moneda local a dólares si está habilitada la opción de mostrar en dólares.
+         * @param {number} numero - El precio en la moneda local.
+         * @returns {number} - El precio convertido a dólares, si está habilitada la opción; de lo contrario, devuelve el precio original.
+         */
         precioToDolar(numero) {
+            // Verifica si la opción de mostrar en dólares está habilitada
             if (!this.priceInDolar) {
-                return numero
+                // Si no está habilitada, devuelve el precio original
+                return numero;
             }
 
-            return parseFloat((numero / this.dolarPrice).toFixed(2))
+            // Calcula el precio en dólares y redondea a 2 decimales
+            return parseFloat((numero / this.dolarPrice).toFixed(2));
         },
         /**
          * Obtiene los días festivos en Colombia.
@@ -778,36 +860,52 @@ export default {
                     console.error(err)
                 })
         },
+        /**
+         * Obtiene los valores predeterminados, como la configuración de reserva, la divisa, y los valores relacionados con los precios en dólares.
+         */
         async getDefault() {
-
-            service.obtenerConfigReserva()
-                .then(res => {
-                    this.porcentajeSeparacion = res.porcentajeSeparacion
-                    this.useGenerales = res.tarifasGenerales
-                    this.edadNiños = res.edadTarifaNiños
-                })
-                .catch(err => {
-                    console.error(err)
-                })
-
             try {
+                // Obtiene la configuración de reserva
+                await service.obtenerConfigReserva()
+                    .then(res => {
+                        // Asigna los valores de la configuración de reserva a las propiedades correspondientes
+                        this.porcentajeSeparacion = res.porcentajeSeparacion
+                        this.useGenerales = res.tarifasGenerales
+                        this.edadNiños = res.edadTarifaNiños
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+
+                // Obtiene los valores predeterminados del servicio
                 let res = await service.obtenerValoresDefault()
+
+                // Asigna los valores obtenidos a las propiedades correspondientes
                 this.divisa = res.divisa
                 this.priceInDolar = res.priceInDolar
                 this.dolarPriceAuto = res.dolarPriceAuto
                 this.dolarPrice = res.dolarPrice
 
-                if (this.dolarPriceAuto) {
+                // Verifica si la opción de mostrar en dólares y el precio automático del dólar están habilitados
+                if (this.priceInDolar && this.dolarPriceAuto) {
+                    // Si están habilitados, obtiene el precio actual del dólar
                     res = await service.valorDolar()
                     this.dolarPrice = res.valor
                 }
             } catch (err) {
+                // Maneja el error estableciendo la opción de mostrar en dólares como falsa y registrando el error
                 this.priceInDolar = false
                 console.error(err)
             }
-
         },
+        /**
+         * Invoca el método de guardado de la fecha de un componente referenciado.
+         * @param {string} menu - La referencia del componente al que se desea acceder.
+         * @param {Date} date - La fecha que se pasa al método de guardado.
+         * @returns {void}
+         */
         save(menu, date) {
+            // Utiliza la referencia proporcionada para acceder al componente y llamar a su método save con la fecha proporcionada
             this.$refs[menu].save(date)
         },
     },

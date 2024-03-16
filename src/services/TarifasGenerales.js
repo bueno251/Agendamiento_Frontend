@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -11,6 +12,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 const TarifaGeneralService = {
 
@@ -31,15 +35,7 @@ const TarifaGeneralService = {
     obtenerTarifasGenerales() {
         let url = `tarifas-generales`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('tarifas-generales', url)
     },
 
     eliminarTarifaGeneral(id) {
@@ -56,28 +52,6 @@ const TarifaGeneralService = {
         })
     },
 
-    /**
-    * Obtiene la lista de jornadas disponibles mediante una solicitud GET a la API.
-    * @function
-    * @memberof RoomService
-    * @returns {Promise} Promesa que se resuelve con la lista de jornadas o se rechaza con un error.
-    */
-    obtenerJornadas() {
-        let url = 'jornadas'
-
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
-    },
-
 }
-
-LOCAL.Axios()
 
 export default TarifaGeneralService
