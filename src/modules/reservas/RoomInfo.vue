@@ -37,14 +37,8 @@
                             <th>
                                 Precios
                             </th>
-                            <th v-if="room.tieneIva">
-                                Precio Con Iva
-                            </th>
                             <th>
                                 Previo A Festivo
-                            </th>
-                            <th v-if="room.tieneIva">
-                                Previo A Festivo Con Iva
                             </th>
                         </tr>
                     </thead>
@@ -57,14 +51,8 @@
                                 <td>
                                     $ {{ comaEnMiles(precioToDolar(tarifa.precio)) }} {{ divisa.codigo }}
                                 </td>
-                                <td v-if="room.tieneIva">
-                                    $ {{ comaEnMiles(precioToDolar(tarifa.precioConIva)) }} {{ divisa.codigo }}
-                                </td>
                                 <td>
                                     $ {{ comaEnMiles(precioToDolar(tarifa.previoFestivo)) }} {{ divisa.codigo }}
-                                </td>
-                                <td v-if="room.tieneIva">
-                                    $ {{ comaEnMiles(precioToDolar(tarifa.previoFestivoConIva)) }} {{ divisa.codigo }}
                                 </td>
                             </template>
                         </tr>
@@ -218,20 +206,19 @@
                             </h4>
                         </v-col>
 
-                        <v-col cols="6" class="py-0">
-                            <label>Descuento</label>
-                            <h4>
-                                $ {{ comaEnMiles(valorDescuento) }} {{ divisa.codigo }}
-                            </h4>
-                        </v-col>
-
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+                            <strong v-if="descuentosActive.length">Descuentos:</strong>
                             <div class="d-flex flex-column">
                                 <label v-for="item in descuentosActive" :key="item.id">
                                     {{ item.nombre }} :
                                     <span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
                                         v-if="item.tipoId == 1">%</span>
                                 </label>
+                            </div>
+                            <div v-if="fechasValidasEnCupones()">
+                                <label>Canjear Código Cupón</label>
+                                <v-otp-input v-model="codigoCupon" :disabled="'nombre' in cupon" @finish="checkCupon"
+                                    @input="toUpperCase('codigoCupon')"></v-otp-input>
                             </div>
                         </v-col>
 
@@ -243,9 +230,9 @@
                         </v-col>
 
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
-                            <h3>Precio Total De La Reserva <span v-if="room.iva">IVA: ({{ room.iva }}%)</span></h3>
+                            <h3>Precio Total De La Reserva</h3>
                             <h1>
-                                $ {{ comaEnMiles(precioNeto) }} {{ divisa.codigo }}
+                                $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
                             </h1>
                         </v-col>
                     </v-row>
@@ -284,6 +271,7 @@
 
 <script>
 
+import Swal from 'sweetalert2'
 import service from '@/services/service'
 import colombiaHolidays from 'colombia-holidays'
 
@@ -324,8 +312,8 @@ export default {
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
                     // Obtiene el precio normal y el precio festivo del día actual
-                    let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precioConIva)
-                    let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivoConIva)
+                    let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precio)
+                    let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivo)
 
                     // Avanza al siguiente día
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
@@ -341,72 +329,70 @@ export default {
                 }
             }
 
-            // Devuelve el precio total, redondeado a 2 decimales
-            return Number(precio.toFixed(2))
+            // redondeadomos el precio a 2 decimales
+            precio = Number(precio.toFixed(2))
+
+            precio -= this.valorDescuento(precio)
+            return precio
         },
         /**
          * Calcula el precio de los adultos.
          */
         precioAdultos() {
-            // Convierte el precio de los adultos a dólares y lo devuelve
-            return Number(this.precioToDolar(this.adultos.val))
+            // Convierte el precio de los adultos a dólares
+            let precio = Number(this.precioToDolar(this.adultos.val))
+
+            let descuento = this.valorDescuento(precio)
+            precio -= descuento
+            return precio >= 0 ? precio : 0
         },
         /**
          * Calcula el precio de los niños.
          */
         precioNiños() {
-            // Convierte el precio de los niños a dólares y lo devuelve
-            return Number(this.precioToDolar(this.niños.val))
+            // Convierte el precio de los niños a dólares
+            let precio = Number(this.precioToDolar(this.niños.val))
+
+            let descuento = this.valorDescuento(precio)
+            precio -= descuento
+            return precio >= 0 ? precio : 0
         },
         /**
          * Calcula el precio de la decoración.
          */
         precioDecoracion() {
-            // Convierte el precio de la decoración a dólares y lo devuelve
-            return Number(this.precioToDolar(this.decoracion.precioConIva))
+            // Convierte el precio de la decoración a dólares
+            let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
+
+            let descuento = this.valorDescuento(precio)
+            precio -= descuento
+            return precio >= 0 ? precio : 0
         },
         /**
          * Calcula el precio del desayuno.
          */
         precioDesayuno() {
             // Verifica si el desayuno está incluido en la habitación
-            // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes y lo devuelve
             // Si está incluido, devuelve 0
-            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes)) : 0
+            if (this.room.incluyeDesayuno) {
+                return 0
+            }
+
+            // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes
+            let precio = Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes))
+
+            let descuento = this.valorDescuento(precio)
+            precio -= descuento
+            return precio >= 0 ? precio : 0
         },
         /**
-         * Calcula el valor de la separación basado en el precio neto y el porcentaje de separación.
+         * Calcula el valor de la separación basado en el precio total y el porcentaje de separación.
          */
         valorSeparacion() {
-            // Verifica si hay un precio neto
-            // Si hay un precio neto, calcula y devuelve el valor de la separación en dólares, redondeado a 2 decimales
-            // Si no hay precio neto, devuelve 0
-            return this.precioNeto ? (this.precioNeto * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
-        },
-        /**
-         * Calcula el valor total de descuento aplicado a la reserva.
-         */
-        valorDescuento() {
-            // Inicializa el descuento total en 0
-            let descuento = 0
-
-            // Itera sobre cada descuento
-            this.descuentos.forEach(discount => {
-                // Verifica si las fechas de llegada y salida están dentro del rango de fechas del descuento
-                if (this.fechaLlegada <= discount.fechaInicio && this.fechaSalida >= discount.fechaFin) {
-                    // Aplica el descuento según el tipo (Porcentaje o Valor Fijo)
-                    if (discount.tipo == 'Porcentaje') {
-                        // Si el descuento es de tipo porcentaje, calcula el descuento en base al precio total y lo agrega al descuento total
-                        descuento += (this.precioTotal * discount.descuento / 100)
-                    } else {
-                        // Si el descuento es de valor fijo, simplemente lo agrega al descuento total
-                        descuento += discount.descuento
-                    }
-                }
-            });
-
-            // Devuelve el descuento total
-            return descuento
+            // Verifica si hay un precio total
+            // Si hay un precio total, calcula y devuelve el valor de la separación en dólares, redondeado a 2 decimales
+            // Si no hay precio total, devuelve 0
+            return this.precioTotal ? (this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
         },
         /**
          * Calcula el precio total de la reserva sumando los precios individuales de alojamiento, adultos, niños, decoración y desayuno.
@@ -423,20 +409,6 @@ export default {
             precio += this.precioDesayuno
 
             // Devuelve el precio total de la reserva
-            return precio
-        },
-        /**
-         * Calcula el precio neto de la reserva restando el valor total de descuento del precio total.
-         */
-        precioNeto() {
-            // Inicializa el precio neto en 0
-            let precio = 0
-
-            // Calcula el precio neto restando el valor total de descuento del precio total
-            precio += this.precioTotal
-            precio -= this.valorDescuento
-
-            // Devuelve el precio neto de la reserva
             return precio
         },
         /**
@@ -558,6 +530,8 @@ export default {
             porcentajeSeparacion: 0,
             dolarPrice: 0,
             edadNiños: 1,
+            codigoCupon: '',
+            idCupon: 0,
             priceInDolar: false,
             dolarPriceAuto: true,
             valid: false,
@@ -574,6 +548,8 @@ export default {
             caracteristicas: [],
             precios: [],
             descuentos: [],
+            cupones: [],
+            cupon: {},
             adultos: {
                 cantidad: 2,
                 val: 0
@@ -859,6 +835,14 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
+
+            service.obtenerCupones(this.room.id)
+                .then(res => {
+                    this.cupones = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
         },
         /**
          * Obtiene los valores predeterminados, como la configuración de reserva, la divisa, y los valores relacionados con los precios en dólares.
@@ -907,6 +891,64 @@ export default {
         save(menu, date) {
             // Utiliza la referencia proporcionada para acceder al componente y llamar a su método save con la fecha proporcionada
             this.$refs[menu].save(date)
+        },
+        /**
+         * Calcula el valor de descuento aplicado a un precio especifico.
+         */
+        valorDescuento(precio) {
+            // Inicializa el descuento en 0
+            let descuento = 0
+
+            // Itera sobre cada descuento
+            this.descuentos.forEach(discount => {
+                // Verifica si las fechas de llegada y salida están dentro del rango de fechas del descuento
+                if (this.fechaLlegada <= discount.fechaInicio && this.fechaSalida >= discount.fechaFin) {
+                    // Aplica el descuento según el tipo (Porcentaje o Valor Fijo)
+                    if (discount.tipo == 'Porcentaje') {
+                        // Si el descuento es de tipo porcentaje, calcula el descuento en base al precio y lo agrega al descuento
+                        descuento += (precio * discount.descuento / 100)
+                    } else {
+                        // Si el descuento es de valor fijo, simplemente lo agrega al descuento
+                        descuento += discount.descuento
+                    }
+                }
+            });
+
+            // Devuelve el descuento total
+            return descuento
+        },
+        fechasValidasEnCupones() {
+
+            for (let i = 0; i < this.cupones.length; i++) {
+                const cupon = this.cupones[i]
+                if (this.dates.length == 2 && cupon.fechaInicio <= this.fechaLlegada && this.fechaSalida <= cupon.fechaFin) {
+                    this.idCupon = cupon.id
+                    return true
+                }
+            }
+
+            return false
+        },
+        checkCupon() {
+
+            service.obtenerCupon(this.codigoCupon, this.idCupon)
+                .then(res => {
+                    this.cupon = res
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: err.response.data.message,
+                    })
+                })
+        },
+        toUpperCase(variable) {
+            try {
+                this[variable] = this[variable].toUpperCase()
+            } catch (err) {
+                console.log(err)
+            }
         },
     },
     async mounted() {

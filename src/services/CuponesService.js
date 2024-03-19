@@ -32,11 +32,21 @@ const CuponesService = {
         })
     },
 
-    obtenerCupones() {
+    obtenerCupones(id = '') {
 
         let url = `cupones`
 
+        if (id) {
+            url += `/${id}`
+        }
+
         return cacheManager.obtenerDatos('cupones', url)
+    },
+
+    obtenerCupon(codigo, id) {
+        let url = `cupones-${codigo}-${id}`
+
+        return cacheManager.obtenerDatos(url, url)
     },
 
     actualizarCupon(data, id) {
@@ -52,7 +62,7 @@ const CuponesService = {
                 })
         })
     },
-    
+
     actualizarCodigosCupon(data) {
         let url = `cupones`
 
