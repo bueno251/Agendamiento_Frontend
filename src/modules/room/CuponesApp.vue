@@ -65,7 +65,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="tipo" :items="tipos" :rules="[rules.required]" item-text="tipo"
-                                item-value="id" outlined required>
+                                item-value="id" :disabled="disabled" outlined required>
 
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
@@ -74,8 +74,18 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-slider v-if="tipo == 1" v-model="descuento" max="100" min="0" label="Descuento"
-                                thumb-label="always">
+                            <v-select v-model="precio" :items="precios" :rules="[rules.required]" item-text="nombre"
+                                return-object outlined required>
+
+                                <template v-slot:label>
+                                    Precio <span class="red--text">*</span>
+                                </template>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <v-slider v-if="tipo == 1" v-model="descuento" :readonly="disabled" max="100" min="0"
+                                label="Descuento" thumb-label="always">
                                 <template v-slot:thumb-label="{ value }">
                                     {{ value }}%
                                 </template>
@@ -128,6 +138,16 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-text-field v-model="cantidad" :rules="[rules.required]" type="number" hide-spin-buttons
+                                outlined required>
+
+                                <template v-slot:label>
+                                    Cantidad <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
                             <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
@@ -167,16 +187,6 @@
                             </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="cantidad" :rules="[rules.required]" type="number" hide-spin-buttons
-                                outlined required>
-
-                                <template v-slot:label>
-                                    Cantidad <span class="red--text">*</span>
-                                </template>
-                            </v-text-field>
-                        </v-col>
-
                     </v-row>
 
                     <div class="buttons">
@@ -204,8 +214,8 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="tipoUpdate" :items="tipos" :rules="[rules.required]" item-text="tipo"
-                                item-value="id" outlined required>
+                            <v-select v-model="tipoUpdate" :items="tipos" :disabled="disabledUpdate"
+                                :rules="[rules.required]" item-text="tipo" item-value="id" outlined required>
 
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
@@ -214,9 +224,19 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-select v-model="precioUpdate" :items="precios" :rules="[rules.required]"
+                                item-text="nombre" return-object outlined required>
 
-                            <v-slider v-if="tipoUpdate == 1" v-model="descuentoUpdate" max="100" min="0"
-                                label="Descuento" thumb-label="always">
+                                <template v-slot:label>
+                                    Precio <span class="red--text">*</span>
+                                </template>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+
+                            <v-slider v-if="tipoUpdate == 1" v-model="descuentoUpdate" :readonly="disabledUpdate"
+                                max="100" min="0" label="Descuento" thumb-label="always">
                                 <template v-slot:thumb-label="{ value }">
                                     {{ value }}%
                                 </template>
@@ -270,6 +290,16 @@
                             </v-select>
                         </v-col>
 
+                        <v-col cols="12" md="6" sm="6">
+                            <v-text-field v-model="cantidadUpdate" :rules="[rules.required, rules.min]" type="number"
+                                hide-spin-buttons outlined required>
+
+                                <template v-slot:label>
+                                    Cantidad <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
                         <v-col cols="6">
                             <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
@@ -308,16 +338,6 @@
                                     locale="es" range no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="cantidadUpdate" :rules="[rules.required, rules.min]" type="number"
-                                hide-spin-buttons outlined required>
-
-                                <template v-slot:label>
-                                    Cantidad <span class="red--text">*</span>
-                                </template>
-                            </v-text-field>
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
@@ -437,6 +457,10 @@ export default {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
                     this.tipoUpdate = newItem.tipoId
+                    this.precioUpdate = {
+                        id: newItem.precioId,
+                        nombre: newItem.precio,
+                    }
                     this.descuentoUpdate = this.comaEnMiles(newItem.descuento)
                     this.habitacionesSelectedUpdate = newItem.habitaciones
                     this.fechasUpd[0] = newItem.fechaInicio
@@ -446,6 +470,30 @@ export default {
                 }
             },
             // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
+            immediate: true
+        },
+        precio: {
+            handler(newItem) {
+                if (newItem.nombre == 'Todo') {
+                    this.tipo = 1
+                    this.descuento = 100
+                    this.disabled = true
+                } else {
+                    this.disabled = false
+                }
+            },
+            immediate: true
+        },
+        precioUpdate: {
+            handler(newItem) {
+                if (newItem.nombre == 'Todo') {
+                    this.tipoUpdate = 1
+                    this.descuentoUpdate = 100
+                    this.disabledUpdate = true
+                } else {
+                    this.disabledUpdate = false
+                }
+            },
             immediate: true
         },
         fechaFinal: function () {
@@ -504,6 +552,7 @@ export default {
             fechas: [],
             descuento: '',
             tipo: 1,
+            precio: 1,
             habitacionesSelected: '',
             codigoUpdate: '',
             nombreUpdate: '',
@@ -514,6 +563,7 @@ export default {
             fechasUpd: [],
             habitacionesSelectedUpdate: '',
             tipoUpdate: '',
+            precioUpdate: '',
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
@@ -526,10 +576,13 @@ export default {
             menu2: false,
             menu3: false,
             menu4: false,
+            disabled: false,
+            disabledUpdate: false,
             coupon: {},
             cupones: [],
             habitaciones: [],
             tipos: [],
+            precios: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
@@ -565,6 +618,7 @@ export default {
                 descuento: this.descuento,
                 habitaciones: this.habitacionesSelected,
                 tipo: this.tipo,
+                precio: this.precio.id,
                 cantidad: this.cantidad,
                 user: vuex.state.user.id,
             }
@@ -625,10 +679,11 @@ export default {
                 fechaFin: this.fechasUpd[1],
                 nombre: this.nombreUpdate,
                 descuento: this.descuentoUpdate,
-                activo: this.activo,
                 habitaciones: this.habitacionesSelectedUpdate,
                 tipo: this.tipoUpdate,
+                precio: this.precioUpdate,
                 cantidad: this.cantidadUpdate,
+                activo: this.activo,
                 user: vuex.state.user.id,
             }
 
@@ -732,7 +787,7 @@ export default {
                         icon: 'error',
                         text: err.response.data.message,
                     })
-                    
+
                     console.error(err)
                 })
         },
@@ -765,6 +820,14 @@ export default {
             service.obtenerRoomsDescuento()
                 .then(res => {
                     this.habitaciones = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerPrecios()
+                .then(res => {
+                    this.precios = res
                 })
                 .catch(err => {
                     console.error(err)

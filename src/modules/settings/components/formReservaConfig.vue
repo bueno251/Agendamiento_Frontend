@@ -1,7 +1,7 @@
 <template>
     <v-card width="90%" elevation="5" min-height="100px">
         <v-card-title class="blue lighten-2 mb-5 white--text">
-            Valores Por Defecto
+            Valores Por Defecto Formulario Cliente Reserva
         </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="guardar">
@@ -10,56 +10,59 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Tipo Documento <span class="red--text">*</span></label>
                         <v-select v-model="tipoDocumento" :items="documentos" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="tipo" item-value="id"
-                            outlined dense required>
+                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>País De Residencia <span class="red--text">*</span></label>
                         <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]"
-                            item-text="nombre" item-value="id" outlined dense required>
+                            @change="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento De Residencia <span class="red--text">*</span></label>
-                        <v-select v-model="departamentoResidencia" :items="departamentos" no-data-text="Seleccione un pais"
-                            @change="getCiudades" :rules="[rules.required]"
-                            :loading="loadingDepartamentos" item-text="nombre" item-value="id" outlined dense required>
+                        <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
+                            no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                            :rules="[rules.required]" :loading="loadingDepartamentosResidencia" item-text="nombre"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
                         <label>Ciudad De Residencia <span class="red--text">*</span></label>
-                        <v-select v-model="ciudadResidencia" :items="ciudades" no-data-text="Seleccione un departamento"
-                            :rules="[rules.required]" :loading="loadingCiudades"
-                            item-text="nombre" item-value="id" outlined dense required>
+                        <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
+                            no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                            :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined dense
+                            required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>País <span class="red--text">*</span></label>
-                        <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]"
-                            item-text="nombre" item-value="id" outlined dense required>
+                        <label>País Procedencia <span class="red--text">*</span></label>
+                        <v-select v-model="paisProcedencia" :items="paises" no-data-text="Espere un momento..."
+                            @change="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Departamento <span class="red--text">*</span></label>
-                        <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione un pais"
-                            @change="getCiudades" :rules="[rules.required]"
-                            :loading="loadingDepartamentos" item-text="nombre" item-value="id" outlined dense required>
+                        <label>Departamento Procedencia<span class="red--text">*</span></label>
+                        <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
+                            no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
+                            :rules="[rules.required]" :loading="loadingDepartamentosProcedencia" item-text="nombre"
+                            item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <label>Ciudad <span class="red--text">*</span></label>
-                        <v-select v-model="ciudad" :items="ciudades" no-data-text="Seleccione un departamento"
-                            :rules="[rules.required]" :loading="loadingCiudades"
-                            item-text="nombre" item-value="id" outlined dense required>
+                        <label>Ciudad Procedencia<span class="red--text">*</span></label>
+                        <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
+                            no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                            :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id" outlined dense
+                            required>
                         </v-select>
                     </v-col>
 
@@ -91,18 +94,18 @@ export default {
             ciudadResidencia: '',
             tipoDocumento: '',
             valid: false,
-            validCreate: false,
-            validUpdate: false,
             loading: false,
             loadingbtn: false,
             loadingDepartamentosProcedencia: false,
             loadingCiudadesProcedencia: false,
             loadingDepartamentosResidencia: false,
             loadingCiudadesResidencia: false,
-            paises: [],
-            departamentos: [],
-            ciudades: [],
             documentos: [],
+            paises: [],
+            departamentosResidencia: [],
+            departamentosProcedencia: [],
+            ciudadesResidencia: [],
+            ciudadesProcedencia: [],
             rules: {
                 required: value => !!value || 'Campo requerido.'
             },
@@ -117,22 +120,17 @@ export default {
 
             // Objeto de datos que se enviará al servicio para establecer los valores predeterminados
             let data = {
-                configuracionId: this.id,
-                pais: this.pais,
-                departamento: this.departamento,
-                ciudad: this.ciudad,
-                priceInDolar: this.priceInDolar,
-                dolarPriceAuto: this.dolarPriceAuto,
-                dolarPrice: Number(this.dolarPrice),
-                divisa: this.divisa,
+                paisProcedencia: this.paisProcedencia,
+                departamentoProcedencia: this.departamentoProcedencia,
+                ciudadProcedencia: this.ciudadProcedencia,
+                paisResidencia: this.paisResidencia,
+                departamentoResidencia: this.departamentoResidencia,
+                ciudadResidencia: this.ciudadResidencia,
                 tipoDocumento: this.tipoDocumento,
-                tipoPersona: this.tipoPersona,
-                tipoRegimen: this.tipoRegimen,
-                tipoResponsabilidad: this.tipoResponsabilidad,
             }
 
             // Llama al servicio para establecer los valores predeterminados
-            service.guardarValoresDefault(data)
+            service.guardarConfigFormReserva(data)
                 .then(res => {
                     this.loading = false
                     Swal.fire({
@@ -149,23 +147,21 @@ export default {
          * Obtiene los valores predeterminados existentes y actualiza los datos del formulario.
          */
         getDefault() {
-            service.obtenerValoresDefault()
+            service.obtenerConfigFormReserva()
                 .then(async res => {
                     if ('id' in res) {
                         // Asigna los valores predeterminados obtenidos a las variables del componente
-                        this.divisa = res.divisa.id
-                        this.tipoDocumento = res.tipo_documento
-                        this.tipoPersona = res.tipo_persona
-                        this.tipoRegimen = res.tipo_regimen
-                        this.tipoResponsabilidad = res.tipo_obligacion
-                        this.priceInDolar = res.priceInDolar
-                        this.dolarPriceAuto = res.dolarPriceAuto
-                        this.dolarPrice = res.dolarPrice
-                        this.pais = res.paisId
-                        this.getDepartamentos()
-                        this.departamento = res.departamentoId
-                        this.getCiudades()
-                        this.ciudad = res.ciudadId
+                        this.tipoDocumento = res.tipoDocumento
+                        this.paisResidencia = res.paisResidencia
+                        this.getDepartamentos('Residencia')
+                        this.paisProcedencia = res.paisProcedencia
+                        this.getDepartamentos('Procedencia')
+                        this.departamentoResidencia = res.departamentoResidencia
+                        this.getCiudades('Residencia')
+                        this.departamentoProcedencia = res.departamentoProcedencia
+                        this.getCiudades('Procedencia')
+                        this.ciudadResidencia = res.ciudadResidencia
+                        this.ciudadProcedencia = res.ciudadProcedencia
                     }
                 })
                 .catch(err => {
@@ -176,22 +172,10 @@ export default {
          * Obtiene los tipos de empresa desde el servicio.
          */
         getTipos() {
-            service.obtenerTiposEmpresa()
+            service.obtenerTiposDocumentoCliente()
                 .then(res => {
                     // Asigna los tipos de documentos, organizaciones, regímenes y responsabilidades a las variables del componente
-                    this.documentos = res.documentos
-                    this.personas = res.organizaciones
-                    this.regimenes = res.regimenes
-                    this.responsabilidades = res.responsabilidades
-                })
-                .catch(err => {
-                    console.error(err)
-                })
-        },
-        getDivisas() {
-            service.obtenerDivisas()
-                .then(res => {
-                    this.divisas = res
+                    this.documentos = res
                 })
                 .catch(err => {
                     console.error(err)
@@ -212,63 +196,79 @@ export default {
         /**
          * Obtiene la lista de departamentos para el país seleccionado.
          */
-        async getDepartamentos() {
-            this.loadingDepartamentos = true
-            this.departamento = ''
-            this.ciudad = ''
-            this.ciudades = []
+        async getDepartamentos(tipo = '') {
+            const tipoMap = {
+                'Residencia': {
+                    pais: this.paisResidencia,
+                    loading: 'loadingDepartamentosResidencia',
+                    departamento: 'departamentoResidencia',
+                    departamentos: 'departamentosResidencia',
+                    ciudad: 'ciudadResidencia',
+                    ciudades: 'ciudadesResidencia'
+                },
+                'Procedencia': {
+                    pais: this.paisProcedencia,
+                    loading: 'loadingDepartamentosProcedencia',
+                    departamento: 'departamentoProcedencia',
+                    departamentos: 'departamentosProcedencia',
+                    ciudad: 'ciudadProcedencia',
+                    ciudades: 'ciudadesProcedencia'
+                }
+            };
 
-            await service.obtenerDepartamentos(this.pais)
-                .then(res => {
-                    this.departamentos = res
-                    this.loadingDepartamentos = false
-                })
-                .catch(err => {
-                    console.error(err)
-                    this.loadingDepartamentos = false
-                })
+            const { pais, loading, departamento, departamentos, ciudad, ciudades } = tipoMap[tipo]
+
+            this[loading] = true
+            this[departamento] = ''
+            this[departamentos] = []
+            this[ciudad] = ''
+            this[ciudades] = []
+
+            try {
+                const res = await service.obtenerDepartamentos(pais)
+                this[departamentos] = res
+                this[loading] = false
+            } catch (err) {
+                console.error(err)
+            }
         },
         /**
          * Obtiene la lista de ciudades para el departamento seleccionado.
          */
-        async getCiudades() {
-            this.loadingCiudades = true
-            this.ciudad = ''
+        async getCiudades(tipo = '') {
+            const tipoMap = {
+                'Residencia': {
+                    departamento: this.departamentoResidencia,
+                    loading: 'loadingCiudadesResidencia',
+                    ciudad: 'ciudadResidencia',
+                    ciudades: 'ciudadesResidencia'
+                },
+                'Procedencia': {
+                    departamento: this.departamentoProcedencia,
+                    loading: 'loadingCiudadesProcedencia',
+                    ciudad: 'ciudadProcedencia',
+                    ciudades: 'ciudadesProcedencia'
+                }
+            }
 
-            await service.obtenerCiudades(this.departamento)
-                .then(res => {
-                    this.ciudades = res
-                    this.loadingCiudades = false
-                })
-                .catch(err => {
-                    console.error(err)
-                    this.loadingCiudades = false
-                })
-        },
-        /**
-         * Formatea un número agregando comas para separar miles y acepta decimales.
-         * @param {number} numero - Número que se formateará.
-         * @returns {string} Número formateado con comas.
-         */
-        comaEnMiles(numero) {
-            // Convertir el número a cadena y dividir la parte entera de la parte decimal
-            let partes = numero.toString().split(',');
+            const { departamento, loading, ciudad, ciudades } = tipoMap[tipo]
 
-            // Expresión regular para agregar comas a la parte entera
-            let expParteEntera = /(\d)(?=(\d{3})+(?!\d))/g;
-            let repParteEntera = '$1.';
+            this[loading] = true
+            this[ciudad] = ''
 
-            // Formatear la parte entera y agregar la parte decimal si existe
-            let parteEnteraFormateada = partes[0].replace(expParteEntera, repParteEntera);
-            let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
-
-            return resultado;
+            try {
+                const res = await service.obtenerCiudades(departamento)
+                this[ciudades] = res
+                this[loading] = false
+            } catch (err) {
+                console.error(err)
+                this[loading] = false
+            }
         },
     },
     mounted() {
         this.getPaises()
         this.getTipos()
-        this.getDivisas()
         this.getDefault()
     },
 }

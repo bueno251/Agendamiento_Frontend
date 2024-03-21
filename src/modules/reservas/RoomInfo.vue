@@ -4,11 +4,8 @@
 
             <article class="room-info pa-5">
                 <h1 class="mb-5">
-                    {{ room.nombre }}
+                    {{ room.nombre }} ({{ room.tipo }})
                 </h1>
-                <span>
-                    {{ room.tipo }}
-                </span>
 
                 <v-carousel v-model="model" cycle show-arrows-on-hover hide-delimiter-background>
                     <v-carousel-item v-for="img in room.imgs" :key="img.id">
@@ -172,7 +169,7 @@
                         </v-col>
 
                         <v-col cols="6" class="py-0">
-                            <label>Valor Adultos</label>
+                            <label>Valor Adulto Adicional</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAdultos) }} {{ divisa.codigo }}
                             </h4>
@@ -207,6 +204,7 @@
                         </v-col>
 
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+
                             <strong v-if="descuentosActive.length">Descuentos:</strong>
                             <div class="d-flex flex-column">
                                 <label v-for="item in descuentosActive" :key="item.id">
@@ -215,9 +213,22 @@
                                         v-if="item.tipoId == 1">%</span>
                                 </label>
                             </div>
-                            <div v-if="fechasValidasEnCupones()">
-                                <label>Canjear Código Cupón</label>
-                                <v-otp-input v-model="codigoCupon" :disabled="'nombre' in cupon" @finish="checkCupon"
+
+                            <strong v-if="'nombre' in cupon">Cupón:</strong>
+                            <div v-if="'nombre' in cupon" class="d-flex flex-column">
+                                <label>
+                                    {{ cupon.nombre }} :
+                                    <span v-if="cupon.tipoId == 2">$</span>
+                                    {{ comaEnMiles(cupon.descuento) }}
+                                    <span v-if="cupon.tipoId == 1">%</span>
+                                     en {{ cupon.precio }}
+                                </label>
+                                <sub v-if="!fechasValidasCupon()" class="red--text mb-5">Fecha del cupón no valida</sub>
+                            </div>
+
+                            <div v-if="fechasValidasEnCupones()" class="d-flex flex-column">
+                                <label style="text-align: center;">Canjear Código Cupón</label>
+                                <v-otp-input v-model="codigoCupon" :disabled="fechasValidasCupon()" @finish="checkCupon"
                                     @input="toUpperCase('codigoCupon')"></v-otp-input>
                             </div>
                         </v-col>
@@ -332,8 +343,14 @@ export default {
             // redondeadomos el precio a 2 decimales
             precio = Number(precio.toFixed(2))
 
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Alojamiento' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
             precio -= this.valorDescuento(precio)
-            return precio
+            precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
         },
         /**
          * Calcula el precio de los adultos.
@@ -342,8 +359,13 @@ export default {
             // Convierte el precio de los adultos a dólares
             let precio = Number(this.precioToDolar(this.adultos.val))
 
-            let descuento = this.valorDescuento(precio)
-            precio -= descuento
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Adulto Adicional' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
         /**
@@ -353,8 +375,13 @@ export default {
             // Convierte el precio de los niños a dólares
             let precio = Number(this.precioToDolar(this.niños.val))
 
-            let descuento = this.valorDescuento(precio)
-            precio -= descuento
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Niño Adicional' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
         /**
@@ -364,8 +391,13 @@ export default {
             // Convierte el precio de la decoración a dólares
             let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
 
-            let descuento = this.valorDescuento(precio)
-            precio -= descuento
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Decoración' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
         /**
@@ -381,8 +413,13 @@ export default {
             // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes
             let precio = Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes))
 
-            let descuento = this.valorDescuento(precio)
-            precio -= descuento
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Desayuno' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
         /**
@@ -531,7 +568,6 @@ export default {
             dolarPrice: 0,
             edadNiños: 1,
             codigoCupon: '',
-            idCupon: 0,
             priceInDolar: false,
             dolarPriceAuto: true,
             valid: false,
@@ -697,6 +733,10 @@ export default {
                 data.decoracion = this.decoracion
             }
 
+            if ('id' in this.cupon) {
+                data.cupon = this.cupon
+            }
+
             // Despacha la acción para establecer los datos de la reserva en el almacenamiento global
             this.$store.dispatch('setReserva', data)
 
@@ -804,21 +844,26 @@ export default {
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
          */
         getDatos() {
-            service.obtenerDesayunos()
-                .then(res => {
-                    this.desayunos = [...this.desayunos, ...res]
-                })
-                .catch(err => {
-                    console.error(err)
-                })
 
-            service.obtenerDecoraciones()
-                .then(res => {
-                    this.decoraciones = [...this.decoraciones, ...res]
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+            if (this.room.tieneDesayuno) {
+                service.obtenerDesayunos()
+                    .then(res => {
+                        this.desayunos = [...this.desayunos, ...res]
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+            }
+
+            if (this.room.tieneDecoracion) {
+                service.obtenerDecoraciones()
+                    .then(res => {
+                        this.decoraciones = [...this.decoraciones, ...res]
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+            }
 
             service.obtenerCaracteristicas()
                 .then(res => {
@@ -917,21 +962,43 @@ export default {
             // Devuelve el descuento total
             return descuento
         },
+        valorDescuentoCupon(precio) {
+            // Inicializa el descuento en 0
+
+            let descuentoCupon = 0
+
+            if (!this.fechasValidasCupon()) {
+                return 0
+            }
+
+            if (this.cupon.tipo == 'Porcentaje') {
+                descuentoCupon += (precio * this.cupon.descuento / 100)
+            }
+
+            if (this.cupon.tipo == 'Precio') {
+                descuentoCupon += this.cupon.descuento
+            }
+
+            return descuentoCupon
+        },
         fechasValidasEnCupones() {
 
             for (let i = 0; i < this.cupones.length; i++) {
                 const cupon = this.cupones[i]
                 if (this.dates.length == 2 && cupon.fechaInicio <= this.fechaLlegada && this.fechaSalida <= cupon.fechaFin) {
-                    this.idCupon = cupon.id
                     return true
                 }
             }
 
             return false
         },
+        fechasValidasCupon() {
+            return this.dates.length == 2 && this.cupon.fechaInicio <= this.fechaLlegada && this.fechaSalida <= this.cupon.fechaFin
+
+        },
         checkCupon() {
 
-            service.obtenerCupon(this.codigoCupon, this.idCupon)
+            service.obtenerCupon(this.codigoCupon, this.room.id)
                 .then(res => {
                     this.cupon = res
                 })

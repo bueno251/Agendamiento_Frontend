@@ -124,6 +124,26 @@ const ConfigService = {
 
         return cacheManager.obtenerDatos('reservar', url)
     },
+
+    obtenerConfigFormReserva() {
+        let url = `formReserva`
+
+        return cacheManager.obtenerDatos('formReserva', url)
+    },
+
+    guardarConfigFormReserva(data){
+        let url = `formReserva`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.post(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
 }
 
 export default ConfigService

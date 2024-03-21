@@ -4,6 +4,8 @@
 
         <reservaConfig :config="config" @update="getSettings" />
 
+        <formReservaConfig />
+
         <defaultConfig :id="id" :updateDivisas="updateDivisas" />
 
         <divisasConfig @updateDivisas="updateDivisas = true" />
@@ -18,18 +20,20 @@
 import service from '@/services/service'
 import metodosPago from './components/metodosPago'
 import reservaConfig from './components/reservaConfig'
-import EmpresaComponent from './components/empresaComponent'
 import defaultConfig from './components/defaultConfig'
-import divisasConfig from './components/divisasConfig.vue'
+import divisasConfig from './components/divisasConfig'
+import EmpresaComponent from './components/empresaComponent'
+import formReservaConfig from './components/formReservaConfig'
 
 export default {
     name: 'settingsApp',
     components: {
         metodosPago,
         reservaConfig,
-        EmpresaComponent,
         defaultConfig,
         divisasConfig,
+        EmpresaComponent,
+        formReservaConfig,
     },
     watch: {
         updateDivisas: {

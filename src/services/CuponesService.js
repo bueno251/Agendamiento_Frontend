@@ -49,6 +49,12 @@ const CuponesService = {
         return cacheManager.obtenerDatos(url, url)
     },
 
+    obtenerPrecios() {
+        let url = `precios`
+
+        return cacheManager.obtenerDatos(`precios`, url)
+    },
+
     actualizarCupon(data, id) {
         let url = `cupon/${id}`
 

@@ -29,9 +29,9 @@ class CacheManager {
                     this.cache[tipo] = {
                         data: res.data,
                         timer: setTimeout(() => {
-                            // Limpiar la caché después de 0.5 minutos
+                            // Limpiar la caché después de 1 segundo
                             delete this.cache[tipo]
-                        }, 30000) // 30000 milisegundos = 0.5 minuto
+                        }, 1000) // 1000 milisegundos = 1 segundo
                     }
 
                     // Resolver todas las promesas pendientes para este tipo de datos con el mismo resultado
