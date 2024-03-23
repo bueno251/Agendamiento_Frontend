@@ -5,6 +5,7 @@ import ConfigService from './ConfigService'
 import CuponesService from './CuponesService'
 import DecoracionService from './DecoracionService'
 import DesayunoService from './DesayunoService'
+import DescuentoEstadiaService from './DescuentoEstadia'
 import DescuentosService from './DescuentosService'
 import DivisasService from './DivisasService'
 import EstadoRoomService from './EstadoRoom'
@@ -28,6 +29,7 @@ const service = {
     ...CuponesService,
     ...DecoracionService,
     ...DesayunoService,
+    ...DescuentoEstadiaService,
     ...DescuentosService,
     ...DivisasService,
     ...EstadoRoomService,

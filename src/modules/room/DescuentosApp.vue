@@ -88,8 +88,9 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="habitacionesSelected" :items="habitaciones" :rules="[rules.arrayRequired]"
-                                item-text="nombre" item-value="id" multiple outlined required>
+                            <v-select v-model="habitacionesSelected" :items="habitaciones"
+                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined
+                                required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -221,7 +222,8 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="habitacionesSelectedUpdate" :items="habitaciones"
-                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined required>
+                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined
+                                required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -593,7 +595,8 @@ export default {
         eliminar() {
             this.loadingbtn = true
 
-                // Llama al servicio para eliminar un descuento
+            // Llama al servicio para eliminar un descuento
+            service.eliminarDescuento(this.discount.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false

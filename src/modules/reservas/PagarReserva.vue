@@ -1,115 +1,5 @@
 <template>
     <div class="main">
-        <v-card class="pa-5 column2" elevation="5">
-            <h2>Información de contacto</h2>
-            <v-form ref="form" v-model="validInfo">
-                <v-row>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>
-                            Tipo de documento <span class="red--text">*</span>
-                        </label>
-                        <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
-                            required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Número Documento <span class="red--text">*</span></label>
-                        <v-text-field v-model="cedula" :rules="[rules.required]" type="number" hide-spin-buttons dense
-                            outlined required>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Nombre <span class="red--text">*</span></label>
-                        <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Apellido <span class="red--text">*</span></label>
-                        <v-text-field v-model="apellido" :rules="[rules.required]" dense outlined required>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
-                        <v-text-field v-model="correo" :rules="[rules.email]" type="email" :required="correoRequired"
-                            dense outlined>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Telefono <span class="red--text">*</span></label>
-                        <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
-                            hide-spin-buttons dense outlined required>
-                        </v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>País De Residencia <span class="red--text">*</span></label>
-                        <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
-                            item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>Departamento De Residencia <span class="red--text">*</span></label>
-                        <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
-                            no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
-                            :rules="[rules.required]" :loading="loadingDepartamentosResidencia" item-text="nombre"
-                            item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>Ciudad De Residencia <span class="red--text">*</span></label>
-                        <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
-                            no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                            :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined dense
-                            required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>País De Procedencia <span class="red--text">*</span></label>
-                        <v-select v-model="paisProcedencia" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
-                            item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>Departamento De Procedencia<span class="red--text">*</span></label>
-                        <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
-                            no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
-                            :rules="[rules.required]" :loading="loadingDepartamentosProcedencia" item-text="nombre"
-                            item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                        <label>Ciudad De Procedencia<span class="red--text">*</span></label>
-                        <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
-                            no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                            :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id" outlined dense
-                            required>
-                        </v-select>
-                    </v-col>
-
-                    <v-col cols="12" md="6" sm="6">
-                        <label>Motivo De Viaje <span class="red--text">*</span></label>
-                        <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
-                            :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
-                        </v-select>
-                    </v-col>
-
-                </v-row>
-            </v-form>
-        </v-card>
 
         <v-card class="pa-5 d-flex flex-column justify-space-between" elevation="5">
             <div>
@@ -118,7 +8,7 @@
                     <strong>
                         Habitacion:
                     </strong>
-                    {{ reserva.room.nombre }} (x{{ reserva.cantidad_rooms }})
+                    {{ reserva.room.nombre }} (x{{ reserva.noches }} {{ reserva.noches > 1 ? 'Noches' : 'Noche' }})
                 </p>
                 <p>
                     <strong>
@@ -163,29 +53,28 @@
                 </span>
                 <span>
                     Valor Separación ({{ porcentajeSeparacion }}%): ${{ comaEnMiles(reserva.valorSeparacion) }} {{
-                divisa.codigo }}
+                        divisa.codigo }}
                 </span>
                 <h2 style="text-wrap: balance;">
                     <strong>
-                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }} <span
-                            v-if="reserva.room.tieneIva">IVA: ({{ reserva.room.iva }}%)</span>
+                        TOTAL: ${{ comaEnMiles(reserva.precioTotal) }} {{ divisa.codigo }}
                     </strong>
                 </h2>
             </div>
         </v-card>
 
-        <v-card class="pa-5 column2" elevation="5">
-            <v-form ref="formPagos" v-model="validPagos" @submit.prevent="reservar()">
+        <v-card class="pa-5" elevation="5">
+            <v-form ref="formPagos" v-model="validPagos" @submit.prevent="modalDatosUser = true">
                 <v-row>
                     <v-col cols="12" v-if="metodosPago.length > 1">
                         <label>Selecciona un método de pago <span class="red--text">*</span></label>
                         <v-select v-model="metodoPago" :items="metodosPago"
                             no-data-text="No hay metodos de pago validas" :rules="[rules.required]" item-text="nombre"
-                            item-value="id" outlined dense required>
+                            return-object outlined dense required>
                         </v-select>
                     </v-col>
 
-                    <template v-if="metodoPago == '1'">
+                    <template v-if="metodoPago.id == '1'">
                         <v-col cols="12">
                             <label>Número para transacciones: 123456789</label>
                         </v-col>
@@ -196,7 +85,7 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
+                        <v-col v-if="metodoPago.requiereComprobante" cols="12" md="6" sm="6">
                             <label>Comprobante de pago <span class="red--text">*</span></label>
                             <v-file-input v-model="file" :rules="[rules.file]" :clearable="false" accept="image/*,.pdf"
                                 truncate-length="15" chips outlined dense required></v-file-input>
@@ -206,16 +95,139 @@
 
                 <div class="buttons">
                     <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validPagos || !validInfo" :loading="loading" color="light-green" type="submit">
-                        pagar
+                    <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
+                        {{ metodoPago.requiereComprobante ? 'Guardar' : 'Pagar' }}
                     </v-btn>
                 </div>
             </v-form>
         </v-card>
 
-        <v-dialog :value="modalTransferencia" width="90%" max-width="500px" persistent>
+        <v-dialog :value="modalDatosUser" width="90%" persistent>
+            <v-card class="pa-5" elevation="5">
+                <v-toolbar elevation="0">
+                    <h2>Información de contacto</h2>
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="modalDatosUser = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-form ref="form" v-model="validInfo" @submit.prevent="reservar()">
+                    <v-row>
 
+                        <!-- <v-col cols="12" md="6" sm="6">
+                            <label>
+                                Huesped <span class="red--text">*</span>
+                            </label>
+                            <v-select v-model="huesped" :items="huespedes" item-text="nombre" return-object dense
+                                outlined required>
+                            </v-select>
+                        </v-col> -->
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>
+                                Tipo de documento <span class="red--text">*</span>
+                            </label>
+                            <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
+                                no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                                required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Número Documento <span class="red--text">*</span></label>
+                            <v-text-field v-model="cedula" :rules="[rules.required]" type="number" hide-spin-buttons
+                                dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Nombre <span class="red--text">*</span></label>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Apellido <span class="red--text">*</span></label>
+                            <v-text-field v-model="apellido" :rules="[rules.required]" dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
+                            <v-text-field v-model="correo" :rules="[rules.email]" type="email"
+                                :required="correoRequired" dense outlined>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Telefono <span class="red--text">*</span></label>
+                            <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
+                                hide-spin-buttons dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>País De Residencia <span class="red--text">*</span></label>
+                            <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
+                                @change="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
+                                item-value="id" outlined dense required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>Departamento De Residencia <span class="red--text">*</span></label>
+                            <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
+                                no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                                :rules="[rules.required]" :loading="loadingDepartamentosResidencia" item-text="nombre"
+                                item-value="id" outlined dense required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>Ciudad De Residencia <span class="red--text">*</span></label>
+                            <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
+                                no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined dense
+                                required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>País De Procedencia <span class="red--text">*</span></label>
+                            <v-select v-model="paisProcedencia" :items="paises" no-data-text="Espere un momento..."
+                                @change="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
+                                item-value="id" outlined dense required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>Departamento De Procedencia<span class="red--text">*</span></label>
+                            <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
+                                no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
+                                :rules="[rules.required]" :loading="loadingDepartamentosProcedencia" item-text="nombre"
+                                item-value="id" outlined dense required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="4" sm="6">
+                            <label>Ciudad De Procedencia<span class="red--text">*</span></label>
+                            <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
+                                no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id" outlined dense
+                                required>
+                            </v-select>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <label>Motivo De Viaje <span class="red--text">*</span></label>
+                            <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
+                                :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
+                            </v-select>
+                        </v-col>
+
+                    </v-row>
+                </v-form>
+            </v-card>
         </v-dialog>
+
     </div>
 </template>
 
@@ -239,11 +251,11 @@ export default {
             telefono: vuex.state.reserva.telefono,
             monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
             motivo: 1,
-            metodoPago: 1,
+            metodoPago: { id: 0 },
             porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
-            modalTransferencia: false,
+            modalDatosUser: false,
             loading: false,
             correoRequired: true,
             loadingDepartamentosProcedencia: false,
@@ -265,6 +277,8 @@ export default {
             ciudadesResidencia: [],
             ciudadesProcedencia: [],
             motivos: [],
+            huespedes: [],
+            huesped: {},
             divisa: {
                 codigo: '',
             },
@@ -325,7 +339,7 @@ export default {
                 motivo: this.motivo,
                 ciudadResidencia: this.ciudadResidencia,
                 ciudadProcedencia: this.ciudadProcedencia,
-                verificacion_pago: this.metodoPago == 1 ? 0 : 1,
+                verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
             // Realiza la llamada al servicio para reservar
@@ -366,6 +380,7 @@ export default {
             service.obtenerMetodosPago()
                 .then(res => {
                     this.metodosPago = res
+                    this.metodoPago = res[0]
                 })
                 .catch(err => {
                     console.error(err)
@@ -375,7 +390,6 @@ export default {
                 .then(res => {
                     this.correoRequired = res.correoObligatorio
                     this.porcentajeSeparacion = res.porcentajeSeparacion
-                    this.$refs.form.resetValidation()
                 })
                 .catch(err => {
                     console.error(err)
@@ -428,6 +442,14 @@ export default {
                         this.getCiudades('Procedencia')
                         this.ciudadResidencia = res.ciudadResidencia
                         this.ciudadProcedencia = res.ciudadProcedencia
+
+                        for (let i = 0; i < this.reserva.adultos; i++) {
+                            let huesped = {
+                                nombre: `Huesped ${i + 1}`,
+                            }
+
+                            this.huespedes.push(huesped)
+                        }
                     }
                 })
                 .catch(err => {
@@ -528,9 +550,9 @@ export default {
 
 <style scoped>
 .main {
-    display: grid;
-    width: min(95%, 1275px);
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    display: flex;
+    flex-direction: column;
+    width: 95%;
     gap: 15px;
 }
 

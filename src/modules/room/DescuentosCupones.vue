@@ -15,6 +15,13 @@
                         <DescuentosApp />
                     </div>
                 </v-window-item>
+
+                <v-window-item>
+                    <div class="d-flex justify-center">
+                        <DescuentosEstadiaApp />
+                    </div>
+                </v-window-item>
+
                 <v-window-item>
                     <div class="d-flex justify-center">
                         <CuponesApp />
@@ -28,18 +35,21 @@
 <script>
 
 import DescuentosApp from './DescuentosApp'
-import CuponesApp from './CuponesApp.vue';
+import CuponesApp from './CuponesApp'
+import DescuentosEstadiaApp from './DescuentoEstadiaApp'
 
 export default {
     components: {
         DescuentosApp,
-        CuponesApp
+        CuponesApp,
+        DescuentosEstadiaApp
     },
     data() {
         return {
             onboarding: 0,
             items: [
                 'Descuentos',
+                'Descuento Larga Estadia',
                 'Cupones',
             ],
         }

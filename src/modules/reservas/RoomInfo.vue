@@ -138,6 +138,8 @@
 
                         <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDesayuno">
                             <label>Desayunos</label>
+                            <a v-if="desayuno.id != null" class="text-caption" @click="dialogMediaDesayunos = true">Ver
+                                Fotos/Videos</a>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
                                 :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 :readonly="room.incluyeDesayuno" return-object dense outlined>
@@ -146,6 +148,9 @@
 
                         <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDecoracion">
                             <label>Decoraciones</label>
+                            <a v-if="decoracion.id != null" class="text-caption"
+                                @click="dialogMediaDecoraciones = true">Ver
+                                Fotos/Videos</a>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
                                 :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 return-object dense outlined>
@@ -214,6 +219,17 @@
                                 </label>
                             </div>
 
+                            <strong v-if="descuentoEstadia.diasEstadia <= diasAlojamiento">Descuento por
+                                larga estadia:</strong>
+                            <div v-if="descuentoEstadia.diasEstadia <= diasAlojamiento" class="d-flex flex-column">
+                                <label>
+                                    {{ descuentoEstadia.nombre }} ({{ descuentoEstadia.diasEstadia }} dias):
+                                    <span v-if="descuentoEstadia.tipoId == 2">$</span>
+                                    {{ comaEnMiles(descuentoEstadia.descuento) }}
+                                    <span v-if="descuentoEstadia.tipoId == 1">%</span>
+                                </label>
+                            </div>
+
                             <strong v-if="'nombre' in cupon">Cupón:</strong>
                             <div v-if="'nombre' in cupon" class="d-flex flex-column">
                                 <label>
@@ -221,7 +237,7 @@
                                     <span v-if="cupon.tipoId == 2">$</span>
                                     {{ comaEnMiles(cupon.descuento) }}
                                     <span v-if="cupon.tipoId == 1">%</span>
-                                     en {{ cupon.precio }}
+                                    en {{ cupon.precio }}
                                 </label>
                                 <sub v-if="!fechasValidasCupon()" class="red--text mb-5">Fecha del cupón no valida</sub>
                             </div>
@@ -260,7 +276,7 @@
 
         <v-dialog :value="datosCliente" width="90%" max-width="500px" persistent>
             <v-card class="pa-5 sticky" elevation="5">
-                <v-form v-model="validDatosCliente" ref="fechas" @submit.prevent="agendar">
+                <v-form v-model="validDatosCedula" @submit.prevent="datosCliente2 = true">
                     <v-row>
                         <v-col cols="12">
                             <v-text-field v-model="cedula" :rules="[rules.required]" label="Cedula" type="number"
@@ -270,11 +286,63 @@
                     </v-row>
                     <div class="buttons mt-5">
                         <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validDatosCliente" :loading="loadingbtn" color="light-green" type="submit">
+                        <v-btn :disabled="!validDatosCedula" color="light-green" type="submit">
                             siguiente
                         </v-btn>
                     </div>
                 </v-form>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="datosCliente2" width="90%" max-width="500px" persistent>
+            <v-card class="pa-5 sticky" elevation="5">
+                <v-form v-model="validDatosTelefono" @submit.prevent="agendar">
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field v-model="telefono" :rules="[rules.required]" label="Telefono" type="number"
+                                hide-spin-buttons dense outlined required>
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <div class="buttons mt-5">
+                        <v-btn @click="datosCliente2 = false" color="blue">cancelar</v-btn>
+                        <v-btn :disabled="!validDatosTelefono" :loading="loadingbtn" color="light-green" type="submit">
+                            siguiente
+                        </v-btn>
+                    </div>
+                </v-form>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="dialogMediaDecoraciones" width="90%" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3"
+                        @click="dialogMediaDecoraciones = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-carousel show-arrows-on-hover hide-delimiter-background>
+                    <v-carousel-item v-for="file in decoracion.media" :key="`decoracionFile${file.id}`">
+                        <img v-if="esImagen(file.url)" class="imgCarousel" :src="rootBackend + file.url">
+                        <video v-else class="videoCarousel" :src="rootBackend + file.url" autoplay muted loop></video>
+                    </v-carousel-item>
+                </v-carousel>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="dialogMediaDesayunos" width="90%" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3"
+                        @click="dialogMediaDesayunos = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-carousel show-arrows-on-hover hide-delimiter-background>
+                    <v-carousel-item v-for="file in desayuno.media" :key="`desayunoFile${file.id}`">
+                        <img v-if="esImagen(file.url)" class="imgCarousel" :src="rootBackend + file.url">
+                        <video v-else class="videoCarousel" :src="rootBackend + file.url" autoplay muted loop></video>
+                    </v-carousel-item>
+                </v-carousel>
             </v-card>
         </v-dialog>
     </div>
@@ -320,20 +388,46 @@ export default {
                 let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
+
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
                     // Obtiene el precio normal y el precio festivo del día actual
                     let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precio)
                     let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivo)
 
+                    let descuentoEstadia = 0
+
                     // Avanza al siguiente día
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
 
                     // Verifica si el día actual es festivo
                     if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
+
+                        if (this.descuentoEstadia.diasEstadia <= this.diasAlojamiento) {
+                            if (this.descuentoEstadia.tipo == 'Porcentaje') {
+                                descuentoEstadia = (precioFestivo * this.descuentoEstadia.descuento / 100)
+                            } else {
+                                descuentoEstadia = this.descuentoEstadia.descuento
+                            }
+                        }
+
                         // Si es festivo, suma el precio festivo al total
+                        precioFestivo -= descuentoEstadia
                         precio += precioFestivo
                     } else {
+
+                        if (this.descuentoEstadia.diasEstadia <= this.diasAlojamiento) {
+
+                            if (this.descuentoEstadia.tipo == 'Porcentaje') {
+                                // Si el descuento es de tipo porcentaje, calcula el descuento en base al precio y lo agrega al descuento
+                                descuentoEstadia = (precioNormal * this.descuentoEstadia.descuento / 100)
+                            } else {
+                                // Si el descuento es de valor fijo, simplemente lo agrega al descuento
+                                descuentoEstadia = this.descuentoEstadia.descuento
+                            }
+                        }
+
+                        precioNormal -= descuentoEstadia
                         // Si no es festivo, suma el precio normal al total
                         precio += precioNormal
                     }
@@ -351,6 +445,22 @@ export default {
             precio -= this.valorDescuento(precio)
             precio -= descuentoCupon
             return precio >= 0 ? precio : 0
+        },
+        noches() {
+            // Definir las dos fechas
+            var fecha1 = new Date(this.fechaLlegada)
+            var fecha2 = new Date(this.fechaSalida)
+
+            // Calcular la diferencia en milisegundos
+            var diferenciaEnMs = fecha2 - fecha1
+
+            // Convertir la diferencia de milisegundos a días
+            var diasDeDiferencia = diferenciaEnMs / (1000 * 60 * 60 * 24)
+
+            return diasDeDiferencia
+        },
+        diasAlojamiento() {
+            return this.noches + 1
         },
         /**
          * Calcula el precio de los adultos.
@@ -551,6 +661,7 @@ export default {
     data() {
         return {
             cedula: '',
+            telefono: '',
             desayuno: {
                 id: null,
                 nombre: 'Ninguno',
@@ -568,13 +679,17 @@ export default {
             dolarPrice: 0,
             edadNiños: 1,
             codigoCupon: '',
+            dialogMediaDecoraciones: false,
+            dialogMediaDesayunos: false,
             priceInDolar: false,
             dolarPriceAuto: true,
             valid: false,
-            validDatosCliente: false,
+            validDatosCedula: false,
+            validDatosTelefono: false,
             loading: false,
             loadingbtn: false,
             datosCliente: false,
+            datosCliente2: false,
             useGenerales: false,
             menu1: false,
             menu2: false,
@@ -584,6 +699,7 @@ export default {
             caracteristicas: [],
             precios: [],
             descuentos: [],
+            descuentoEstadia: [],
             cupones: [],
             cupon: {},
             adultos: {
@@ -720,6 +836,8 @@ export default {
                 precioTotal: this.precioTotal,
                 precioNeto: this.precioNeto,
                 cedula: this.cedula,
+                telefono: this.telefono,
+                noches: this.noches,
                 cantidad_rooms: this.cantidadRooms,
             }
 
@@ -839,6 +957,16 @@ export default {
         includeCaracteristic(caracteris, room) {
             return room.caracteristicas.includes(caracteris.id)
         },
+        esImagen(url) {
+            // Extraer la extensión del archivo de la URL
+            const extension = url.split('.').pop().toLowerCase();
+
+            // Lista de extensiones de archivos de imagen
+            const extensionesImagen = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg'];
+
+            // Verificar si la extensión está en la lista de extensiones de imagen
+            return extensionesImagen.includes(extension);
+        },
         /**
          * Obtiene la información de desayunos, decoraciones y características para ser utilizada en el agendamiento.
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
@@ -876,6 +1004,16 @@ export default {
             service.obtenerDescuentos(this.room.id)
                 .then(res => {
                     this.descuentos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerDescuentosEstadia(this.room.id)
+                .then(res => {
+                    this.descuentoEstadia = res.reduce((menorDescuento, descuento) => {
+                        return descuento.diasEstadia < menorDescuento.diasEstadia ? descuento : menorDescuento
+                    })
                 })
                 .catch(err => {
                     console.error(err)
@@ -1094,6 +1232,17 @@ h2 {
 .caracteristic p {
     margin: 0;
     text-align: center;
+}
+
+.imgCarousel {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.videoCarousel {
+    width: 100%;
+    height: 100%;
 }
 
 @media only screen and (max-width: 800px) {

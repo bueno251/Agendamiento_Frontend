@@ -13,8 +13,8 @@
                 </v-col>
             </v-row>
         </v-card-title>
-        <v-data-table :headers="headers" :items="cupones" :search="search" :loading="loading"
-            no-results-text="No hay ningún cupón que coincida" no-data-text="No hay cupones"
+        <v-data-table :headers="headers" :items="descuentos" :search="search" :loading="loading"
+            no-results-text="No hay ningún descuento que coincida" no-data-text="No hay descuentos"
             loading-text="Cargando... Por favor espera"
             :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
             <template v-slot:item="{ item }">
@@ -27,21 +27,17 @@
                                 </v-btn>
                             </template>
                             <v-list>
-                                <v-list-item link @click="coupon = item, dialogCodigos = true">
-                                    <v-list-item-title v-text="'Ver Códigos'"></v-list-item-title>
-                                </v-list-item>
-                                <v-list-item link @click="coupon = item, dialogUpdate = true">
+                                <v-list-item link @click="discount = item, dialogUpdate = true">
                                     <v-list-item-title v-text="'Ajustes'"></v-list-item-title>
                                 </v-list-item>
-                                <v-list-item link @click="coupon = item, dialogDelete = true">
+                                <v-list-item link @click="discount = item, dialogDelete = true">
                                     <v-list-item-title v-text="'Eliminar'"></v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
                     <td>{{ item.nombre }}</td>
-                    <td>{{ item.fechaInicio }}</td>
-                    <td>{{ item.fechaFin }}</td>
+                    <td>{{ item.dias }}</td>
                     <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
                             v-if="item.tipoId == 1">%</span></td>
                     <td>{{ item.created_at }}</td>
@@ -64,8 +60,18 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-text-field v-model="diasEstancia" :rules="[rules.required]" type="number"
+                                hide-spin-buttons outlined required>
+
+                                <template v-slot:label>
+                                    Dias Minimos De La Estancia <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
                             <v-select v-model="tipo" :items="tipos" :rules="[rules.required]" item-text="tipo"
-                                item-value="id" :disabled="disabled" outlined required>
+                                item-value="id" outlined required>
 
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
@@ -74,18 +80,8 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="precio" :items="precios" :rules="[rules.required]" item-text="nombre"
-                                return-object outlined required>
-
-                                <template v-slot:label>
-                                    Precio <span class="red--text">*</span>
-                                </template>
-                            </v-select>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
-                            <v-slider v-if="tipo == 1" v-model="descuento" :readonly="disabled" max="100" min="0"
-                                label="Descuento" thumb-label="always">
+                            <v-slider v-if="tipo == 1" v-model="descuento" max="100" min="0" label="Descuento"
+                                thumb-label="always">
                                 <template v-slot:thumb-label="{ value }">
                                     {{ value }}%
                                 </template>
@@ -137,56 +133,6 @@
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="cantidad" :rules="[rules.required]" type="number" hide-spin-buttons
-                                outlined required>
-
-                                <template v-slot:label>
-                                    Cantidad <span class="red--text">*</span>
-                                </template>
-                            </v-text-field>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
-                            <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechas[0]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Inicio <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechas" :min="hoy" @change="save('menu1', fechas)" locale="es"
-                                    range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
-                            <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechas[1]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Fin <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechas" :min="hoy" @change="save('menu2', fechas)" locale="es"
-                                    range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
                     </v-row>
 
                     <div class="buttons">
@@ -214,8 +160,18 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="tipoUpdate" :items="tipos" :disabled="disabledUpdate"
-                                :rules="[rules.required]" item-text="tipo" item-value="id" outlined required>
+                            <v-text-field v-model="diasEstanciaUpdate" :rules="[rules.required]" type="number"
+                                hide-spin-buttons outlined required>
+
+                                <template v-slot:label>
+                                    Dias Minimos De La Estancia <span class="red--text">*</span>
+                                </template>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
+                            <v-select v-model="tipoUpdate" :items="tipos" :rules="[rules.required]" item-text="tipo"
+                                item-value="id" outlined required>
 
                                 <template v-slot:label>
                                     Tipo <span class="red--text">*</span>
@@ -224,19 +180,9 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-select v-model="precioUpdate" :items="precios" :rules="[rules.required]"
-                                item-text="nombre" return-object outlined required>
 
-                                <template v-slot:label>
-                                    Precio <span class="red--text">*</span>
-                                </template>
-                            </v-select>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
-
-                            <v-slider v-if="tipoUpdate == 1" v-model="descuentoUpdate" :readonly="disabledUpdate"
-                                max="100" min="0" label="Descuento" thumb-label="always">
+                            <v-slider v-if="tipoUpdate == 1" v-model="descuentoUpdate" max="100" min="0"
+                                label="Descuento" thumb-label="always">
                                 <template v-slot:thumb-label="{ value }">
                                     {{ value }}%
                                 </template>
@@ -255,7 +201,8 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="habitacionesSelectedUpdate" :items="habitaciones"
-                                :rules="[rules.required]" item-text="nombre" item-value="id" multiple outlined required>
+                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined
+                                required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -291,56 +238,6 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <v-text-field v-model="cantidadUpdate" :rules="[rules.required, rules.min]" type="number"
-                                hide-spin-buttons outlined required>
-
-                                <template v-slot:label>
-                                    Cantidad <span class="red--text">*</span>
-                                </template>
-                            </v-text-field>
-                        </v-col>
-
-                        <v-col cols="6">
-                            <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechasUpd[0]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Inicio <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechasUpd" :min="hoy" @change="save('menu3', fechasUpd)"
-                                    locale="es" range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="6">
-                            <v-menu ref="menu4" v-model="menu4" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechasUpd[1]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Fin <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechasUpd" :min="hoy" @change="save('menu4', fechasUpd)"
-                                    locale="es" range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="12" md="6" sm="6">
                             <div class="flex">
                                 <p>
                                     Activo
@@ -364,42 +261,13 @@
         <v-dialog :value="dialogDelete" width="90%" max-width="600px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar el cupón {{ coupon.nombre }}?</h3>
+                    <h3>Eliminar el descuento {{ discount.nombre }}?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
                         <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
                     </div>
                 </v-sheet>
-            </v-card>
-        </v-dialog>
-
-        <v-dialog :value="dialogCodigos" width="90%" max-width="600px" persistent>
-            <v-card class="pa-5">
-                <v-toolbar elevation="0">
-                    <v-spacer></v-spacer>
-                    <v-btn icon class="ml-3"
-                        @click="dialogCodigos = false, saveCodigos()"><v-icon>mdi-close-box</v-icon></v-btn>
-                </v-toolbar>
-                <v-data-table :headers="headersCode" :items="coupon.codigos" :loading="loading"
-                    no-data-text="No hay ningún código" loading-text="Cargando... Por favor espera"
-                    :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }"
-                    :items-per-page="5">
-                    <template v-slot:item="{ item }">
-                        <tr>
-                            <td>{{ item.codigo }}</td>
-                            <td>{{ item.usado ? 'Si' : 'No' }}</td>
-                            <td>
-                                <div class="flex pa-0 ma-0">
-                                    <p>
-                                        Activo
-                                    </p>
-                                    <v-switch v-model="item.activo" :label="item.activo ? 'Si' : 'No'" inset></v-switch>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
-                </v-data-table>
             </v-card>
         </v-dialog>
 
@@ -413,20 +281,8 @@ import Swal from 'sweetalert2'
 import service from '@/services/service'
 
 export default {
-    name: 'CuponesApp',
+    name: 'DescuentoEstadiaApp',
     computed: {
-        fechaInicio() {
-            return this.fechas[0] || ''
-        },
-        fechaFinal() {
-            return this.fechas[1] || ''
-        },
-        fechaInicioUpd() {
-            return this.fechasUpd[0] || ''
-        },
-        fechaFinalUpd() {
-            return this.fechasUpd[1] || ''
-        },
         selectAllRooms() {
             return this.habitacionesSelected.length === this.habitaciones.length
         },
@@ -451,82 +307,20 @@ export default {
         },
     },
     watch: {
-        coupon: {
-            // Función que se ejecuta cuando hay cambios en el cupón
+        discount: {
+            // Función que se ejecuta cuando hay cambios en descuento
             handler(newItem) {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
+                    this.diasEstanciaUpdate = newItem.dias
                     this.tipoUpdate = newItem.tipoId
-                    this.precioUpdate = {
-                        id: newItem.precioId,
-                        nombre: newItem.precio,
-                    }
                     this.descuentoUpdate = this.comaEnMiles(newItem.descuento)
                     this.habitacionesSelectedUpdate = newItem.habitaciones
-                    this.fechasUpd[0] = newItem.fechaInicio
-                    this.fechasUpd[1] = newItem.fechaFin
                     this.activo = newItem.activo
-                    this.cantidadUpdate = newItem.codigos.length
                 }
             },
             // Immediate: true indica que se ejecutará el handler inmediatamente después de registrar el watcher
             immediate: true
-        },
-        precio: {
-            handler(newItem) {
-                if (newItem.nombre == 'Todo') {
-                    this.tipo = 1
-                    this.descuento = 100
-                    this.disabled = true
-                } else {
-                    this.disabled = false
-                }
-            },
-            immediate: true
-        },
-        precioUpdate: {
-            handler(newItem) {
-                if (newItem.nombre == 'Todo') {
-                    this.tipoUpdate = 1
-                    this.descuentoUpdate = 100
-                    this.disabledUpdate = true
-                } else {
-                    this.disabledUpdate = false
-                }
-            },
-            immediate: true
-        },
-        fechaFinal: function () {
-            if (this.fechas.length > 1) {
-                let fecha1 = new Date(this.fechas[0])
-                let fecha2 = new Date(this.fechas[1])
-
-                // Ajusta la fecha de salida si es igual a la fecha de llegada
-                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
-                    fecha2.setDate(fecha2.getDate() + 1)
-                    this.fechas[1] = fecha2.toISOString().slice(0, 10)
-                }
-
-                // Ordena las fechas de Inicio y Fin
-                let sortfechas = this.fechas.toSorted()
-                this.fechas = sortfechas
-            }
-        },
-        fechaFinalUpd: function () {
-            if (this.fechasUpd.length > 1) {
-                let fecha1 = new Date(this.fechasUpd[0])
-                let fecha2 = new Date(this.fechasUpd[1])
-
-                // Ajusta la fecha de salida si es igual a la fecha de llegada
-                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
-                    fecha2.setDate(fecha2.getDate() + 1)
-                    this.fechasUpd[1] = fecha2.toISOString().slice(0, 10)
-                }
-
-                // Ordena las fechasUpd de Inicio y Fin
-                let sortfechasUpd = this.fechasUpd.toSorted()
-                this.fechasUpd = sortfechasUpd
-            }
         },
     },
     directives: {
@@ -546,60 +340,38 @@ export default {
     data() {
         return {
             search: '',
-            codigo: '',
             nombre: '',
-            cantidad: 1,
-            fechas: [],
+            diasEstancia: 1,
             descuento: '',
             tipo: 1,
-            precio: 1,
             habitacionesSelected: '',
-            codigoUpdate: '',
             nombreUpdate: '',
+            diasEstanciaUpdate: '',
             descuentoUpdate: '',
             activo: '',
-            hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            cantidadUpdate: '',
-            fechasUpd: [],
             habitacionesSelectedUpdate: '',
             tipoUpdate: '',
-            precioUpdate: '',
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
             dialogUpdate: false,
             dialogDelete: false,
-            dialogCodigos: false,
             validCreate: false,
             validUpdate: false,
-            menu1: false,
-            menu2: false,
-            menu3: false,
-            menu4: false,
-            disabled: false,
-            disabledUpdate: false,
-            coupon: {},
-            cupones: [],
+            discount: {},
+            descuentos: [],
             habitaciones: [],
             tipos: [],
-            precios: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
-                { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
-                { text: 'Fecha Fin', key: 'fechaFin', value: 'fechaFin' },
+                { text: 'Dias De Estancia', key: 'fechaInicio', value: 'fechaInicio' },
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
-            ],
-            headersCode: [
-                { text: 'Codigo', key: 'codigo', value: 'codigo' },
-                { text: 'Usado', key: 'usado', value: 'usado' },
-                { text: 'Activo', key: 'activo', value: 'activo', sortable: false },
             ],
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 arrayRequired: value => !!value.length || 'Mínimo uno selecionado.',
-                min: value => value >= this.coupon.codigos.length || 'No puede ser menor a la cantidad anterior.'
             },
         }
     },
@@ -612,24 +384,21 @@ export default {
             }
 
             let data = {
-                fechaInicio: this.fechaInicio,
-                fechaFin: this.fechaFinal,
                 nombre: this.nombre,
+                dias: this.diasEstancia,
                 descuento: this.descuento,
                 habitaciones: this.habitacionesSelected,
                 tipo: this.tipo,
-                precio: this.precio.id,
-                cantidad: this.cantidad,
                 user: vuex.state.user.id,
             }
 
-            // Llama al servicio para crear un nuevo cupón
-            service.crearCupon(data)
+            // Llama al servicio para crear un nuevo descuento
+            service.crearDescuentoEstadia(data)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogCreate = false
 
-                    this.getCupones()
+                    this.getDescuentos() // Actualiza la lista de descuentos después de crear un nuevo
 
                     Swal.fire({
                         icon: 'success',
@@ -646,17 +415,17 @@ export default {
                 })
         },
         /**
-         * Obtiene la lista de cupones.
+         * Obtiene la lista de descuentos.
          */
-        getCupones() {
+        getDescuentos() {
             this.loading = true
-            this.coupon = {}
+            this.discount = {}
 
-            // Llama al servicio para obtener la lista de cupones
-            service.obtenerCupones()
+            // Llama al servicio para obtener la lista de descuentos
+            service.obtenerDescuentosEstadia()
                 .then(res => {
                     this.loading = false
-                    this.cupones = res
+                    this.descuentos = res
                 })
                 .catch(err => {
                     this.loading = false
@@ -664,7 +433,7 @@ export default {
                 })
         },
         /**
-         * Actualiza un cupón existente.
+         * Actualiza un descuento existente.
          */
         actualizar() {
             this.loadingbtn = true
@@ -675,25 +444,22 @@ export default {
 
             // Prepara los datos para enviar al servidor
             let data = {
-                fechaInicio: this.fechaInicioUpd,
-                fechaFin: this.fechasUpd[1],
                 nombre: this.nombreUpdate,
+                dias: this.diasEstanciaUpdate,
                 descuento: this.descuentoUpdate,
+                activo: this.activo,
                 habitaciones: this.habitacionesSelectedUpdate,
                 tipo: this.tipoUpdate,
-                precio: this.precioUpdate,
-                cantidad: this.cantidadUpdate,
-                activo: this.activo,
                 user: vuex.state.user.id,
             }
 
-            // Llama al servicio para actualizar un cupón existente
-            service.actualizarCupon(data, this.coupon.id)
+            // Llama al servicio para actualizar un descuento existente
+            service.actualizarDescuentoEstadia(data, this.discount.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogUpdate = false
 
-                    this.getCupones()
+                    this.getDescuentos() // Actualiza la lista de descuentos después de la actualización
 
                     Swal.fire({
                         icon: 'success',
@@ -710,18 +476,18 @@ export default {
                 })
         },
         /**
-         * Elimina un cupón.
+         * Elimina un descuento.
          */
         eliminar() {
             this.loadingbtn = true
 
-            // Llama al servicio para eliminar un cupón
-            service.eliminarCupon(this.coupon.id)
+            // Llama al servicio para eliminar un descuento
+            service.eliminarDescuentoEstadia(this.discount.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogDelete = false
 
-                    this.getCupones()
+                    this.getDescuentos() // Actualiza la lista de descuentos después de la eliminación
 
                     Swal.fire({
                         icon: 'success',
@@ -772,26 +538,6 @@ export default {
         save(menu, date) {
             this.$refs[menu].save(date)
         },
-        saveCodigos() {
-            let data = {
-                codigos: this.coupon.codigos
-            }
-
-            service.actualizarCodigosCupon(data)
-                .then(() => {
-                    this.getCupones()
-                })
-                .catch(err => {
-                    this.dialogCodigos = true
-
-                    Swal.fire({
-                        icon: 'error',
-                        text: err.response.data.message,
-                    })
-
-                    console.error(err)
-                })
-        },
         toggleSelect(metodo) {
             this.$nextTick(() => {
                 if (metodo == 'create') {
@@ -825,18 +571,10 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-
-            service.obtenerPrecios()
-                .then(res => {
-                    this.precios = res
-                })
-                .catch(err => {
-                    console.error(err)
-                })
         },
     },
     mounted() {
-        this.getCupones()
+        this.getDescuentos()
         this.getDatos()
     },
 }
