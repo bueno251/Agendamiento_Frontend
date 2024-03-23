@@ -41,6 +41,8 @@
                     <td>{{ item.fechaFin }}</td>
                     <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
                             v-if="item.tipoId == 1">%</span></td>
+                    <td>{{ listHabitaciones(item.habitaciones) }}</td>
+                    <td>{{ item.activo ? 'Activo' : 'Desactivo' }}</td>
                     <td>{{ item.created_at }}</td>
                 </tr>
             </template>
@@ -222,7 +224,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="habitacionesSelectedUpdate" :items="habitaciones"
-                                :rules="[rules.arrayRequired]" item-text="nombre" item-value="id" multiple outlined
+                                :rules="[rules.arrayRequired]" item-text="nombre" return-object multiple outlined
                                 required>
 
                                 <template v-slot:label>
@@ -479,6 +481,8 @@ export default {
                 { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
                 { text: 'Fecha Fin', key: 'fechaFin', value: 'fechaFin' },
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
+                { text: 'Habitaciones', key: 'habitaciones', value: 'habitaciones' },
+                { text: 'Activo', key: 'activo', value: 'activo' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
             rules: {
@@ -562,7 +566,7 @@ export default {
                 nombre: this.nombreUpdate,
                 descuento: this.descuentoUpdate,
                 activo: this.activo,
-                habitaciones: this.habitacionesSelectedUpdate,
+                habitaciones: this.habitacionesSelectedUpdate.map(item => item.id),
                 tipo: this.tipoUpdate,
                 user: vuex.state.user.id,
             }
@@ -664,10 +668,13 @@ export default {
                     if (this.selectAllRoomsUpdate) {
                         this.habitacionesSelectedUpdate = []
                     } else {
-                        this.habitacionesSelectedUpdate = this.habitaciones.map(habitacion => habitacion.id)
+                        this.habitacionesSelectedUpdate = this.habitaciones
                     }
                 }
             })
+        },
+        listHabitaciones(array) {
+            return array.map(item => item.nombre).join(', ')
         },
         getDatos() {
             service.obtenerTiposDescuento()

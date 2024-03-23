@@ -105,126 +105,164 @@
         <v-dialog :value="modalDatosUser" width="90%" persistent>
             <v-card class="pa-5" elevation="5">
                 <v-toolbar elevation="0">
-                    <h2>Información de contacto</h2>
+                    <h2>{{ titulos[steps] }}</h2>
                     <v-spacer></v-spacer>
                     <v-btn icon class="ml-3" @click="modalDatosUser = false"><v-icon>mdi-close-box</v-icon></v-btn>
                 </v-toolbar>
-                <v-form ref="form" v-model="validInfo" @submit.prevent="reservar()">
-                    <v-row>
 
-                        <!-- <v-col cols="12" md="6" sm="6">
-                            <label>
-                                Huesped <span class="red--text">*</span>
-                            </label>
-                            <v-select v-model="huesped" :items="huespedes" item-text="nombre" return-object dense
-                                outlined required>
-                            </v-select>
-                        </v-col> -->
+                <v-window v-model="steps">
+                    <v-window-item>
+                        <v-form ref="form" v-model="validInfo" @submit.prevent="steps++">
+                            <v-row class="pt-5">
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>
-                                Tipo de documento <span class="red--text">*</span>
-                            </label>
-                            <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
-                                no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
-                                required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>
+                                        Tipo de documento <span class="red--text">*</span>
+                                    </label>
+                                    <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
+                                        no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense
+                                        outlined required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Número Documento <span class="red--text">*</span></label>
-                            <v-text-field v-model="cedula" :rules="[rules.required]" type="number" hide-spin-buttons
-                                dense outlined required>
-                            </v-text-field>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Número Documento <span class="red--text">*</span></label>
+                                    <v-text-field v-model="documento" :rules="[rules.required]" type="number"
+                                        hide-spin-buttons dense outlined required>
+                                    </v-text-field>
+                                </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Nombre <span class="red--text">*</span></label>
-                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
-                            </v-text-field>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
+                                    <v-text-field v-model="correo" :rules="[rules.email]" type="email"
+                                        :required="correoRequired" dense outlined>
+                                    </v-text-field>
+                                </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Apellido <span class="red--text">*</span></label>
-                            <v-text-field v-model="apellido" :rules="[rules.required]" dense outlined required>
-                            </v-text-field>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Telefono <span class="red--text">*</span></label>
+                                    <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]"
+                                        type="number" hide-spin-buttons dense outlined required>
+                                    </v-text-field>
+                                </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
-                            <v-text-field v-model="correo" :rules="[rules.email]" type="email"
-                                :required="correoRequired" dense outlined>
-                            </v-text-field>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>País De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="paisResidencia" :items="paises"
+                                        no-data-text="Espere un momento..." @change="getDepartamentos('Residencia')"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Telefono <span class="red--text">*</span></label>
-                            <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]" type="number"
-                                hide-spin-buttons dense outlined required>
-                            </v-text-field>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Departamento De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
+                                        no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                                        :rules="[rules.required]" :loading="loadingDepartamentosResidencia"
+                                        item-text="nombre" item-value="id" outlined dense required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>País De Residencia <span class="red--text">*</span></label>
-                            <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
-                                @change="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
-                                item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Ciudad De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
+                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                        :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined
+                                        dense required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>Departamento De Residencia <span class="red--text">*</span></label>
-                            <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
-                                no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
-                                :rules="[rules.required]" :loading="loadingDepartamentosResidencia" item-text="nombre"
-                                item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>País De Procedencia <span class="red--text">*</span></label>
+                                    <v-select v-model="paisProcedencia" :items="paises"
+                                        no-data-text="Espere un momento..." @change="getDepartamentos('Procedencia')"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>Ciudad De Residencia <span class="red--text">*</span></label>
-                            <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
-                                no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                                :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined dense
-                                required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Departamento De Procedencia<span class="red--text">*</span></label>
+                                    <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
+                                        no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
+                                        :rules="[rules.required]" :loading="loadingDepartamentosProcedencia"
+                                        item-text="nombre" item-value="id" outlined dense required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>País De Procedencia <span class="red--text">*</span></label>
-                            <v-select v-model="paisProcedencia" :items="paises" no-data-text="Espere un momento..."
-                                @change="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
-                                item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Ciudad De Procedencia<span class="red--text">*</span></label>
+                                    <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
+                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                        :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id"
+                                        outlined dense required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>Departamento De Procedencia<span class="red--text">*</span></label>
-                            <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
-                                no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
-                                :rules="[rules.required]" :loading="loadingDepartamentosProcedencia" item-text="nombre"
-                                item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Motivo De Viaje <span class="red--text">*</span></label>
+                                    <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
 
-                        <v-col cols="12" md="4" sm="6">
-                            <label>Ciudad De Procedencia<span class="red--text">*</span></label>
-                            <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
-                                no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                                :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id" outlined dense
-                                required>
-                            </v-select>
-                        </v-col>
+                            </v-row>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Motivo De Viaje <span class="red--text">*</span></label>
-                            <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
-                                :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense required>
-                            </v-select>
-                        </v-col>
+                            <div class="buttons">
+                                <v-btn @click="modalDatosUser = false" color="blue">
+                                    cancelar
+                                </v-btn>
+                                <v-btn :disabled="!validInfo" :loading="loading" color="light-green" type="submit">
+                                    Continuar
+                                </v-btn>
+                            </div>
+                        </v-form>
+                    </v-window-item>
 
-                    </v-row>
-                </v-form>
+                    <v-window-item>
+                        <v-form ref="form" v-model="validHuespedes" @submit.prevent="checkHuespedes">
+                            <v-row class="pt-5">
+
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>
+                                        Huesped
+                                    </label>
+                                    <v-select v-model="huesped" :items="huespedes"
+                                        :item-text="item => `${item.nombre} ${item.apellido}`" return-object dense
+                                        outlined required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Nombre <span class="red--text">*</span></label>
+                                    <v-text-field v-model="huesped.nombre" :rules="[rules.required]" dense outlined
+                                        required>
+                                    </v-text-field>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Apellido <span class="red--text">*</span></label>
+                                    <v-text-field v-model="huesped.apellido" :rules="[rules.required]" dense outlined
+                                        required>
+                                    </v-text-field>
+                                </v-col>
+
+                            </v-row>
+
+                            <div class="buttons">
+                                <v-btn @click="steps--" color="blue">
+                                    cancelar
+                                </v-btn>
+                                <v-btn :disabled="!validHuespedes" :loading="loading" color="light-green" type="submit">
+                                    Continuar
+                                </v-btn>
+                            </div>
+                        </v-form>
+                    </v-window-item>
+                </v-window>
+
             </v-card>
         </v-dialog>
 
@@ -242,19 +280,19 @@ export default {
     data() {
         return {
             reserva: vuex.state.reserva,
-            cedula: vuex.state.reserva.cedula,
+            documento: vuex.state.reserva.documento,
             roomid: vuex.state.reserva.room.id,
             tipoDocumento: '',
-            nombre: '',
-            apellido: '',
             correo: '',
             telefono: vuex.state.reserva.telefono,
             monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
             motivo: 1,
+            steps: 0,
             metodoPago: { id: 0 },
             porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
+            validHuespedes: false,
             modalDatosUser: false,
             loading: false,
             correoRequired: true,
@@ -277,6 +315,10 @@ export default {
             ciudadesResidencia: [],
             ciudadesProcedencia: [],
             motivos: [],
+            titulos: [
+                'Información de contacto',
+                'Información de huespedes',
+            ],
             huespedes: [],
             huesped: {},
             divisa: {
@@ -325,9 +367,7 @@ export default {
             // Construye el objeto de datos para la reserva
             let data = {
                 tipoDocumento: this.tipoDocumento,
-                cedula: this.cedula,
-                nombre: this.nombre,
-                apellido: this.apellido,
+                documento: this.documento,
                 correo: this.correo,
                 telefono: this.telefono,
                 dateIn: this.reserva.dateIn,
@@ -375,6 +415,21 @@ export default {
             let resultado = partes.length === 2 ? parteEnteraFormateada + ',' + partes[1] : parteEnteraFormateada;
 
             return resultado;
+        },
+        checkHuespedes() {
+            for (let i = 0; i < this.huespedes.length; i++) {
+                const huesped = this.huespedes[i]
+
+                if (huesped.nombre == "" || huesped.apellido == "") {
+                    this.huesped = huesped
+                    return
+                }
+            }
+
+            Swal.fire({
+                icon: 'success',
+                text: 'Guardar Reserva(pendiente)',
+            })
         },
         async getDatos() {
             service.obtenerMetodosPago()
@@ -446,23 +501,25 @@ export default {
                         for (let i = 0; i < this.reserva.adultos; i++) {
                             let huesped = {
                                 nombre: `Huesped ${i + 1}`,
+                                apellido: '',
                             }
 
                             this.huespedes.push(huesped)
                         }
+
+                        this.huesped = this.huespedes[0]
                     }
                 })
                 .catch(err => {
                     console.error(err)
                 })
 
-            await service.encontrarClienteDocumento(this.cedula)
+            await service.encontrarClienteDocumento(this.documento)
                 .then(res => {
                     if ('id' in res) {
                         this.tipoDocumento = res.tipo_documento_id
-                        this.nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
-                        this.apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
-                        this.telefono = res.telefono
+                        this.huespedes[0].nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
+                        this.huespedes[0].apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
                         this.paisResidencia = res.paisId
                         this.departamentoResidencia = res.departamentoId
                         this.ciudadResidencia = res.ciudadId

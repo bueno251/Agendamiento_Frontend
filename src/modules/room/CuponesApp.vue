@@ -44,6 +44,8 @@
                     <td>{{ item.fechaFin }}</td>
                     <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
                             v-if="item.tipoId == 1">%</span></td>
+                    <td>{{ listHabitaciones(item.habitaciones) }}</td>
+                    <td>{{ item.activo ? 'Activo' : 'Desactivo' }}</td>
                     <td>{{ item.created_at }}</td>
                 </tr>
             </template>
@@ -255,7 +257,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <v-select v-model="habitacionesSelectedUpdate" :items="habitaciones"
-                                :rules="[rules.required]" item-text="nombre" item-value="id" multiple outlined required>
+                                :rules="[rules.required]" item-text="nombre" return-object multiple outlined required>
 
                                 <template v-slot:label>
                                     Habitaciones afectadas <span class="red--text">*</span>
@@ -589,6 +591,8 @@ export default {
                 { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
                 { text: 'Fecha Fin', key: 'fechaFin', value: 'fechaFin' },
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
+                { text: 'Habitaciones', key: 'habitaciones', value: 'habitaciones' },
+                { text: 'Activo', key: 'activo', value: 'activo' },
                 { text: 'Creado', key: 'created_at', value: 'created_at' },
             ],
             headersCode: [
@@ -679,9 +683,9 @@ export default {
                 fechaFin: this.fechasUpd[1],
                 nombre: this.nombreUpdate,
                 descuento: this.descuentoUpdate,
-                habitaciones: this.habitacionesSelectedUpdate,
+                habitaciones: this.habitacionesSelectedUpdate.map(item => item.id),
                 tipo: this.tipoUpdate,
-                precio: this.precioUpdate,
+                precio: this.precioUpdate.id,
                 cantidad: this.cantidadUpdate,
                 activo: this.activo,
                 user: vuex.state.user.id,
@@ -804,10 +808,13 @@ export default {
                     if (this.selectAllRoomsUpdate) {
                         this.habitacionesSelectedUpdate = []
                     } else {
-                        this.habitacionesSelectedUpdate = this.habitaciones.map(habitacion => habitacion.id)
+                        this.habitacionesSelectedUpdate = this.habitaciones
                     }
                 }
             })
+        },
+        listHabitaciones(array) {
+            return array.map(item => item.nombre).join(', ')
         },
         getDatos() {
             service.obtenerTiposDescuento()
