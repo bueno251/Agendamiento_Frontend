@@ -227,6 +227,7 @@
                                     <span v-if="descuentoEstadia.tipoId == 2">$</span>
                                     {{ comaEnMiles(descuentoEstadia.descuento) }}
                                     <span v-if="descuentoEstadia.tipoId == 1">%</span>
+                                    (Por dia)
                                 </label>
                             </div>
 

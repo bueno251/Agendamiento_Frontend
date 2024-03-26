@@ -83,6 +83,9 @@
                             <label>Monto <span class="red--text">*</span></label>
                             <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
+
+                            Pendiente de pago el dia de llegada ${{ comaEnMiles(reserva.valorSeparacion) }} {{
+                        divisa.codigo }}
                         </v-col>
 
                         <v-col v-if="metodoPago.requiereComprobante" cols="12" md="6" sm="6">
@@ -106,133 +109,36 @@
             <v-card class="pa-5" elevation="5">
                 <v-toolbar elevation="0">
                     <h2>{{ titulos[steps] }}</h2>
+                    <v-col v-if="steps == 0" class="py-0" cols="12" md="6" sm="6">
+                        <v-select v-model="huesped" :items="huespedes" @change="changeHuesped"
+                            :item-text="item => `${item.nombre} ${item.apellido}`" return-object hide-details dense
+                            outlined required>
+                        </v-select>
+                    </v-col>
                     <v-spacer></v-spacer>
                     <v-btn icon class="ml-3" @click="modalDatosUser = false"><v-icon>mdi-close-box</v-icon></v-btn>
                 </v-toolbar>
 
                 <v-window v-model="steps">
                     <v-window-item>
-                        <v-form ref="form" v-model="validInfo" @submit.prevent="steps++">
+                        <v-form ref="form" v-model="validHuesped" @submit.prevent="reservar">
                             <v-row class="pt-5">
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>
                                         Tipo de documento <span class="red--text">*</span>
                                     </label>
-                                    <v-select v-model="tipoDocumento" :items="tipoDocuments" :rules="[rules.required]"
-                                        no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense
-                                        outlined required>
+                                    <v-select v-model="huesped.tipoDocumento" :items="tipoDocuments"
+                                        :rules="[rules.required]" no-data-text="Espere un momento..." item-text="tipo"
+                                        item-value="id" dense outlined required>
                                     </v-select>
                                 </v-col>
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>Número Documento <span class="red--text">*</span></label>
-                                    <v-text-field v-model="documento" :rules="[rules.required]" type="number"
-                                        hide-spin-buttons dense outlined required>
-                                    </v-text-field>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="6" sm="6">
-                                    <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
-                                    <v-text-field v-model="correo" :rules="[rules.email]" type="email"
-                                        :required="correoRequired" dense outlined>
-                                    </v-text-field>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="6" sm="6">
-                                    <label>Telefono <span class="red--text">*</span></label>
-                                    <v-text-field v-model="telefono" :rules="[rules.required, rules.phone]"
+                                    <v-text-field v-model="huesped.documento" :rules="[rules.required, rules.unique]"
                                         type="number" hide-spin-buttons dense outlined required>
                                     </v-text-field>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>País De Residencia <span class="red--text">*</span></label>
-                                    <v-select v-model="paisResidencia" :items="paises"
-                                        no-data-text="Espere un momento..." @change="getDepartamentos('Residencia')"
-                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
-                                        required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>Departamento De Residencia <span class="red--text">*</span></label>
-                                    <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
-                                        no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
-                                        :rules="[rules.required]" :loading="loadingDepartamentosResidencia"
-                                        item-text="nombre" item-value="id" outlined dense required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>Ciudad De Residencia <span class="red--text">*</span></label>
-                                    <v-select v-model="ciudadResidencia" :items="ciudadesResidencia"
-                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                                        :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined
-                                        dense required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>País De Procedencia <span class="red--text">*</span></label>
-                                    <v-select v-model="paisProcedencia" :items="paises"
-                                        no-data-text="Espere un momento..." @change="getDepartamentos('Procedencia')"
-                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
-                                        required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>Departamento De Procedencia<span class="red--text">*</span></label>
-                                    <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
-                                        no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
-                                        :rules="[rules.required]" :loading="loadingDepartamentosProcedencia"
-                                        item-text="nombre" item-value="id" outlined dense required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="4" sm="6">
-                                    <label>Ciudad De Procedencia<span class="red--text">*</span></label>
-                                    <v-select v-model="ciudadProcedencia" :items="ciudadesProcedencia"
-                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
-                                        :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id"
-                                        outlined dense required>
-                                    </v-select>
-                                </v-col>
-
-                                <v-col class="py-0" cols="12" md="6" sm="6">
-                                    <label>Motivo De Viaje <span class="red--text">*</span></label>
-                                    <v-select v-model="motivo" :items="motivos" no-data-text="No hay motivos"
-                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
-                                        required>
-                                    </v-select>
-                                </v-col>
-
-                            </v-row>
-
-                            <div class="buttons">
-                                <v-btn @click="modalDatosUser = false" color="blue">
-                                    cancelar
-                                </v-btn>
-                                <v-btn :disabled="!validInfo" :loading="loading" color="light-green" type="submit">
-                                    Continuar
-                                </v-btn>
-                            </div>
-                        </v-form>
-                    </v-window-item>
-
-                    <v-window-item>
-                        <v-form ref="form" v-model="validHuespedes" @submit.prevent="checkHuespedes">
-                            <v-row class="pt-5">
-
-                                <v-col class="py-0" cols="12" md="6" sm="6">
-                                    <label>
-                                        Huesped
-                                    </label>
-                                    <v-select v-model="huesped" :items="huespedes"
-                                        :item-text="item => `${item.nombre} ${item.apellido}`" return-object dense
-                                        outlined required>
-                                    </v-select>
                                 </v-col>
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
@@ -249,14 +155,96 @@
                                     </v-text-field>
                                 </v-col>
 
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Correo <span v-if="correoRequired" class="red--text">*</span></label>
+                                    <v-text-field v-model="huesped.correo" :rules="[rules.email]" type="email"
+                                        :required="correoRequired" dense outlined>
+                                    </v-text-field>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Telefono <span class="red--text">*</span></label>
+                                    <v-text-field v-model="huesped.telefono" :rules="[rules.required, rules.phone]"
+                                        type="number" hide-spin-buttons dense outlined required>
+                                    </v-text-field>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>País De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.paisResidencia" :items="paises"
+                                        no-data-text="Espere un momento..." @change="getDepartamentos('Residencia')"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Departamento De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.departamentoResidencia" :items="departamentosResidencia"
+                                        no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                                        :rules="[rules.required]" :loading="loadingDepartamentosResidencia"
+                                        item-text="nombre" item-value="id" outlined dense required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Ciudad De Residencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.ciudadResidencia" :items="ciudadesResidencia"
+                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                        :loading="loadingCiudadesResidencia" item-text="nombre" item-value="id" outlined
+                                        dense required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>País De Procedencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.paisProcedencia" :items="paises"
+                                        no-data-text="Espere un momento..." @change="getDepartamentos('Procedencia')"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Departamento De Procedencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.departamentoProcedencia"
+                                        :items="departamentosProcedencia" no-data-text="Seleccione un pais"
+                                        @change="getCiudades('Procedencia')" :rules="[rules.required]"
+                                        :loading="loadingDepartamentosProcedencia" item-text="nombre" item-value="id"
+                                        outlined dense required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="4" sm="6">
+                                    <label>Ciudad De Procedencia <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.ciudadProcedencia" :items="ciudadesProcedencia"
+                                        no-data-text="Seleccione un departamento" :rules="[rules.required]"
+                                        :loading="loadingCiudadesProcedencia" item-text="nombre" item-value="id"
+                                        outlined dense required>
+                                    </v-select>
+                                </v-col>
+
+                                <v-col class="py-0" cols="12" md="6" sm="6">
+                                    <label>Motivo De Viaje <span class="red--text">*</span></label>
+                                    <v-select v-model="huesped.motivo" :items="motivos" no-data-text="No hay motivos"
+                                        :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
+                                        required>
+                                    </v-select>
+                                </v-col>
+
                             </v-row>
 
                             <div class="buttons">
-                                <v-btn @click="steps--" color="blue">
+                                <v-btn @click="modalDatosUser = false" color="blue">
                                     cancelar
                                 </v-btn>
-                                <v-btn :disabled="!validHuespedes" :loading="loading" color="light-green" type="submit">
-                                    Continuar
+                                <v-btn v-if="!validHuespedes" :disabled="!validHuesped" :loading="loading"
+                                    color="light-green" @click="checkHuespedes()">
+                                    continuar
+                                </v-btn>
+                                <v-btn v-else :disabled="!validHuesped" :loading="loading" color="light-green"
+                                    type="submit">
+                                    guardar
                                 </v-btn>
                             </div>
                         </v-form>
@@ -277,14 +265,23 @@ import service from "@/services/service"
 
 export default {
     name: 'PagarReserva',
+    computed: {
+        validHuespedes() {
+            for (let i = 0; i < this.huespedes.length; i++) {
+                const huesped = this.huespedes[i]
+
+                if (!huesped.nombre || !huesped.apellido || !huesped.documento || !huesped.telefono || (!huesped.correo && this.correoRequired)) {
+                    return false
+                }
+            }
+
+            return true
+        },
+    },
     data() {
         return {
             reserva: vuex.state.reserva,
-            documento: vuex.state.reserva.documento,
             roomid: vuex.state.reserva.room.id,
-            tipoDocumento: '',
-            correo: '',
-            telefono: vuex.state.reserva.telefono,
             monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
             motivo: 1,
             steps: 0,
@@ -292,7 +289,7 @@ export default {
             porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
-            validHuespedes: false,
+            validHuesped: false,
             modalDatosUser: false,
             loading: false,
             correoRequired: true,
@@ -301,12 +298,6 @@ export default {
             loadingDepartamentosResidencia: false,
             loadingCiudadesResidencia: false,
             file: null,
-            paisProcedencia: '',
-            departamentoProcedencia: '',
-            ciudadProcedencia: '',
-            paisResidencia: '',
-            departamentoResidencia: '',
-            ciudadResidencia: '',
             metodosPago: [],
             tipoDocuments: [],
             paises: [],
@@ -316,7 +307,6 @@ export default {
             ciudadesProcedencia: [],
             motivos: [],
             titulos: [
-                'Información de contacto',
                 'Información de huespedes',
             ],
             huespedes: [],
@@ -353,6 +343,11 @@ export default {
 
                     return true
                 },
+                unique: value => {
+                    const res = this.huespedes.filter(item => item.documento == value)
+
+                    return res.length == 1 || 'Documento ya usado'
+                },
             },
         }
     },
@@ -365,20 +360,28 @@ export default {
             this.loading = true
 
             // Construye el objeto de datos para la reserva
+
+            this.huespedes.forEach(huesped => {
+                let names = huesped.nombre.split(' ')
+                let lastnames = huesped.apellido.split(' ')
+
+                huesped.nombre1 = names[0]
+                huesped.nombre2 = names[1] ? names[1] : null
+
+                huesped.apellido1 = lastnames[0]
+                huesped.apellido2 = lastnames[1] ? lastnames[1] : null
+            })
+
+            console.log(this.huespedes)
+
             let data = {
-                tipoDocumento: this.tipoDocumento,
-                documento: this.documento,
-                correo: this.correo,
-                telefono: this.telefono,
                 dateIn: this.reserva.dateIn,
                 dateOut: this.reserva.dateOut,
                 room: this.reserva.room.id,
                 adultos: this.reserva.adultos,
                 niños: this.reserva.niños,
                 precio: this.reserva.precioTotal,
-                motivo: this.motivo,
-                ciudadResidencia: this.ciudadResidencia,
-                ciudadProcedencia: this.ciudadProcedencia,
+                huespedes: this.huespedes,
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
@@ -420,16 +423,17 @@ export default {
             for (let i = 0; i < this.huespedes.length; i++) {
                 const huesped = this.huespedes[i]
 
-                if (huesped.nombre == "" || huesped.apellido == "") {
+                if (!huesped.nombre || !huesped.apellido || !huesped.documento || !huesped.telefono || (!huesped.correo && this.correoRequired)) {
                     this.huesped = huesped
                     return
                 }
             }
-
-            Swal.fire({
-                icon: 'success',
-                text: 'Guardar Reserva(pendiente)',
-            })
+        },
+        changeHuesped() {
+            this.getDepartamentos('Residencia')
+            this.getDepartamentos('Procedencia')
+            this.getCiudades('Residencia')
+            this.getCiudades('Procedencia')
         },
         async getDatos() {
             service.obtenerMetodosPago()
@@ -485,36 +489,42 @@ export default {
             service.obtenerConfigFormReserva()
                 .then(async res => {
                     if ('id' in res) {
-                        // Asigna los valores predeterminados obtenidos a las variables del componente
-                        this.tipoDocumento = res.tipoDocumento
-                        this.paisResidencia = res.paisResidencia
-                        this.getDepartamentos('Residencia')
-                        this.paisProcedencia = res.paisProcedencia
-                        this.getDepartamentos('Procedencia')
-                        this.departamentoResidencia = res.departamentoResidencia
-                        this.getCiudades('Residencia')
-                        this.departamentoProcedencia = res.departamentoProcedencia
-                        this.getCiudades('Procedencia')
-                        this.ciudadResidencia = res.ciudadResidencia
-                        this.ciudadProcedencia = res.ciudadProcedencia
 
                         for (let i = 0; i < this.reserva.adultos; i++) {
                             let huesped = {
+                                tipoDocumento: res.tipoDocumento,
+                                documento: '',
                                 nombre: `Huesped ${i + 1}`,
                                 apellido: '',
+                                paisResidencia: res.paisResidencia,
+                                departamentoResidencia: res.departamentoResidencia,
+                                ciudadResidencia: res.ciudadResidencia,
+                                paisProcedencia: res.paisProcedencia,
+                                departamentoProcedencia: res.departamentoProcedencia,
+                                ciudadProcedencia: res.ciudadProcedencia,
+                                motivo: 1,
+                                responsable: false,
                             }
 
                             this.huespedes.push(huesped)
                         }
 
+                        this.huespedes[0].documento = this.reserva.documento
+                        this.huespedes[0].telefono = this.reserva.telefono
+                        this.huespedes[0].responsable = true
                         this.huesped = this.huespedes[0]
+
+                        this.getDepartamentos('Residencia')
+                        this.getDepartamentos('Procedencia')
+                        this.getCiudades('Residencia')
+                        this.getCiudades('Procedencia')
                     }
                 })
                 .catch(err => {
                     console.error(err)
                 })
 
-            await service.encontrarClienteDocumento(this.documento)
+            await service.encontrarClienteDocumento(this.reserva.documento)
                 .then(res => {
                     if ('id' in res) {
                         this.tipoDocumento = res.tipo_documento_id
@@ -532,29 +542,23 @@ export default {
         async getDepartamentos(tipo = '') {
             const tipoMap = {
                 'Residencia': {
-                    pais: this.paisResidencia,
+                    pais: this.huesped.paisResidencia,
                     loading: 'loadingDepartamentosResidencia',
-                    departamento: 'departamentoResidencia',
                     departamentos: 'departamentosResidencia',
-                    ciudad: 'ciudadResidencia',
                     ciudades: 'ciudadesResidencia'
                 },
                 'Procedencia': {
-                    pais: this.paisProcedencia,
+                    pais: this.huesped.paisProcedencia,
                     loading: 'loadingDepartamentosProcedencia',
-                    departamento: 'departamentoProcedencia',
                     departamentos: 'departamentosProcedencia',
-                    ciudad: 'ciudadProcedencia',
                     ciudades: 'ciudadesProcedencia'
                 }
             };
 
-            const { pais, loading, departamento, departamentos, ciudad, ciudades } = tipoMap[tipo]
+            const { pais, loading, departamentos, ciudades } = tipoMap[tipo]
 
             this[loading] = true
-            this[departamento] = ''
             this[departamentos] = []
-            this[ciudad] = ''
             this[ciudades] = []
 
             try {
@@ -571,23 +575,20 @@ export default {
         async getCiudades(tipo = '') {
             const tipoMap = {
                 'Residencia': {
-                    departamento: this.departamentoResidencia,
+                    departamento: this.huesped.departamentoResidencia,
                     loading: 'loadingCiudadesResidencia',
-                    ciudad: 'ciudadResidencia',
                     ciudades: 'ciudadesResidencia'
                 },
                 'Procedencia': {
-                    departamento: this.departamentoProcedencia,
+                    departamento: this.huesped.departamentoProcedencia,
                     loading: 'loadingCiudadesProcedencia',
-                    ciudad: 'ciudadProcedencia',
                     ciudades: 'ciudadesProcedencia'
                 }
             }
 
-            const { departamento, loading, ciudad, ciudades } = tipoMap[tipo]
+            const { departamento, loading, ciudades } = tipoMap[tipo]
 
             this[loading] = true
-            this[ciudad] = ''
 
             try {
                 const res = await service.obtenerCiudades(departamento)
