@@ -3,14 +3,11 @@
         <section class="room">
 
             <article class="room-info pa-5">
-                <h1 class="mb-5">
-                    {{ room.nombre }}
+                <h1 class="mb-5 text-center">
+                    {{ room.nombre }} ({{ room.tipo }})
                 </h1>
-                <span>
-                    {{ room.tipo }}
-                </span>
 
-                <v-carousel v-model="model" cycle show-arrows-on-hover hide-delimiter-background>
+                <v-carousel cycle show-arrows-on-hover hide-delimiter-background>
                     <v-carousel-item v-for="img in room.imgs" :key="img.id">
                         <v-sheet height="100%" tile>
                             <v-card class="portrait" :img="rootBackend + img.url" height="100%" width="auto"></v-card>
@@ -35,23 +32,25 @@
                                 Día
                             </th>
                             <th>
-                                Normal
+                                Precios
                             </th>
                             <th>
-                                Con Iva
-                            </th>
-                            <th>
-                                Jornada
+                                Previo A Festivo
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(day, i) in room.precios" :key="day.name">
+                        <tr v-for="(tarifa, i) in precios" :key="tarifa.name">
                             <template v-if="i < 7">
-                                <td>{{ day.name }}</td>
-                                <td>$ {{ comaEnMiles(precioToDolar(day.precio)) }} {{ divisa.codigo }}</td>
-                                <td>$ {{ comaEnMiles(precioToDolar(day.precioConIva)) }} {{ divisa.codigo }}</td>
-                                <td>{{ day.jornada }}</td>
+                                <td>
+                                    {{ tarifa.name }}
+                                </td>
+                                <td>
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.precio)) }} {{ divisa.codigo }}
+                                </td>
+                                <td>
+                                    $ {{ comaEnMiles(precioToDolar(tarifa.previoFestivo)) }} {{ divisa.codigo }}
+                                </td>
                             </template>
                         </tr>
                     </tbody>
@@ -87,19 +86,19 @@
             </article>
         </section>
 
-        <section class="calendar sticky pa-5">
+        <section class="calendar sticky py-5">
             <v-card class="pa-5" elevation="5">
                 <v-form v-model="valid" ref="fechas">
                     <v-row>
 
-                        <v-col cols="12">
+                        <v-col cols="12" class="py-0">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
                                 :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
                                 no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
@@ -118,7 +117,7 @@
                             </v-menu>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
@@ -137,74 +136,121 @@
                             </v-menu>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6" v-if="room.hasDesayuno">
-                            <label>Desayunos<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDesayuno">
+                            <label>Desayunos</label>
+                            <a v-if="desayuno.id != null" class="text-small" @click="dialogMediaDesayunos = true">Ver
+                                Fotos/Videos</a>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
                                 :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
-                                return-object dense outlined>
+                                :readonly="room.incluyeDesayuno" return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6" v-if="room.hasDecoracion">
-                            <label>Decoraciones<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0" v-if="room.tieneDecoracion">
+                            <label>Decoraciones</label>
+                            <a v-if="decoracion.id != null" class="text-small"
+                                @click="dialogMediaDecoraciones = true">Ver
+                                Fotos/Videos</a>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
                                 :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Adultos<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0">
+                            <label>Adultos</label>
                             <v-select v-model="adultos" :items="selectAdultos"
                                 :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="12" md="6" sm="6">
-                            <label>Niños<span class="red--text">*</span></label>
+                        <v-col cols="12" md="6" sm="6" class="py-0">
+                            <label>Niños ({{ edadNiños }} {{ edadNiños > 1 ? 'Años' : 'Año' }} en adelante)</label>
                             <v-select v-model="niños" :items="selectNiños"
                                 :item-text="item => `${item.cantidad} ${item.val > 0 ? '+ $' + comaEnMiles(precioToDolar(item.val)) : ''}`"
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="6">
-                            <label>Valor Adultos</label>
+                        <v-col cols="6" class="py-0">
+                            <label>Valor Adulto Adicional</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAdultos) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="6" class="py-0">
                             <label>Valor Niños</label>
                             <h4>
                                 $ {{ comaEnMiles(precioNiños) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="room.hasDecoracion" cols="6">
+                        <v-col v-if="room.tieneDecoracion" cols="6" class="py-0">
                             <label>Valor Decoración</label>
                             <h4>
                                 $ {{ comaEnMiles(precioDecoracion) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="room.hasDesayuno && !room.incluyeDesayuno" cols="6">
+                        <v-col v-if="room.tieneDesayuno && !room.incluyeDesayuno" cols="6" class="py-0">
                             <label>Valor Desayuno</label>
                             <h4>
                                 $ {{ comaEnMiles(precioDesayuno) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col cols="6">
-                            <label>Precio De La Alojamiento</label>
+                        <v-col cols="6" class="py-0">
+                            <label>Precio Del Alojamiento</label>
                             <h4>
                                 $ {{ comaEnMiles(precioAlojamiento) }} {{ divisa.codigo }}
                             </h4>
                         </v-col>
 
-                        <v-col v-if="porcentajeSeparacion" cols="6">
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
+
+                            <strong v-if="descuentosActive.length">Descuentos:</strong>
+                            <div class="d-flex flex-column">
+                                <label v-for="item in descuentosActive" :key="item.id">
+                                    {{ item.nombre }} :
+                                    <span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
+                                        v-if="item.tipoId == 1">%</span>
+                                </label>
+                            </div>
+
+                            <strong v-if="descuentoEstadia.diasEstadia <= noches">Descuento por
+                                larga estadia:</strong>
+                            <div v-if="descuentoEstadia.diasEstadia <= noches" class="d-flex flex-column">
+                                <label>
+                                    {{ descuentoEstadia.nombre }} ({{ descuentoEstadia.diasEstadia }} dias):
+                                    <span v-if="descuentoEstadia.tipoId == 2">$</span>
+                                    {{ comaEnMiles(descuentoEstadia.descuento) }}
+                                    <span v-if="descuentoEstadia.tipoId == 1">%</span>
+                                    (Por dia)
+                                </label>
+                            </div>
+
+                            <strong v-if="'nombre' in cupon">Cupón:</strong>
+                            <div v-if="'nombre' in cupon" class="d-flex flex-column">
+                                <label>
+                                    {{ cupon.nombre }} :
+                                    <span v-if="cupon.tipoId == 2">$</span>
+                                    {{ comaEnMiles(cupon.descuento) }}
+                                    <span v-if="cupon.tipoId == 1">%</span>
+                                    en {{ cupon.precio }}
+                                </label>
+                                <sub v-if="!fechasValidasCupon()" class="red--text mb-5">Fecha del cupón no valida</sub>
+                            </div>
+
+                            <div v-if="fechasValidasEnCupones()" class="d-flex flex-column">
+                                <label style="text-align: center;">Canjear Código Cupón</label>
+                                <v-otp-input v-model="codigoCupon" :disabled="fechasValidasCupon()" @finish="checkCupon"
+                                    @input="toUpperCase('codigoCupon')"></v-otp-input>
+                            </div>
+                        </v-col>
+
+                        <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
                             <label>Valor Separación {{ porcentajeSeparacion }}%</label>
                             <h4>
                                 $ {{ comaEnMiles(valorSeparacion) }} {{ divisa.codigo }}
@@ -212,7 +258,7 @@
                         </v-col>
 
                         <v-col class="d-flex flex-column align-center flex-grow-0" cols="12">
-                            <h3>Precio Total De La Reserva <span v-if="room.iva">IVA: ({{ room.iva }}%)</span></h3>
+                            <h3>Precio Total De La Reserva</h3>
                             <h1>
                                 $ {{ comaEnMiles(precioTotal) }} {{ divisa.codigo }}
                             </h1>
@@ -231,21 +277,60 @@
 
         <v-dialog :value="datosCliente" width="90%" max-width="500px" persistent>
             <v-card class="pa-5 sticky" elevation="5">
-                <v-form v-model="validDatosCliente" ref="fechas" @submit.prevent="agendar">
+                <v-form v-model="validDatosCliente" @submit.prevent="agendar">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="cedula" :rules="[rules.required]" label="Cedula" type="number"
+                            <v-text-field v-model="documento" :rules="[rules.required]" @focusout="getUser()"
+                                label="Documento" type="number" hide-spin-buttons dense outlined required>
+                            </v-text-field>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-text-field v-model="telefono" :rules="[rules.required]" label="Telefono" type="number"
                                 hide-spin-buttons dense outlined required>
                             </v-text-field>
                         </v-col>
                     </v-row>
+
                     <div class="buttons mt-5">
                         <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validDatosCliente" :loading="loadingbtn" color="light-green" type="submit">
+                        <v-btn :disabled="!validDatosCliente" color="light-green" type="submit">
                             siguiente
                         </v-btn>
                     </div>
                 </v-form>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="dialogMediaDecoraciones" width="90%" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3"
+                        @click="dialogMediaDecoraciones = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-carousel show-arrows-on-hover hide-delimiter-background>
+                    <v-carousel-item v-for="file in decoracion.media" :key="`decoracionFile${file.id}`">
+                        <img v-if="esImagen(file.url)" class="imgCarousel" :src="rootBackend + file.url">
+                        <video v-else class="videoCarousel" :src="rootBackend + file.url" autoplay muted loop></video>
+                    </v-carousel-item>
+                </v-carousel>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog :value="dialogMediaDesayunos" width="90%" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3"
+                        @click="dialogMediaDesayunos = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-carousel show-arrows-on-hover hide-delimiter-background>
+                    <v-carousel-item v-for="file in desayuno.media" :key="`desayunoFile${file.id}`">
+                        <img v-if="esImagen(file.url)" class="imgCarousel" :src="rootBackend + file.url">
+                        <video v-else class="videoCarousel" :src="rootBackend + file.url" autoplay muted loop></video>
+                    </v-carousel-item>
+                </v-carousel>
             </v-card>
         </v-dialog>
     </div>
@@ -253,6 +338,7 @@
 
 <script>
 
+import Swal from 'sweetalert2'
 import service from '@/services/service'
 import colombiaHolidays from 'colombia-holidays'
 
@@ -278,48 +364,179 @@ export default {
             return this.adultos.cantidad + this.niños.cantidad
         },
         /**
-         * Calcula el precio total de la reserva, teniendo en cuenta las fechas de entrada y salida, así como el número de adultos y niños.
+         * Calcula el precio total del alojamiento, teniendo en cuenta las fechas de entrada y salida, los precios por día,
+         * los días festivos, los descuentos por estancia y los cupones.
          */
         precioAlojamiento() {
+            // Inicializa el precio total
             let precio = 0
 
+            // Verifica si se han proporcionado fechas de entrada y salida
             if (this.dates.length === 2) {
+                // Convierte las fechas de entrada y salida en objetos Date
                 let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
                 let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
 
                 // Calcula el precio acumulado por cada día de alojamiento
                 while (fechaInicio < fechaFinal) {
-                    precio += this.precioToDolar(this.room.precios[fechaInicio.getDay()].precioConIva)
+                    // Obtiene el precio normal y el precio festivo del día actual
+                    let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precio)
+                    let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivo)
+                    let descuentoEstadia = 0
 
+                    // Avanza al siguiente día
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
+
+                    // Aplica descuentos por estancia si corresponde
+                    if (this.descuentoEstadia.diasEstadia <= this.noches) {
+                        if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
+                            descuentoEstadia = this.descuentoEstadia.tipo === 'Porcentaje' ?
+                                (precioFestivo * this.descuentoEstadia.descuento / 100) :
+                                this.descuentoEstadia.descuento
+                        } else {
+                            descuentoEstadia = this.descuentoEstadia.tipo === 'Porcentaje' ?
+                                (precioNormal * this.descuentoEstadia.descuento / 100) :
+                                this.descuentoEstadia.descuento
+                        }
+                    }
+
+                    // Aplica el descuento al precio correspondiente
+                    if (this.festivos.includes(fechaInicio.toISOString().split('T')[0])) {
+                        precioFestivo -= descuentoEstadia
+                        precio += precioFestivo
+                    } else {
+                        precioNormal -= descuentoEstadia
+                        precio += precioNormal
+                    }
                 }
             }
 
-            return Number(precio.toFixed(2))
+            // Redondea el precio a 2 decimales
+            precio = Number(precio.toFixed(2))
+
+            // Aplica descuentos de cupón si corresponde
+            let descuentoCupon = 0
+            if (this.cupon.precio === 'Alojamiento' || this.cupon.precio === 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            // Aplica el valor total de los descuentos y el descuento del cupón al precio final
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
+
+            // Devuelve el precio total, asegurándose de que no sea negativo
+            return precio >= 0 ? precio : 0
         },
+        /**
+         * Calcula la cantidad de noches de estancia entre dos fechas.
+         */
+        noches() {
+            // Definir las dos fechas
+            let fechaInicio = new Date(this.fechaLlegada)
+            let fechaFin = new Date(this.fechaSalida)
+
+            // Calcular la diferencia en milisegundos
+            let diferenciaEnMs = fechaFin - fechaInicio
+
+            // Convertir la diferencia de milisegundos a días
+            let nochesDeEstancia = diferenciaEnMs / (1000 * 60 * 60 * 24)
+
+            return nochesDeEstancia
+        },
+        /**
+         * Calcula el precio de los adultos.
+         */
         precioAdultos() {
-            return Number(this.precioToDolar(this.adultos.val))
+            // Convierte el precio de los adultos a dólares
+            let precio = Number(this.precioToDolar(this.adultos.val))
+
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Adulto Adicional' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
         },
+        /**
+         * Calcula el precio de los niños.
+         */
         precioNiños() {
-            return Number(this.precioToDolar(this.niños.val))
+            // Convierte el precio de los niños a dólares
+            let precio = Number(this.precioToDolar(this.niños.val))
+
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Niño Adicional' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
         },
+        /**
+         * Calcula el precio de la decoración.
+         */
         precioDecoracion() {
-            return Number(this.precioToDolar(this.decoracion.precioConIva))
+            // Convierte el precio de la decoración a dólares
+            let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
+
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Decoración' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
         },
+        /**
+         * Calcula el precio del desayuno.
+         */
         precioDesayuno() {
-            return !this.room.incluyeDesayuno ? Number(this.precioToDolar(this.desayuno.precioConIva)) : 0
+            // Verifica si el desayuno está incluido en la habitación
+            // Si está incluido, devuelve 0
+            if (this.room.incluyeDesayuno) {
+                return 0
+            }
+
+            // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes
+            let precio = Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes))
+
+            let descuentoCupon = 0
+            if (this.cupon.precio == 'Desayuno' || this.cupon.precio == 'Todo') {
+                descuentoCupon = this.valorDescuentoCupon(precio)
+            }
+
+            precio -= this.valorDescuento(precio)
+            precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
         },
+        /**
+         * Calcula el valor de la separación basado en el precio total y el porcentaje de separación.
+         */
         valorSeparacion() {
-            return this.precioAlojamiento ? (this.precioAlojamiento * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            // Verifica si hay un precio total
+            // Si hay un precio total, calcula y devuelve el valor de la separación en dólares, redondeado a 2 decimales
+            // Si no hay precio total, devuelve 0
+            return this.precioTotal ? (this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
         },
+        /**
+         * Calcula el precio total de la reserva sumando los precios individuales de alojamiento, adultos, niños, decoración y desayuno.
+         */
         precioTotal() {
+            // Inicializa el precio total en 0
             let precio = 0
 
+            // Suma los precios individuales de alojamiento, adultos, niños, decoración y desayuno al precio total
             precio += this.precioAlojamiento
             precio += this.precioAdultos
             precio += this.precioNiños
             precio += this.precioDecoracion
             precio += this.precioDesayuno
+
+            // Devuelve el precio total de la reserva
             return precio
         },
         /**
@@ -335,8 +552,8 @@ export default {
                 let value = 0
 
                 // Asigna el valor del precio de adultos adicionales si está disponible
-                if (this.room.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.room.precios[7].precioConIva
+                if (this.precios.length > 7) {
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.precios[7].precioConIva
                     value = i > 1 ? precio : 0
                 }
 
@@ -368,20 +585,37 @@ export default {
                 let value = 0
 
                 // Asigna el valor del precio de niños adicionales si está disponible
-                if (this.room.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.room.precios[8].precioConIva
-                    value = i > 1 ? precio : 0
+                if (this.precios.length > 7) {
+                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.precios[8].precioConIva
+                    value = precio
                 }
 
                 let cantidad = i + 1
 
                 niños.push({
                     cantidad: cantidad,
-                    val: value * (cantidad - 2),
+                    val: value * (cantidad),
                 })
             }
 
             return niños
+        },
+        /**
+         * Filtra los descuentos activos que están dentro del rango de fechas de la reserva.
+         */
+        descuentosActive() {
+            // Inicializa un array vacío para almacenar los descuentos activos
+            let array = []
+
+            // Filtra los descuentos activos que están dentro del rango de fechas de la reserva
+            this.descuentos.map(discount => {
+                if (this.fechaLlegada <= discount.fechaInicio && discount.fechaFin <= this.fechaSalida) {
+                    array.push(discount)
+                }
+            });
+
+            // Devuelve el array de descuentos activos
+            return array
         },
     },
     watch: {
@@ -407,7 +641,8 @@ export default {
     },
     data() {
         return {
-            cedula: '',
+            documento: '',
+            telefono: '',
             desayuno: {
                 id: null,
                 nombre: 'Ninguno',
@@ -420,9 +655,12 @@ export default {
             },
             maxDate: '',
             cantidadRooms: 1,
-            model: 0,
             porcentajeSeparacion: 0,
             dolarPrice: 0,
+            edadNiños: 1,
+            codigoCupon: '',
+            dialogMediaDecoraciones: false,
+            dialogMediaDesayunos: false,
             priceInDolar: false,
             dolarPriceAuto: true,
             valid: false,
@@ -433,11 +671,15 @@ export default {
             useGenerales: false,
             menu1: false,
             menu2: false,
-            file: null,
             dates: [],
             datesInvalid: [],
             festivos: [],
             caracteristicas: [],
+            precios: [],
+            descuentos: [],
+            descuentoEstadia: [],
+            cupones: [],
+            cupon: {},
             adultos: {
                 cantidad: 2,
                 val: 0
@@ -453,14 +695,14 @@ export default {
                 {
                     id: null,
                     nombre: 'Ninguno',
-                    precio: 0,
+                    precioConIva: 0,
                 }
             ],
             decoraciones: [
                 {
                     id: null,
                     nombre: 'Ninguna',
-                    precio: 0,
+                    precioConIva: 0,
                 }
             ],
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -486,20 +728,6 @@ export default {
 
                     return true
                 },
-                file: file => {
-                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
-                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf'];
-
-                    if (!file) {
-                        return 'Campo requerido.'
-                    }
-
-                    if (!allowedFormats.includes(file.type) && !allowedExtensions.includes(file.name.slice(-4).toLowerCase())) {
-                        return 'El archivo debe ser una imagen (JPEG, PNG, GIF) o un archivo PDF';
-                    }
-
-                    return true;
-                },
             },
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
@@ -510,26 +738,67 @@ export default {
          * Si la obtención es exitosa, actualiza la variable 'room' con la información de la habitación.
          * En caso de error, redirige al usuario a la vista de habitaciones ('viewRooms').
          */
-        getRoom() {
+        async getRoom() {
+            // Obtiene el ID de la habitación de los parámetros de la ruta
             let id = this.$route.params.id
 
-            service.obtenerRoom(id)
-                .then(res => {
-                    this.room = res
+            try {
+                // Obtiene los detalles de la habitación del servicio
+                let res = await service.obtenerRoom(id)
+
+                // Define una lista de días de la semana con valores predeterminados
+                let week = [
+                    { name: 'Domingo' },
+                    { name: 'Lunes' },
+                    { name: 'Martes' },
+                    { name: 'Miércoles' },
+                    { name: 'Jueves' },
+                    { name: 'Viernes' },
+                    { name: 'Sábado' },
+                    { name: 'Adicional' },
+                    { name: 'Niños' },
+                ]
+
+                // Mapea los precios de la habitación y los asigna a los días correspondientes en la lista de la semana
+                res.precios.map((day) => {
+                    const index = week.findIndex((weekDay) => weekDay.name === day.name)
+
+                    if (index !== -1) {
+                        week[index].precio = day.precio
+                        week[index].precioConIva = day.precioConIva
+                        week[index].previoFestivo = day.previoFestivo
+                        week[index].previoFestivoConIva = day.previoFestivoConIva
+                        week[index].jornada = day.jornada
+                    }
                 })
-                .catch(err => {
-                    console.error(err)
-                    this.$router.push({ name: 'viewRooms' })
-                })
+
+                // Asigna los detalles de la habitación y los precios actualizados a las propiedades correspondientes
+                this.room = res
+                this.precios = week
+
+                // Verifica si la habitación incluye desayuno y actualiza la información del desayuno si es necesario
+                if (res.incluyeDesayuno) {
+                    this.desayunos[0].nombre = 'Incluido'
+                    this.desayuno = {
+                        id: null,
+                        nombre: 'Incluido',
+                        precioConIva: 0,
+                    }
+                }
+            } catch (err) {
+                // Maneja el error y redirige a la vista de habitaciones en caso de fallo
+                console.error(err)
+                this.$router.push({ name: 'viewRooms' })
+            }
         },
         /**
-         * Inicia el proceso de agendamiento.
-         * Prepara la información necesaria (fechas, habitación, cantidad de personas, etc.) y la almacena en el estado global.
-         * Luego, redirige al usuario a la vista de pago ('pagar').
+         * Inicia el proceso de agendamiento y redirige a la página de pago.
          */
         agendar() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loadingbtn = true
 
+            // Prepara los datos de la reserva
             let data = {
                 dateIn: this.fechaLlegada,
                 dateOut: this.fechaSalida,
@@ -543,20 +812,31 @@ export default {
                 precioDesayuno: this.precioDesayuno,
                 valorSeparacion: this.valorSeparacion,
                 precioTotal: this.precioTotal,
-                cedula: this.cedula,
+                precioNeto: this.precioNeto,
+                documento: this.documento,
+                telefono: this.telefono,
+                noches: this.noches,
                 cantidad_rooms: this.cantidadRooms,
             }
 
+            // Verifica si se ha seleccionado un desayuno y lo agrega a los datos de la reserva si es necesario
             if (this.desayuno) {
                 data.desayuno = this.desayuno
             }
 
+            // Verifica si se ha seleccionado una decoración y la agrega a los datos de la reserva si es necesario
             if (this.decoracion) {
                 data.decoracion = this.decoracion
             }
 
+            if ('id' in this.cupon) {
+                data.cupon = this.cupon
+            }
+
+            // Despacha la acción para establecer los datos de la reserva en el almacenamiento global
             this.$store.dispatch('setReserva', data)
 
+            // Redirige a la página de pago
             this.$router.push({ name: 'pagar' })
         },
         /**
@@ -578,12 +858,20 @@ export default {
 
             return resultado;
         },
+        /**
+         * Convierte un precio de la moneda local a dólares si está habilitada la opción de mostrar en dólares.
+         * @param {number} numero - El precio en la moneda local.
+         * @returns {number} - El precio convertido a dólares, si está habilitada la opción; de lo contrario, devuelve el precio original.
+         */
         precioToDolar(numero) {
+            // Verifica si la opción de mostrar en dólares está habilitada
             if (!this.priceInDolar) {
-                return numero
+                // Si no está habilitada, devuelve el precio original
+                return numero;
             }
 
-            return parseFloat((numero / this.dolarPrice).toFixed(2))
+            // Calcula el precio en dólares y redondea a 2 decimales
+            return parseFloat((numero / this.dolarPrice).toFixed(2));
         },
         /**
          * Obtiene los días festivos en Colombia.
@@ -648,25 +936,45 @@ export default {
             return room.caracteristicas.includes(caracteris.id)
         },
         /**
+         * Verifica si una URL corresponde a una imagen basándose en su extensión.
+         * @param {string} url - La URL de la imagen.
+         * @returns {boolean} True si la URL corresponde a una imagen, False en caso contrario.
+         */
+        esImagen(url) {
+            // Extraer la extensión del archivo de la URL
+            const extension = url.split('.').pop().toLowerCase()
+
+            // Lista de extensiones de archivos de imagen
+            const extensionesImagen = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg']
+
+            // Verificar si la extensión está en la lista de extensiones de imagen
+            return extensionesImagen.includes(extension)
+        },
+        /**
          * Obtiene la información de desayunos, decoraciones y características para ser utilizada en el agendamiento.
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
          */
         getDatos() {
-            service.obtenerDesayunos()
-                .then(res => {
-                    this.desayunos = [...this.desayunos, ...res]
-                })
-                .catch(err => {
-                    console.error(err)
-                })
 
-            service.obtenerDecoraciones()
-                .then(res => {
-                    this.decoraciones = [...this.decoraciones, ...res]
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+            if (this.room.tieneDesayuno) {
+                service.obtenerDesayunos()
+                    .then(res => {
+                        this.desayunos = [...this.desayunos, ...res]
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+            }
+
+            if (this.room.tieneDecoracion) {
+                service.obtenerDecoraciones()
+                    .then(res => {
+                        this.decoraciones = [...this.decoraciones, ...res]
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+            }
 
             service.obtenerCaracteristicas()
                 .then(res => {
@@ -675,41 +983,207 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        async getDefault() {
 
-            service.obtenerConfigReserva()
+            service.obtenerDescuentos(this.room.id)
                 .then(res => {
-                    this.porcentajeSeparacion = res.porcentajeSeparacion
-                    this.useGenerales = res.tarifasGenerales
+                    this.descuentos = res
                 })
                 .catch(err => {
                     console.error(err)
                 })
 
+            service.obtenerDescuentosEstadia(this.room.id)
+                .then(res => {
+                    this.descuentoEstadia = res.reduce((menorDescuento, descuento) => {
+                        return descuento.diasEstadia < menorDescuento.diasEstadia ? descuento : menorDescuento
+                    })
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerCupones(this.room.id)
+                .then(res => {
+                    this.cupones = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
+        /**
+         * Obtiene los valores predeterminados, como la configuración de reserva, la divisa, y los valores relacionados con los precios en dólares.
+         */
+        async getDefault() {
             try {
+                // Obtiene la configuración de reserva
+                await service.obtenerConfigReserva()
+                    .then(res => {
+                        // Asigna los valores de la configuración de reserva a las propiedades correspondientes
+                        this.porcentajeSeparacion = res.porcentajeSeparacion
+                        this.useGenerales = res.tarifasGenerales
+                        this.edadNiños = res.edadTarifaNiños
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    })
+
+                // Obtiene los valores predeterminados del servicio
                 let res = await service.obtenerValoresDefault()
+
+                // Asigna los valores obtenidos a las propiedades correspondientes
                 this.divisa = res.divisa
                 this.priceInDolar = res.priceInDolar
                 this.dolarPriceAuto = res.dolarPriceAuto
                 this.dolarPrice = res.dolarPrice
 
-                if (this.dolarPriceAuto) {
+                // Verifica si la opción de mostrar en dólares y el precio automático del dólar están habilitados
+                if (this.priceInDolar && this.dolarPriceAuto) {
+                    // Si están habilitados, obtiene el precio actual del dólar
                     res = await service.valorDolar()
                     this.dolarPrice = res.valor
                 }
             } catch (err) {
+                // Maneja el error estableciendo la opción de mostrar en dólares como falsa y registrando el error
                 this.priceInDolar = false
                 console.error(err)
             }
-
         },
+        /**
+         * Invoca el método de guardado de la fecha de un componente referenciado.
+         * @param {string} menu - La referencia del componente al que se desea acceder.
+         * @param {Date} date - La fecha que se pasa al método de guardado.
+         * @returns {void}
+         */
         save(menu, date) {
+            // Utiliza la referencia proporcionada para acceder al componente y llamar a su método save con la fecha proporcionada
             this.$refs[menu].save(date)
+        },
+        /**
+         * Calcula el valor de descuento aplicado a un precio especifico.
+         */
+        valorDescuento(precio) {
+            // Inicializa el descuento en 0
+            let descuento = 0
+
+            // Itera sobre cada descuento
+            this.descuentos.forEach(discount => {
+                // Verifica si las fechas de llegada y salida están dentro del rango de fechas del descuento
+                if (this.fechaLlegada <= discount.fechaInicio && this.fechaSalida >= discount.fechaFin) {
+                    // Aplica el descuento según el tipo (Porcentaje o Valor Fijo)
+                    if (discount.tipo == 'Porcentaje') {
+                        // Si el descuento es de tipo porcentaje, calcula el descuento en base al precio y lo agrega al descuento
+                        descuento += (precio * discount.descuento / 100)
+                    } else {
+                        // Si el descuento es de valor fijo, simplemente lo agrega al descuento
+                        descuento += discount.descuento
+                    }
+                }
+            });
+
+            // Devuelve el descuento total
+            return descuento
+        },
+        /**
+         * Calcula el valor del descuento aplicable al precio del alojamiento según el cupón.
+         * @param {number} precio - El precio del alojamiento antes de aplicar el descuento del cupón.
+         * @returns {number} El valor del descuento del cupón.
+         */
+        valorDescuentoCupon(precio) {
+            // Inicializa el descuento en 0
+            let descuentoCupon = 0
+
+            // Verifica si las fechas del cupón son válidas
+            if (!this.fechasValidasCupon()) {
+                return 0
+            }
+
+            // Aplica el descuento según el tipo de cupón
+            if (this.cupon.tipo === 'Porcentaje') {
+                descuentoCupon += precio * (this.cupon.descuento / 100)
+            }
+
+            if (this.cupon.tipo === 'Precio') {
+                descuentoCupon += this.cupon.descuento
+            }
+
+            return descuentoCupon
+        },
+        /**
+         * Verifica si las fechas de llegada y salida están dentro del período de validez de al menos uno de los cupones.
+         * @returns {boolean} True si las fechas están dentro del período de validez de al menos un cupón, False en caso contrario.
+         */
+        fechasValidasEnCupones() {
+            // Itera sobre los cupones disponibles
+            for (let i = 0; i < this.cupones.length; i++) {
+                const cupon = this.cupones[i]
+
+                // Verifica si las fechas de llegada y salida están dentro del período de validez del cupón actual
+                if (this.dates.length === 2 && cupon.fechaInicio <= this.fechaLlegada && this.fechaSalida <= cupon.fechaFin) {
+                    return true
+                }
+            }
+
+            return false
+        },
+        /**
+         * Verifica si las fechas de llegada y salida están dentro del período de validez del cupón actual.
+         * @returns {boolean} True si las fechas están dentro del período de validez del cupón, False en caso contrario.
+         */
+        fechasValidasCupon() {
+            return this.dates.length === 2 && this.cupon.fechaInicio <= this.fechaLlegada && this.fechaSalida <= this.cupon.fechaFin;
+        },
+        /**
+         * Verifica el cupón ingresado y actualiza el cupón actual en base a la respuesta del servicio.
+         */
+        checkCupon() {
+            // Llama al servicio para obtener información sobre el cupón
+            service.obtenerCupon(this.codigoCupon, this.room.id)
+                .then(res => {
+                    // Actualiza el cupón actual con la respuesta del servicio
+                    this.cupon = res
+                })
+                .catch(err => {
+                    // Muestra un mensaje de error si ocurre algún problema al obtener el cupón
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: err.response.data.message,
+                    })
+                })
+        },
+        /**
+         * Convierte el valor de una variable a mayúsculas.
+         * @param {string} variable - El nombre de la variable cuyo valor se convertirá a mayúsculas.
+         */
+        toUpperCase(variable) {
+            try {
+                // Convierte el valor de la variable a mayúsculas
+                this[variable] = this[variable].toUpperCase()
+            } catch (err) {
+                // Maneja cualquier error que pueda ocurrir durante la conversión
+                console.error('Error al convertir a mayúsculas:', err)
+            }
+        },
+        /**
+         * Obtiene la información del usuario mediante su número de cédula y actualiza el teléfono del usuario actual.
+         */
+        getUser() {
+            // Busca al cliente usando su número de cédula
+            service.encontrarClienteDocumento(this.documento)
+                .then(res => {
+                    // Verifica si se encontró al cliente y actualiza el teléfono si está disponible
+                    if ('id' in res) {
+                        this.telefono = res.telefono
+                    }
+                })
+                .catch(err => {
+                    // Maneja cualquier error que pueda ocurrir durante la búsqueda del cliente
+                    console.error(err)
+                })
         },
     },
     async mounted() {
-        this.getRoom()
+        await this.getRoom()
         await this.getDefault()
         this.getDates()
         this.getDatos()
@@ -763,7 +1237,7 @@ h2 {
 
 .sticky {
     position: sticky;
-    top: 20px;
+    top: 0px;
 }
 
 .caracteristics {
@@ -784,6 +1258,22 @@ h2 {
 .caracteristic p {
     margin: 0;
     text-align: center;
+}
+
+.imgCarousel {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.videoCarousel {
+    width: 100%;
+    height: 100%;
+}
+
+.text-small {
+    font-size: 65%;
+    padding-inline: 10px;
 }
 
 @media only screen and (max-width: 800px) {

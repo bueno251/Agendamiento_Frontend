@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios from "axios"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -10,6 +11,9 @@ const LOCAL = {
     }
 }
 
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
+
 const SocrataService = {
 
     valorDolar() {
@@ -18,19 +22,9 @@ const SocrataService = {
 
         let url = `https://www.datos.gov.co/resource/32sa-8pi3.json?vigenciahasta=${hoy}`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data[0])
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('valorDolar', url)
     },
 
 }
-
-LOCAL.Axios()
 
 export default SocrataService

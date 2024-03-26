@@ -5,7 +5,7 @@
                 <v-row>
 
                     <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="nombre" :rules="[rules.required]" outlined>
+                        <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined>
 
                             <template v-slot:label>
                                 Nombre <span class="red--text">*</span>
@@ -14,7 +14,7 @@
                     </v-col>
 
                     <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="codigo" :rules="[rules.required]" outlined>
+                        <v-text-field v-model="codigo" :rules="[rules.required]" dense outlined>
 
                             <template v-slot:label>
                                 Código <span class="red--text">*</span>
@@ -24,7 +24,7 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <v-text-field v-model="tasa" type="number" min="0" :rules="[rules.required]" hide-spin-buttons
-                            outlined>
+                            dense outlined>
 
                             <template v-slot:label>
                                 Tasa <span class="red--text">*</span>
@@ -34,7 +34,8 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <v-select v-model="tipo" :items="tiposImpuesto" :rules="[rules.required]"
-                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" outlined required>
+                            no-data-text="Espere un momento..." item-text="tipo" item-value="id" dense outlined
+                            required>
 
                             <template v-slot:label>
                                 Tipo De Impuesto <span class="red--text">*</span>
@@ -46,8 +47,7 @@
 
                 <div class="buttons">
                     <v-btn @click="$emit('close'), $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validCreate" type="submit" :loading="loading"
-                        color="light-green">crear</v-btn>
+                    <v-btn :disabled="!validCreate" type="submit" :loading="loading" color="light-green">crear</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -93,6 +93,7 @@ export default {
                 .then(res => {
                     this.dialogCreate = false
                     this.loading = false
+
                     this.$emit('close')
                     this.$emit('update')
 

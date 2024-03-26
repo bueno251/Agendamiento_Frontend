@@ -5,7 +5,7 @@
                 <v-row>
 
                     <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                        <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
                             <template v-slot:label>
                                 Nombre<span class="red--text">*</span>
                             </template>
@@ -13,7 +13,7 @@
                     </v-col>
 
                     <v-col cols="12" md="6" sm="6">
-                        <v-text-field v-model="capacidad" :rules="[rules.required]" outlined required>
+                        <v-text-field v-model="capacidad" :rules="[rules.required]" dense outlined required>
 
                             <template v-slot:label>
                                 Capacidad<span class="red--text">*</span>
@@ -23,7 +23,7 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <v-select v-model="tipo" :items="tipos" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="tipo" item-value="id" outlined>
+                            :rules="[rules.required]" item-text="tipo" item-value="id" dense outlined>
 
                             <template v-slot:label>
                                 Tipo<span class="red--text">*</span>
@@ -33,7 +33,7 @@
 
                     <v-col cols="12" md="6" sm="6">
                         <v-select v-model="estado" :items="estados" no-data-text="Espere un momento..."
-                            :rules="[rules.required]" item-text="estado" item-value="id" outlined>
+                            :rules="[rules.required]" item-text="estado" item-value="id" dense outlined>
 
                             <template v-slot:label>
                                 Estado<span class="red--text">*</span>
@@ -42,7 +42,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-text-field v-model="cantidad" :rules="[rules.required, rules.min]" outlined required>
+                        <v-text-field v-model="cantidad" :rules="[rules.required, rules.min]" dense outlined required>
 
                             <template v-slot:label>
                                 Cantidad <span class="red--text">*</span>
@@ -51,7 +51,8 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" outlined>
+                        <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" dense
+                            outlined>
 
                             <template v-slot:label>
                                 Decoración <span class="red--text">*</span>
@@ -60,7 +61,7 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" outlined>
+                        <v-select v-model="desayuno" :items="yesNo" item-text="text" item-value="value" dense outlined>
 
                             <template v-slot:label>
                                 Desayuno <span class="red--text">*</span>
@@ -69,7 +70,8 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6" v-if="desayuno">
-                        <v-select v-model="incluyeDesayuno" :items="yesNo" item-text="text" item-value="value" outlined>
+                        <v-select v-model="incluyeDesayuno" :items="yesNo" item-text="text" item-value="value" dense
+                            outlined>
 
                             <template v-slot:label>
                                 Incluir Desayuno <span class="red--text">*</span>
@@ -82,24 +84,28 @@
                             <p>
                                 Tiene Un Impuesto?
                             </p>
-                            <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                            <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
                         </div>
                     </v-col>
 
-                    <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                    <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
-                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
+                            required>
 
                             <template v-slot:label>
                                 Impuesto <span class="red--text">*</span>
                             </template>
 
-                            <template v-slot:append-outer>
-                                <v-btn icon @click="createImpuestoDialog = true">
-                                    <v-icon>
-                                        mdi-plus-circle
-                                    </v-icon>
-                                </v-btn>
+                            <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
                     </v-col>
@@ -146,13 +152,16 @@
                 </v-row>
 
                 <div class="buttons pt-5">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">Actualizar</v-btn>
                 </div>
             </v-form>
         </v-card>
-        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
-            @create="getCaracteristicas(), dialogCreate = false" />
+
+        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false" @update="getCaracteristicas" />
+
+        <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos()" />
+
     </v-dialog>
 </template>
 
@@ -162,6 +171,7 @@ import vuex from "@/store"
 import Swal from 'sweetalert2'
 import service from "@/services/service"
 import CreateCaracteristicRoom from './CreateCaracteristicRoom.vue'
+import createImpuesto from '@/modules/impuestos/components/createImpuesto.vue'
 
 export default {
     name: 'DialogUpdate',
@@ -171,6 +181,7 @@ export default {
     },
     components: {
         CreateCaracteristicRoom,
+        createImpuesto,
     },
     computed: {
         noSelectedCaracteristicas() {
@@ -186,7 +197,7 @@ export default {
             handler(newRoom) {
                 if ("id" in newRoom) {
                     this.nombre = newRoom.nombre
-                    this.hasIva = newRoom.hasIva
+                    this.tieneIva = newRoom.tieneIva
                     this.impuesto = newRoom.impuestoId
                     this.descripcion = newRoom.descripcion
                     this.tipo = newRoom.tipoId
@@ -194,8 +205,9 @@ export default {
                     this.cantidad = newRoom.countRooms
                     this.estado = newRoom.estadoId
                     this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
-                    this.desayuno = newRoom.hasDesayuno ? 1 : 0
-                    this.decoracion = newRoom.hasDecoracion ? 1 : 0
+                    this.desayuno = newRoom.tieneDesayuno ? 1 : 0
+                    this.decoracion = newRoom.tieneDecoracion ? 1 : 0
+                    this.incluyeDesayuno = newRoom.incluyeDesayuno ? 1 : 0
                     this.getCaracteristicas()
                 }
             },
@@ -214,10 +226,11 @@ export default {
             desayuno: 0,
             decoracion: 0,
             incluyeDesayuno: 0,
-            hasIva: 0,
+            tieneIva: 0,
             valid: false,
             loading: false,
             dialogCreate: false,
+            createImpuestoDialog: false,
             tipos: [],
             estados: [],
             caracteristicas: [],
@@ -261,7 +274,7 @@ export default {
                 user: vuex.state.user.id,
                 nombre: this.nombre,
                 descripcion: this.descripcion,
-                hasIva: this.hasIva ? 1 : 0,
+                tieneIva: this.tieneIva ? 1 : 0,
                 impuesto: this.impuesto,
                 tipo: this.tipo,
                 capacidad: this.capacidad,
@@ -278,6 +291,7 @@ export default {
             service.actualizarRoom(data, this.room.id)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',

@@ -63,6 +63,11 @@ const routes = [
 				component: () => import('@/modules/room/roomTarifas.vue')
 			},
 			{
+				path: 'habitaciones/descuentos-cupones',
+				name: 'descuentosCupones',
+				component: () => import('@/modules/room/DescuentosCupones.vue')
+			},
+			{
 				path: 'configuracion',
 				name: 'configuracion',
 				component: () => import('@/modules/settings/settingsApp.vue')

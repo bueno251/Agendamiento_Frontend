@@ -121,7 +121,7 @@
             </v-data-table>
         </v-container>
 
-        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false" @update="dialogCancelar = false, getReservas()"/>
+        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false" @update="getReservas()"/>
     </v-card>
 </template>
 

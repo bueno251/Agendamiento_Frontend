@@ -19,8 +19,15 @@
 
                             <v-col cols="12">
                                 <v-text-field v-model="weekday.precio" :rules="[rules.required, rules.numerico]"
-                                    label="Precio" v-price @input="formatNumber(weekday)" hide-spin-buttons dense
+                                    label="Precio" v-price @input="formatNumber(weekday.precio)" hide-spin-buttons dense
                                     outlined required>
+                                </v-text-field>
+                            </v-col>
+
+                            <v-col cols="12">
+                                <v-text-field v-model="weekday.previoFestivo" :rules="[rules.required, rules.numerico]"
+                                    label="Precio Previo A Festivo" v-price @input="formatNumber(weekday.previoFestivo)"
+                                    hide-spin-buttons dense outlined required>
                                 </v-text-field>
                             </v-col>
                         </div>
@@ -29,7 +36,7 @@
                 </div>
 
                 <div class="buttons">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
@@ -87,13 +94,13 @@ export default {
             valid: false,
             loading: false,
             week: [
-                { name: 'Domingo', precio: '', jornada_id: 2 },
-                { name: 'Lunes', precio: '', jornada_id: 1 },
-                { name: 'Martes', precio: '', jornada_id: 1 },
-                { name: 'Miércoles', precio: '', jornada_id: 1 },
-                { name: 'Jueves', precio: '', jornada_id: 1 },
-                { name: 'Viernes', precio: '', jornada_id: 1 },
-                { name: 'Sábado', precio: '', jornada_id: 2 },
+                { name: 'Domingo', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
+                { name: 'Lunes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Martes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Miércoles', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Jueves', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Viernes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Sábado', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
             ],
             jornadas: [],
             rules: {
@@ -112,10 +119,11 @@ export default {
             // Mapea los datos de la semana para prepararlos para ser enviados al servidor
             let week = []
 
-            this.week.map(({ name, precio, jornada_id }) => {
+            this.week.map(({ name, precio, previoFestivo, jornada_id }) => {
                 let dia = {
                     name: name,
                     precio: parseInt(precio.replace(/\./g, '')), // Convierte el precio a entero eliminando puntos de separación de miles
+                    previoFestivo: parseInt(previoFestivo.replace(/\./g, '')), // Convierte el precio a entero eliminando puntos de separación de miles
                     jornada_id: jornada_id
                 }
                 week.push(dia);
@@ -123,7 +131,7 @@ export default {
 
             let data = {
                 impuesto: this.room.impuestoId,
-                hasIva: this.room.hasIva,
+                tieneIva: this.room.tieneIva,
                 tarifas: week,
             }
 
@@ -131,6 +139,7 @@ export default {
             service.guardarTarifas(data, this.room.id)
                 .then(res => {
                     this.loading = false
+                    this.$emit('close')
                     this.$emit('update') // Emite un evento para indicar que se han actualizado los precios
                     Swal.fire({
                         icon: 'success',
@@ -160,9 +169,9 @@ export default {
          * Formatea el número de un día de la semana agregando comas para separar miles.
          * @param {object} day - Objeto que representa un día de la semana con un precio.
          */
-        formatNumber(day) {
-            let formattedNumber = day.precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
-            day.precio = this.comaEnMiles(formattedNumber) // Formatea el número con comas
+        formatNumber(precio) {
+            let formattedNumber = precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
+            precio = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
         /**
          * Obtiene los precios guardados para la habitación y los muestra en la interfaz de usuario.
@@ -171,22 +180,24 @@ export default {
             service.obtenerTarifas(this.room.id)
                 .then(res => {
                     this.week = [
-                        { name: 'Domingo', precio: '', jornada_id: 2 },
-                        { name: 'Lunes', precio: '', jornada_id: 1 },
-                        { name: 'Martes', precio: '', jornada_id: 1 },
-                        { name: 'Miércoles', precio: '', jornada_id: 1 },
-                        { name: 'Jueves', precio: '', jornada_id: 1 },
-                        { name: 'Viernes', precio: '', jornada_id: 1 },
-                        { name: 'Sábado', precio: '', jornada_id: 2 },
+                        { name: 'Domingo', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
+                        { name: 'Lunes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                        { name: 'Martes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                        { name: 'Miércoles', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                        { name: 'Jueves', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                        { name: 'Viernes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                        { name: 'Sábado', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
                     ]
 
                     this.$refs.form.resetValidation()
 
                     res.map((day) => {
-                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name);
+                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name)
 
                         if (index !== -1) {
-                            this.week[index].precio = this.comaEnMiles(day.precio);
+                            this.week[index].precio = this.comaEnMiles(day.precio)
+                            this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
+                            this.week[index].jornada_id = day.jornada_id
                         }
                     });
 

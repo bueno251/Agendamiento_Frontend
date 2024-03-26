@@ -1,5 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 /**
  * Objeto LOCAL para gestionar las solicitudes y configuración de la API de reservas.
@@ -21,6 +22,9 @@ const LOCAL = {
         })
     }
 }
+
+LOCAL.Axios()
+const cacheManager = new CacheManager(LOCAL.api)
 
 /**
  * Servicio para realizar operaciones relacionadas con las reservas utilizando la API externa.
@@ -46,15 +50,7 @@ const TipoCancelacionService = {
     obtenerTiposCancelacion() {
         let url = `cancelar/tipos`
 
-        return new Promise((resolve, reject) => {
-            LOCAL.api.get(url)
-                .then((res) => {
-                    resolve(res.data)
-                })
-                .catch((err) => {
-                    reject(err)
-                })
-        })
+        return cacheManager.obtenerDatos('cancelar/tipos', url)
     },
 
     actualizarTipoCancelacion(data, id) {
@@ -85,7 +81,5 @@ const TipoCancelacionService = {
         })
     },
 }
-
-LOCAL.Axios()
 
 export default TipoCancelacionService

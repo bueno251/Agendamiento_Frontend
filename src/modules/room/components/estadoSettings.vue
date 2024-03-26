@@ -39,7 +39,7 @@
                 <v-form ref="formCreate" v-model="validCreate" @submit.prevent="newEstado">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="newestado" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="newestado" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
@@ -60,7 +60,7 @@
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="updateEstado">
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field v-model="estado" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="estado" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>

@@ -5,7 +5,7 @@
                 <v-row>
                     <template v-for="room in rooms">
                         <v-col cols="12" md="5" sm="4" :key="`name-${room.id}`">
-                            <v-text-field v-model="room.nombre" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="room.nombre" :rules="[rules.required]" dense outlined required>
                                 <template v-slot:label>
                                     Nombre<span class="red--text">*</span>
                                 </template>
@@ -14,7 +14,7 @@
 
                         <v-col cols="12" md="5" sm="4" :key="room.id">
                             <v-select v-model="room.estado_id" :items="estados" no-data-text="Espere un momento..."
-                                :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" outlined>
+                                :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" dense outlined>
 
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
@@ -32,7 +32,7 @@
                     </template>
                 </v-row>
                 <div class="buttons pt-5">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
@@ -116,6 +116,7 @@ export default {
                     this.loading = false
 
                     // Emite el evento 'update' para notificar a otros componentes sobre la actualización
+                    this.$emit('close')
                     this.$emit('update')
 
                     // Muestra un mensaje de éxito
@@ -163,6 +164,7 @@ export default {
                     this.dialogDelete = false
 
                     // Emite el evento 'update' para notificar a otros componentes sobre la actualización
+                    this.$emit('close')
                     this.$emit('update')
 
                     // Muestra un mensaje de éxito

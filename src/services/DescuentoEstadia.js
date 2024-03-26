@@ -16,10 +16,10 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const TarifaGeneralService = {
+const DescuentoEstadiaService = {
 
-    guardarTarifasGenerales(data) {
-        let url = 'tarifas-generales'
+    crearDescuentoEstadia(data) {
+        let url = `descuento-estadia`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -32,14 +32,33 @@ const TarifaGeneralService = {
         })
     },
 
-    obtenerTarifasGenerales() {
-        let url = `tarifas-generales`
+    obtenerDescuentosEstadia(id = '') {
 
-        return cacheManager.obtenerDatos('tarifas-generales', url)
+        let url = `descuentos-estadia`
+
+        if (id) {
+            url += `/${id}`
+        }
+
+        return cacheManager.obtenerDatos(url, url)
     },
 
-    eliminarTarifaGeneral(id) {
-        let url = `tarifa-general/${id}`
+    actualizarDescuentoEstadia(data, id) {
+        let url = `descuento-estadia/${id}`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarDescuentoEstadia(id) {
+        let url = `descuento-estadia/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -51,7 +70,6 @@ const TarifaGeneralService = {
                 })
         })
     },
-
 }
 
-export default TarifaGeneralService
+export default DescuentoEstadiaService

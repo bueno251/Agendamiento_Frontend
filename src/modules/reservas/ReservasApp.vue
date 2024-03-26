@@ -86,6 +86,7 @@
                 </template>
             </v-data-table>
         </v-card>
+
         <v-dialog :value="dialogAprobar" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -98,6 +99,7 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
+
         <v-dialog :value="dialogRechazar" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -110,8 +112,9 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
-        <v-dialog v-if="!reserva.comprobante || reserva.comprobante.endsWith('.pdf')" :value="dialogComprobante" width="90%"
-            max-width="300px" persistent>
+
+        <v-dialog v-if="!reserva.comprobante || reserva.comprobante.endsWith('.pdf')" :value="dialogComprobante"
+            width="90%" max-width="300px" persistent>
             <v-card class="pa-5">
                 <div class="buttons">
                     <v-btn @click="dialogComprobante = false" icon><v-icon>mdi-close-box</v-icon></v-btn>
@@ -123,6 +126,7 @@
                 </v-sheet>
             </v-card>
         </v-dialog>
+
         <v-dialog v-else :value="dialogComprobante" width="90%" persistent>
             <v-card class="pa-5">
                 <div class="buttons">
@@ -136,7 +140,7 @@
         </v-dialog>
 
         <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
-            @update="dialogCancelar = false, getReservas()" />
+            @update="getReservas()" />
     </div>
 </template>
 

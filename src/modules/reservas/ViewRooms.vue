@@ -22,17 +22,19 @@
                         <v-divider class="my-2" />
 
                         <template v-for="(precios, jornada, index) in room.precios">
-                            <h1 v-if="index < 2" :key="`${jornada}${index}`" class="blue--text text-center w-100">
+                            <h1 v-if="jornada != 'null'" :key="`${jornada}${index}`"
+                                class="blue--text text-center w-100">
                                 $ {{ comaEnMiles(precioToDolar(precios[0].precio)) }} {{ divisa.codigo }}
                             </h1>
-                            <p v-if="index < 2" :key="`${jornada} - ${index}`" class="text-center w-100">
+                            <p v-if="jornada != 'null'" :key="`${jornada} - ${index}`"
+                                class="d-flex flex-column text-center w-100">
                                 De {{ precios[0].name }} A {{ precios[precios.length - 1].name }}
+                                <sub v-if="jornada == 'Semana'">Dias no previos a festivos</sub>
                             </p>
                         </template>
 
                         <v-divider class="my-2" />
 
-                        <p>Incluye</p>
                         <div class="caracteristics">
 
                             <template v-for="(item, index) in caracteristicas">
@@ -93,19 +95,57 @@ export default {
     }),
     methods: {
         /**
-         * Obtiene la información de todas las habitaciones.
-         * Organiza los precios de cada habitación agrupándolos por jornada.
-         * Actualiza la variable 'rooms' con la información de las habitaciones.
+         * Obtiene la información de las habitaciones y organiza los precios por día y jornada.
          */
         getRooms() {
+            // Llama al servicio para obtener la información de las habitaciones
             service.obtenerRooms()
                 .then(res => {
-                    res.forEach(room => {
-                        room.precios = Object.groupBy(room.precios, (price) => price.jornada)
-                    })
+                    // Almacena la información de las habitaciones en this.rooms
                     this.rooms = res
+                    // Itera sobre cada habitación
+                    this.rooms.forEach(room => {
+                        // Define una lista de días de la semana con precios iniciales y jornadas
+                        let week = [
+                            { name: 'Lunes', precio: 0, jornada: '' },
+                            { name: 'Martes', precio: 0, jornada: '' },
+                            { name: 'Miércoles', precio: 0, jornada: '' },
+                            { name: 'Jueves', precio: 0, jornada: '' },
+                            { name: 'Viernes', precio: 0, jornada: '' },
+                            { name: 'Sábado', precio: 0, jornada: '' },
+                        ]
+
+                        // Verifica si la habitación tiene precios definidos
+                        if (Array.isArray(room.precios)) {
+                            // Mapea los precios por día
+                            room.precios.map(day => {
+                                // Encuentra el índice del día en la semana
+                                const index = week.findIndex((weekDay) => weekDay.name === day.name)
+
+                                // Actualiza el precio y la jornada del día correspondiente
+                                if (index !== -1) {
+                                    week[index].precio = this.comaEnMiles(day.precio);
+                                    week[index].jornada = day.jornada
+                                }
+
+                                // Verifica si el día es domingo para ajustar su posición en la semana
+                                if (day.name == 'Domingo') {
+                                    if (day.jornada == 'Semana') {
+                                        week.unshift(day)
+                                    } else {
+                                        week.push(day)
+                                    }
+                                }
+                            })
+
+                            // Agrupa los precios por jornada y asigna a room.precios
+                            room.precios = Object.groupBy(week, (tarifas) => tarifas.jornada)
+
+                        }
+                    })
                 })
                 .catch(err => {
+                    // Maneja el error en caso de fallo en la obtención de las habitaciones
                     console.error(err)
                 })
         },
@@ -135,11 +175,19 @@ export default {
 
             return resultado;
         },
+        /**
+         * Convierte un precio de la moneda local a dólares si está habilitada la opción de mostrar en dólares.
+         * @param {number} numero - El precio en la moneda local.
+         * @returns {number} - El precio convertido a dólares, si está habilitada la opción; de lo contrario, devuelve el precio original.
+         */
         precioToDolar(numero) {
+            // Verifica si la opción de mostrar en dólares está habilitada
             if (!this.priceInDolar) {
+                // Si no está habilitada, devuelve el precio original
                 return numero
             }
 
+            // Convierte el precio a dólares y redondea a 2 decimales
             return (numero / this.dolarPrice).toFixed(2)
         },
         /**
@@ -163,23 +211,36 @@ export default {
                     console.error(err)
                 })
         },
+        /**
+         * Obtiene los valores predeterminados, como la divisa, el estado de la opción de mostrar en dólares,
+         * el precio automático del dólar y el precio actual del dólar.
+         * @async
+         * @function getDefault
+         * @memberof NombreDeLaClase
+         * @returns {Promise<void>} Una promesa que se resuelve una vez que se obtienen los valores predeterminados.
+         */
         async getDefault() {
             try {
+                // Obtiene los valores predeterminados del servicio
                 let res = await service.obtenerValoresDefault()
+
+                // Asigna los valores obtenidos a las propiedades correspondientes
                 this.divisa = res.divisa
                 this.priceInDolar = res.priceInDolar
                 this.dolarPriceAuto = res.dolarPriceAuto
                 this.dolarPrice = res.dolarPrice
 
-                if (this.dolarPriceAuto) {
+                // Verifica si la opción de mostrar en dólares y el precio automático del dólar están habilitados
+                if (this.priceInDolar && this.dolarPriceAuto) {
+                    // Si están habilitados, obtiene el precio actual del dólar
                     res = await service.valorDolar()
                     this.dolarPrice = res.valor
                 }
             } catch (err) {
+                // Maneja el error estableciendo la opción de mostrar en dólares como falsa y registrando el error
                 this.priceInDolar = false
                 console.error(err)
             }
-
         },
     },
     async mounted() {

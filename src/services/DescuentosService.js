@@ -1,6 +1,6 @@
-import axios from "axios";
-import vuex from "@/store";
-import CacheManager from "./CacheManager/CacheManager";
+import axios from "axios"
+import vuex from "@/store"
+import CacheManager from "./CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -16,10 +16,10 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const DivisasService = {
+const DescuentosService = {
 
-    crearDivisa(data) {
-        let url = `divisa`
+    crearDescuento(data) {
+        let url = `descuento`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -32,14 +32,31 @@ const DivisasService = {
         })
     },
 
-    obtenerDivisas() {
-        let url = `divisas`
+    obtenerTiposDescuento() {
+        let url = `descuento-tipos`
 
-        return cacheManager.obtenerDatos('divisas', url)
+        return cacheManager.obtenerDatos('descuento-tipos', url)
     },
 
-    actualizarDivisa(data, id) {
-        let url = `divisa/${id}`
+    obtenerRoomsDescuento() {
+        let url = `descuento-rooms`
+
+        return cacheManager.obtenerDatos('descuento-rooms', url)
+    },
+
+    obtenerDescuentos(id = '') {
+
+        let url = `descuentos`
+
+        if (id) {
+            url += `/${id}`
+        }
+
+        return cacheManager.obtenerDatos(url, url)
+    },
+
+    actualizarDescuento(data, id) {
+        let url = `descuento/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -52,8 +69,8 @@ const DivisasService = {
         })
     },
 
-    eliminarDivisa(id) {
-        let url = `divisa/${id}`
+    eliminarDescuento(id) {
+        let url = `descuento/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -67,4 +84,4 @@ const DivisasService = {
     },
 }
 
-export default DivisasService
+export default DescuentosService

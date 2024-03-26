@@ -63,9 +63,11 @@
                 </template>
             </v-data-table>
         </v-card>
-        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @create="getRooms(), dialogCreate = false" />
-        <DialogUpdate :show="dialogUpdate" :room="room" @close="dialogUpdate = false"
-            @update="getRooms(), dialogUpdate = false" />
+
+        <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @update="getRooms()" />
+
+        <DialogUpdate :show="dialogUpdate" :room="room" @close="dialogUpdate = false" @update="getRooms()" />
+
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
             <v-card>
                 <v-sheet class="d-flex justify-center align-center flex-column pa-5">
@@ -80,9 +82,11 @@
         </v-dialog>
 
         <estadosRoom :show="dialogBitacora" :id="room.id" @close="dialogBitacora = false" />
-        <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms(), dialogImg = false" />
-        <SimilarRooms :show="dialogRooms" :room="room" @close="dialogRooms = false"
-            @update="getRooms(), dialogRooms = false" />
+
+        <DialogImg :show="dialogImg" :room="room" @close="dialogImg = false" @update="getRooms()" />
+
+        <SimilarRooms :show="dialogRooms" :room="room" @close="dialogRooms = false" @update="getRooms()" />
+
     </div>
 </template>
 

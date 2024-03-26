@@ -6,7 +6,7 @@
 
                     <v-col cols="12">
                         <v-text-field v-model="Adicional" v-price :rules="[rules.required, rules.numerico]"
-                            @input="formatNumber('Adicional', Adicional)" outlined required>
+                            @input="formatNumber('Adicional', Adicional)" dense outlined required>
 
                             <template v-slot:label>
                                 Tarifa Persona <span class="red--text">*</span>
@@ -16,7 +16,7 @@
 
                     <v-col cols="12">
                         <v-text-field v-model="Niños" v-price :rules="[rules.required, rules.numerico]"
-                            @input="formatNumber('Niños', Niños)" outlined required>
+                            @input="formatNumber('Niños', Niños)" dense outlined required>
 
                             <template v-slot:label>
                                 Tarifa Niños <span class="red--text">*</span>
@@ -29,37 +29,42 @@
                             <p>
                                 Tienen Un Impuesto?
                             </p>
-                            <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                            <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
                         </div>
                     </v-col>
 
-                    <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                    <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
-                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+                            :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
+                            required>
 
                             <template v-slot:label>
                                 Impuesto <span class="red--text">*</span>
                             </template>
 
-                            <template v-slot:append-outer>
-                                <v-btn icon @click="createImpuestoDialog = true">
-                                    <v-icon>
-                                        mdi-plus-circle
-                                    </v-icon>
-                                </v-btn>
+                            <template v-slot:prepend-item>
+                                <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            Añadir Impuesto
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
                     </v-col>
                 </v-row>
 
                 <div class="buttons pt-5">
-                    <v-btn @click="close" color="blue">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
                     <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>
 
         <createImpuesto :show="createImpuestoDialog" @close="createImpuestoDialog = false" @update="getImpuestos" />
+
     </v-dialog>
 </template>
 
@@ -67,12 +72,16 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
+import createImpuesto from '@/modules/impuestos/components/createImpuesto.vue'
 
 export default {
     name: 'PreciosExtra',
     props: {
         show: Boolean,
         room: Object,
+    },
+    components: {
+        createImpuesto,
     },
     watch: {
         // Observa cambios en la propiedad 'room'
@@ -81,20 +90,21 @@ export default {
             handler(newItem) {
                 // Verifica si 'precios' está presente en 'newItem'
                 if ("precios" in newItem) {
-                    // Reinicia los valores de 'Adicional' y 'Niños'
-                    this.Adicional = 0
-                    this.Niños = 0
+                    this.tieneIva = false
+                    this.impuesto = ''
 
                     // Itera sobre los precios y actualiza los valores si son 'Adicional' o 'Niños'
-                    newItem.precios.map((day) => {
-                        if (day.name == 'Adicional' || day.name == 'Niños') {
-                            this[day.name] = this.comaEnMiles(day.precio)
-                            if (day.impuestoId) {
-                                this.impuesto = day.impuestoId
-                                this.hasIva = true
+                    newItem.precios.map((tarifa) => {
+
+                        if (tarifa.name == 'Adicional' || tarifa.name == 'Niños') {
+                            this[tarifa.name] = this.comaEnMiles(tarifa.precio)
+                            if (tarifa.impuestoId) {
+                                this.impuesto = tarifa.impuestoId
+                                this.tieneIva = true
                             }
                         }
                     })
+
                 }
             },
             // Indica que el 'handler' debe ejecutarse inmediatamente después de la vinculación del watch
@@ -120,7 +130,8 @@ export default {
             Adicional: '',
             Niños: '',
             impuesto: '',
-            hasIva: false,
+            edadNiños: '',
+            tieneIva: false,
             valid: false,
             loading: false,
             createImpuestoDialog: false,
@@ -153,7 +164,7 @@ export default {
 
             let data = {
                 impuesto: this.impuesto,
-                hasIva: this.hasIva,
+                tieneIva: this.tieneIva,
                 tarifas: week
             }
 
@@ -162,6 +173,7 @@ export default {
                 .then(res => {
                     this.loading = false
                     this.dialogTarifasExtra = false
+                    this.$emit('close')
                     this.$emit('update')
                     Swal.fire({
                         icon: 'success',
@@ -212,13 +224,6 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        /**
-         * Cierra el componente emitiento un evento 'close'.
-         */
-        close() {
-            // Emitir evento 'close'
-            this.$emit('close')
         },
     },
     mounted() {

@@ -30,7 +30,7 @@
                                         <v-list-item-title v-text="'Tarifas'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogExtra = true">
-                                        <v-list-item-title v-text="'Tarifas Adicionales'"></v-list-item-title>
+                                        <v-list-item-title v-text="'Tarifa Persona Adicional'"></v-list-item-title>
                                     </v-list-item>
                                     <v-list-item link @click="room = item, dialogEspeciales = true">
                                         <v-list-item-title v-text="'Tarifas Especiales'"></v-list-item-title>
@@ -61,12 +61,13 @@
             </v-data-table>
         </v-card>
 
-        <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false"
-            @update="getRooms(), dialogPrecios = false" />
-        <PreciosExtra :show="dialogExtra" :room="room" @close="dialogExtra = false"
-            @update="getRooms(), dialogExtra = false" />
+        <PreciosRoom :show="dialogPrecios" :room="room" @close="dialogPrecios = false" @update="getRooms()" />
+
+        <PreciosExtra :show="dialogExtra" :room="room" @close="dialogExtra = false" @update="getRooms()" />
+
         <tarifasEspeciales :show="dialogEspeciales" :room="room" @close="dialogEspeciales = false"
-            @update="getRooms(), dialogEspeciales = false" />
+            @update="getRooms()" />
+
     </div>
 </template>
 
@@ -137,16 +138,24 @@ export default {
          * Obtiene la lista de habitaciones.
          */
         getRooms() {
+            // Establece la variable de carga como verdadera para mostrar el estado de carga
             this.loading = true
+
+            // Reinicia la habitación seleccionada
             this.room = {}
 
             // Llama al servicio para obtener la lista de habitaciones
             service.obtenerAllRooms()
                 .then(res => {
+                    // Establece la variable de carga como falsa una vez que se completa la solicitud
                     this.loading = false
+
+                    // Asigna las habitaciones obtenidas a la lista local de habitaciones
                     this.rooms = res
 
+                    // Itera sobre cada habitación para formatear los precios y jornadas
                     this.rooms.map(room => {
+                        // Define una semana con los días y precios predeterminados
                         let week = [
                             { name: 'Domingo', precio: 0, jornada_id: 2 },
                             { name: 'Lunes', precio: 0, jornada_id: 1 },
@@ -159,27 +168,36 @@ export default {
                             { name: 'Niños', precio: 0, jornada_id: null },
                         ]
 
+                        // Verifica si la habitación tiene precios definidos
                         if (room.precios) {
+                            // Mapea los precios de la habitación y los asigna a la semana correspondiente
                             room.precios.map(day => {
                                 const index = week.findIndex((weekDay) => weekDay.name === day.name);
 
                                 if (index !== -1) {
                                     week[index].precio = this.comaEnMiles(day.precio);
+                                    week[index].jornada_id = day.jornada_id;
                                     week[index].impuestoId = day.impuestoId;
                                 }
                             })
                         }
 
+                        // Asigna la semana formateada de precios a la habitación
                         room.precios = week
                     })
                 })
                 .catch(err => {
+                    // Maneja el error imprimiendo un mensaje en la consola
                     this.loading = false
                     console.error(err)
                 })
         },
+        /**
+         * Formatea un número agregando comas para separar miles y acepta decimales.
+         * @param {number} numero - Número que se formateará.
+         * @returns {string} Número formateado con comas.
+         */
         comaEnMiles(numero) {
-
             // Convertir el número a cadena y dividir la parte entera de la parte decimal
             let partes = numero.toString().split(',');
 
@@ -201,8 +219,17 @@ export default {
             let formattedNumber = day.precio.replace(/\D/g, '') // Elimina caracteres no numéricos del precio
             day.precio = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
+        /**
+         * Guarda una tarifa para una habitación en un día específico y muestra un mensaje de éxito o error.
+         * @function save
+         * @param {string} precio - El precio de la tarifa.
+         * @param {string} dia - El día de la semana para la tarifa.
+         * @param {Object} room - La habitación asociada a la tarifa.
+         * @param {string|null} jornada - La jornada asociada a la tarifa (opcional).
+         * @returns {void}
+         */
         save(precio, dia, room, jornada = null) {
-
+            // Prepara los datos para guardar la tarifa
             let data = {
                 room: room,
                 name: dia,
@@ -210,16 +237,20 @@ export default {
                 jornada: jornada,
             }
 
+            // Llama al servicio para guardar la tarifa
             service.guardarTarifa(data)
                 .then(res => {
+                    // Actualiza la lista de habitaciones una vez que se guarda la tarifa
                     this.getRooms()
+
+                    // Muestra un mensaje de éxito
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
                     })
                 })
                 .catch(err => {
-                    this.loading = false
+                    // Maneja el error imprimiendo un mensaje en la consola
                     console.error(err)
                 })
         },

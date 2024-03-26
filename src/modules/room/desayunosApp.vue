@@ -52,7 +52,7 @@
                     <v-row>
 
                         <v-col cols="12">
-                            <v-text-field v-model="nombre" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombre" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
@@ -62,7 +62,7 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="precio" v-price :rules="[rules.required]"
-                                @input="formatNumber('precio', precio)" outlined required>
+                                @input="formatNumber('precio', precio)" dense outlined required>
 
                                 <template v-slot:label>
                                     Precio <span class="red--text">*</span>
@@ -75,24 +75,28 @@
                                 <p>
                                     Tiene Un Impuesto?
                                 </p>
-                                <v-switch v-model="hasIva" :label="hasIva ? 'Si' : 'No'" inset></v-switch>
+                                <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
                             </div>
                         </v-col>
 
-                        <v-col v-if="hasIva" cols="12" md="6" sm="6">
+                        <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                             <v-select v-model="iva" :items="impuestos" :rules="[rules.required]"
-                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
+                                required>
 
                                 <template v-slot:label>
                                     Impuesto <span class="red--text">*</span>
                                 </template>
 
-                                <template v-slot:append-outer>
-                                    <v-btn icon @click="createImpuestoDialog = true">
-                                        <v-icon>
-                                            mdi-plus-circle
-                                        </v-icon>
-                                    </v-btn>
+                                <template v-slot:prepend-item>
+                                    <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                Añadir Impuesto
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-divider class="mt-2"></v-divider>
                                 </template>
                             </v-select>
                         </v-col>
@@ -106,7 +110,7 @@
 
                             <v-file-input v-model="mediaFiles" :rules="[rules.file, rules.fileRequired]"
                                 @change="handleFileChange('mediaFiles')" label="Imagenes" accept="image/*,video/*"
-                                prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input outlined
+                                prepend-icon="mdi-plus-circle" truncate-length="15" multiple hide-input dense outlined
                                 required></v-file-input>
 
                             <span class="red--text">{{ error }}</span>
@@ -150,7 +154,7 @@
                     <v-row>
 
                         <v-col cols="12">
-                            <v-text-field v-model="nombreUpdate" :rules="[rules.required]" outlined required>
+                            <v-text-field v-model="nombreUpdate" :rules="[rules.required]" dense outlined required>
 
                                 <template v-slot:label>
                                     Nombre <span class="red--text">*</span>
@@ -160,7 +164,7 @@
 
                         <v-col cols="12">
                             <v-text-field v-model="precioUpdate" :rules="[rules.required]"
-                                @input="formatNumber('precioUpdate', precioUpdate)" outlined required>
+                                @input="formatNumber('precioUpdate', precioUpdate)" dense outlined required>
 
                                 <template v-slot:label>
                                     Precio <span class="red--text">*</span>
@@ -173,24 +177,29 @@
                                 <p>
                                     Tiene Un Impuesto?
                                 </p>
-                                <v-switch v-model="hasIvaUpdate" :label="hasIvaUpdate ? 'Si' : 'No'" inset></v-switch>
+                                <v-switch v-model="tieneIvaUpdate" :label="tieneIvaUpdate ? 'Si' : 'No'"
+                                    inset></v-switch>
                             </div>
                         </v-col>
 
-                        <v-col v-if="hasIvaUpdate" cols="12" md="6" sm="6">
+                        <v-col v-if="tieneIvaUpdate" cols="12" md="6" sm="6">
                             <v-select v-model="ivaUpdate" :items="impuestos" :rules="[rules.required]"
-                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" outlined required>
+                                :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
+                                required>
 
                                 <template v-slot:label>
                                     Impuesto <span class="red--text">*</span>
                                 </template>
 
-                                <template v-slot:append-outer>
-                                    <v-btn icon @click="createImpuestoDialog = true">
-                                        <v-icon>
-                                            mdi-plus-circle
-                                        </v-icon>
-                                    </v-btn>
+                                <template v-slot:prepend-item>
+                                    <v-list-item ripple @mousedown.prevent @click="createImpuestoDialog = true">
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                Añadir Impuesto
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-divider class="mt-2"></v-divider>
                                 </template>
                             </v-select>
                         </v-col>
@@ -206,7 +215,7 @@
                             <v-file-input v-model="mediaFilesToUpload" :rules="[rules.file]"
                                 @change="handleFileChange('mediaFilesToUpload')" label="Imagenes"
                                 accept="image/*,video/*" prepend-icon="mdi-plus-circle" truncate-length="15" multiple
-                                hide-input outlined required></v-file-input>
+                                hide-input dense outlined required></v-file-input>
 
                             <div class="grid my-5">
 
@@ -249,7 +258,7 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
+                        <v-btn @click="dialogUpdate = false, closeUpdate()" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
                             color="light-green">actualizar</v-btn>
                     </div>
@@ -280,7 +289,7 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import createImpuesto from '../impuestos/components/createImpuesto.vue'
+import createImpuesto from '../impuestos/components/createImpuesto'
 
 export default {
     name: 'DesayunosApp',
@@ -295,7 +304,7 @@ export default {
                     this.nombreUpdate = newItem.nombre
                     this.precioUpdate = this.comaEnMiles(newItem.precio)
                     this.ivaUpdate = newItem.impuestoId
-                    this.hasIvaUpdate = newItem.hasIva
+                    this.tieneIvaUpdate = newItem.tieneIva
                     this.descripcionUpdate = newItem.descripcion
                     this.mediaToSee = !newItem.media ? [] : Array.from(newItem.media)
                 }
@@ -329,9 +338,9 @@ export default {
             nombreUpdate: '',
             precioUpdate: '',
             descripcionUpdate: '',
-            hasIvaUpdate: '',
+            tieneIvaUpdate: '',
             ivaUpdate: '',
-            hasIva: false,
+            tieneIva: false,
             loading: false,
             loadingbtn: false,
             dialogCreate: false,
@@ -399,7 +408,7 @@ export default {
             data.append('nombre', this.nombre)
             data.append('precio', parseInt(this.precio.replace(".", "")))
             data.append('descripcion', this.descripcion)
-            data.append('hasIva', this.hasIva ? 1 : 0)
+            data.append('tieneIva', this.tieneIva ? 1 : 0)
             data.append('impuesto', this.iva)
 
             const mediaForUpload = this.mediaFiles
@@ -463,7 +472,7 @@ export default {
             data.append('nombre', this.nombreUpdate)
             data.append('precio', parseInt(this.precioUpdate.replace(".", "")))
             data.append('descripcion', this.descripcionUpdate)
-            data.append('hasIva', this.hasIvaUpdate ? 1 : 0)
+            data.append('tieneIva', this.tieneIvaUpdate ? 1 : 0)
             data.append('impuesto', this.ivaUpdate)
 
             let mediaFilesToDelete = this.mediaFilesToDelete
@@ -574,10 +583,10 @@ export default {
             this[value] = this.comaEnMiles(formattedNumber) // Formatea el número con comas
         },
         closeUpdate() {
-            if (this.decoration.media == null) {
+            if (this.breakfast.media == null) {
                 this.mediaToSee = []
             } else {
-                this.mediaToSee = Array.from(this.decoration.media)
+                this.mediaToSee = Array.from(this.breakfast.media)
             }
 
             this.mediaFilesToUpload = []
