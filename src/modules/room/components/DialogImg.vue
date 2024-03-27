@@ -92,18 +92,24 @@ export default {
             showMenu: false,
             rules: {
                 file: imgs => {
-
-                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif'];
-                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                    const allowedFormats = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+                    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+                    const maxSizeInBytes = 64 * 1024 * 1024 // 64 MB
 
                     for (let i = 0; i < imgs.length; i++) {
                         if (!allowedFormats.includes(imgs[i].type) && !allowedExtensions.includes(imgs[i].name.slice(-4).toLowerCase())) {
-                            this.error = 'Los archivos deben ser imagenes (JPEG, PNG, GIF)'
-                            return this.error
+                            this.error = 'Los archivos deben ser imágenes (JPEG, PNG, GIF).'
+                            return false
+                        }
+
+                        if (imgs[i].size > maxSizeInBytes) {
+                            this.error = 'El tamaño máximo permitido por archivo es de 64 MB.'
+                            return false
                         }
                     }
 
-                    return true;
+                    this.error = ''
+                    return true
                 }
             },
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',

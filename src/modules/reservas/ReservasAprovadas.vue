@@ -8,25 +8,36 @@
                 <v-row>
 
                     <v-col cols="12" md="2" sm="4">
-                        <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false" transition="scale-transition"
-                            offset-y min-width="auto">
+                        <v-checkbox v-model="twoDates" label="Entre Fechas"></v-checkbox>
+                    </v-col>
+
+                    <v-col v-if="!twoDates" cols="12" md="2" sm="4">
+                        <v-select v-model="date" :items="dates" label="Fecha Reserva" dense outlined>
+                        </v-select>
+                    </v-col>
+
+                    <v-col v-if="twoDates || date == 'Llegada'" cols="12" md="2" sm="4">
+                        <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
+                            transition="scale-transition" offset-y min-width="auto">
                             <template v-slot:activator="{ on, attrs }">
-                                <v-text-field v-model="fechaLLegada" label="Fecha Llegada" prepend-inner-icon="mdi-calendar"
-                                    v-bind="attrs" v-on="on" clearable readonly dense outlined>
+                                <v-text-field v-model="fechaLLegada" label="Fecha Llegada"
+                                    prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" clearable readonly dense
+                                    outlined>
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="fechaLLegada" min="1950-01-01"
-                                :max="fechaSalida" @change="save('menu1', fechaLLegada)" locale="es">
+                            <v-date-picker v-model="fechaLLegada" min="1950-01-01" :max="fechaSalida"
+                                @change="save('menu1', fechaLLegada)" locale="es">
                             </v-date-picker>
                         </v-menu>
                     </v-col>
 
-                    <v-col cols="12" md="2" sm="4">
-                        <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false" transition="scale-transition"
-                            offset-y min-width="auto">
+                    <v-col v-if="twoDates || date == 'Salida'" cols="12" md="2" sm="4">
+                        <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
+                            transition="scale-transition" offset-y min-width="auto">
                             <template v-slot:activator="{ on, attrs }">
-                                <v-text-field v-model="fechaSalida" label="Fecha Salida" prepend-inner-icon="mdi-calendar"
-                                    v-bind="attrs" v-on="on" clearable readonly dense outlined>
+                                <v-text-field v-model="fechaSalida" label="Fecha Salida"
+                                    prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" clearable readonly dense
+                                    outlined>
                                 </v-text-field>
                             </template>
                             <v-date-picker v-model="fechaSalida" :min="fechaLLegada"
@@ -52,7 +63,8 @@
                     </v-col>
 
                     <v-col cols="12">
-                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details />
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                            hide-details />
                     </v-col>
                 </v-row>
             </v-card-title>
@@ -111,9 +123,9 @@
                                 </v-tooltip>
                             </v-row>
                         </td>
-                        <td>{{ item.cedula }}</td>
-                        <td>{{ item.telefono }}</td>
-                        <td>{{ item.fullname }}</td>
+                        <td>{{ item.huesped.documento }}</td>
+                        <td>{{ item.huesped.telefono }}</td>
+                        <td>{{ item.huesped.fullname }}</td>
                         <td>$ {{ comaEnMiles(item.precio) }} COP</td>
                         <td>{{ item.estado }}</td>
                     </tr>
@@ -121,7 +133,8 @@
             </v-data-table>
         </v-container>
 
-        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false" @update="getReservas()"/>
+        <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
+            @update="getReservas()" />
     </v-card>
 </template>
 
@@ -135,12 +148,33 @@ export default {
     components: {
         CancelacionReserva,
     },
+    watch: {
+        twoDates: {
+            handler() {
+                this.fechaLLegada = null
+                this.fechaSalida = null
+            },
+            immediate: true,
+        },
+        date: {
+            handler(newItem) {
+                if (newItem == 'Llegada') {
+                    this.fechaSalida = null
+                }
+                if (newItem == 'Salida') {
+                    this.fechaLLegada = null
+                }
+            },
+            immediate: true,
+        }
+    },
     data() {
         return {
             search: '',
             documento: '',
             telefono: '',
             estado: '',
+            date: 'Llegada',
             fechaLLegada: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             fechaSalida: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             loading: true,
@@ -151,18 +185,23 @@ export default {
             dialogRechazar: false,
             dialogComprobante: false,
             dialogCancelar: false,
+            twoDates: false,
             reserva: {
                 comprobante: '',
             },
             reservas: [],
             reservasFilter: [],
+            dates: [
+                'Llegada',
+                'Salida',
+            ],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Creada el', key: 'created_at', value: 'created_at' },
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
-                { text: 'Documento', key: 'cedula', value: 'cedula' },
+                { text: 'Documento', key: 'documento', value: 'documento' },
                 { text: 'Telefono', key: 'telefono', value: 'telefono' },
                 { text: 'Huesped', key: 'huesped', value: 'huesped' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
