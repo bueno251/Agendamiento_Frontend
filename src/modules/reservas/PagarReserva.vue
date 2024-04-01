@@ -372,7 +372,7 @@ export default {
                 huesped.apellido2 = lastnames[1] ? lastnames[1] : null
             })
 
-            console.log(this.huespedes)
+            
 
             let data = {
                 dateIn: this.reserva.dateIn,
@@ -383,6 +383,10 @@ export default {
                 precio: this.reserva.precioTotal,
                 huespedes: this.huespedes,
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
+            }
+
+            if ('id' in this.reserva.cupon) {
+                data.cupon = this.reserva.cupon
             }
 
             // Realiza la llamada al servicio para reservar

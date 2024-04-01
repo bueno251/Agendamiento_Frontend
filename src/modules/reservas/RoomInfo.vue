@@ -93,8 +93,8 @@
 
                         <v-col cols="12" class="py-0">
                             <v-date-picker v-model="dates" :min="hoy" :max="maxDate" :events="festivos"
-                                :allowed-dates="allowedDates" event-color="red lighten-1" locale="es" full-width range
-                                no-title scrollable>
+                                :readonly="calendarioInhabilitado" :allowed-dates="allowedDates"
+                                event-color="red lighten-1" locale="es" full-width range no-title scrollable>
                             </v-date-picker>
                         </v-col>
 
@@ -110,7 +110,7 @@
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy" :readonly="calendarioInhabilitado"
                                     @change="save('menu1', dates)" event-color="red lighten-1" locale="es" range
                                     no-title scrollable>
                                 </v-date-picker>
@@ -129,7 +129,7 @@
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy" :readonly="calendarioInhabilitado"
                                     @change="save('menu2', dates)" event-color="red lighten-1" locale="es" range
                                     no-title scrollable>
                                 </v-date-picker>
@@ -267,8 +267,8 @@
 
                     <div class="buttons mt-5">
                         <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                        <v-btn @click="datosCliente = true" :disabled="!valid" color="light-green">
-                            siguiente
+                        <v-btn @click="datosCliente = true" :disabled="!valid || !canReservar" color="light-green">
+                            reservar
                         </v-btn>
                     </div>
                 </v-form>
@@ -383,6 +383,12 @@ export default {
                     let precioNormal = this.precioToDolar(this.precios[fechaInicio.getDay()].precio)
                     let precioFestivo = this.precioToDolar(this.precios[fechaInicio.getDay()].previoFestivo)
                     let descuentoEstadia = 0
+
+                    let tarifaEspecial = this.getTarifaEspecial(fechaInicio.toISOString().split('T')[0])
+
+                    if (tarifaEspecial) {
+                        precioNormal = this.precioToDolar(tarifaEspecial.precio)
+                    }
 
                     // Avanza al siguiente día
                     fechaInicio.setDate(fechaInicio.getDate() + 1)
@@ -659,6 +665,8 @@ export default {
             dolarPrice: 0,
             edadNiños: 1,
             codigoCupon: '',
+            canReservar: true,
+            calendarioInhabilitado: false,
             dialogMediaDecoraciones: false,
             dialogMediaDesayunos: false,
             priceInDolar: false,
@@ -950,6 +958,9 @@ export default {
             // Verificar si la extensión está en la lista de extensiones de imagen
             return extensionesImagen.includes(extension)
         },
+        getTarifaEspecial(date) {
+            return this.room.tarifasEspeciales.find(tarifa => date == tarifa.fecha)
+        },
         /**
          * Obtiene la información de desayunos, decoraciones y características para ser utilizada en el agendamiento.
          * Actualiza las variables 'desayunos', 'decoraciones' y 'caracteristicas'.
@@ -1022,6 +1033,8 @@ export default {
                         this.porcentajeSeparacion = res.porcentajeSeparacion
                         this.useGenerales = res.tarifasGenerales
                         this.edadNiños = res.edadTarifaNiños
+                        this.canReservar = res.usuarioReserva
+                        this.calendarioInhabilitado = res.calendarioInhabilitado
                     })
                     .catch(err => {
                         console.error(err)

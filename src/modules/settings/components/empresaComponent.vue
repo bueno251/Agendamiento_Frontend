@@ -23,6 +23,20 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
+                        <label>Código RNT <span v-if="empresa === null" class="red--text">*</span></label>
+                        <v-text-field v-model="codeRNT" :rules="[rules.required]" :disabled="empresa !== null"
+                            type="number" hide-spin-buttons outlined dense required>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
+                        <label>Código CIIU de actividad económica <span v-if="empresa === null" class="red--text">*</span></label>
+                        <v-text-field v-model="codeCIIU" :rules="[rules.required]" :disabled="empresa !== null"
+                            type="number" hide-spin-buttons outlined dense required>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
                         <label>DV <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-text-field v-model="dv" :rules="[rules.required]" :disabled="empresa !== null" outlined dense
                             required>
@@ -95,14 +109,14 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Idioma <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="lenguaje" :items="idiomas" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" outlined dense required>
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Operación <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="operacion" :items="operaciones" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
@@ -110,7 +124,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Entorno <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="entorno" :items="entornos" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
@@ -118,7 +132,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Organización <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="organizacion" :items="organizaciones" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
@@ -126,7 +140,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Responsabilidad <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="responsabilidad" :items="responsabilidades"
                             no-data-text="Espere un momento..." :rules="[rules.required]" :disabled="empresa !== null"
@@ -134,7 +148,7 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
                         <label>Tipo Regimen <span v-if="empresa === null" class="red--text">*</span></label>
                         <v-select v-model="regimen" :items="regimenes" no-data-text="Espere un momento..."
                             :rules="[rules.required]" :disabled="empresa !== null" item-text="tipo" item-value="id"
@@ -170,6 +184,8 @@ export default {
                 if (newitem !== null) {
                     this.tipoDocumento = newitem.idDocumento
                     this.identificacion = newitem.identificacion
+                    this.codeRNT = newitem.codigoRNT
+                    this.codeCIIU = newitem.codigoCIIU
                     this.nombre = newitem.nombre
                     this.dv = newitem.dv
                     this.registro = newitem.registro
@@ -202,6 +218,8 @@ export default {
             tipoDocumento: '',
             nombre: '',
             identificacion: '',
+            codeRNT: '',
+            codeCIIU: '',
             pais: '',
             departamento: '',
             ciudad: '',
@@ -261,6 +279,8 @@ export default {
                 nombre: this.nombre,
                 tipoDocumento: this.tipoDocumento,
                 identificacion: this.identificacion,
+                codigoRNT: this.codeRNT,
+                codigoCIIU: this.codeCIIU,
                 dv: this.dv,
                 registro: this.registro,
                 pais: this.pais,

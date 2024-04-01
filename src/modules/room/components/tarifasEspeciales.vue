@@ -39,10 +39,8 @@
                                 </v-list>
                             </v-menu>
                         </td>
-                        <td>{{ item.fechaInicio }}</td>
-                        <td>{{ item.fechaFin }}</td>
+                        <td>{{ item.fecha }}</td>
                         <td>${{ comaEnMiles(item.precio) }}</td>
-                        <td>${{ comaEnMiles(item.precioConIva) }}</td>
                         <td>{{ item.descripcion }}</td>
                     </tr>
                 </template>
@@ -64,42 +62,22 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="6">
+                        <v-col cols="12">
                             <v-menu ref="menu1" v-model="menu1" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechas[0]" :rules="[rules.required]"
+                                    <v-text-field v-model="fecha" :rules="[rules.required]"
                                         prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
                                         required>
                                         <template v-slot:label>
-                                            Fecha Inicio <span class="red--text">*</span>
+                                            Fecha <span class="red--text">*</span>
                                         </template>
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="fechas" :min="hoy" @change="save('menu1', fechas)" locale="es"
-                                    range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="6">
-                            <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechas[1]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Fin <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechas" :min="hoy" @change="save('menu2', fechas)" locale="es"
-                                    range no-title scrollable>
+                                <v-date-picker v-model="fecha" :min="hoy" @change="save('menu1', fecha)" locale="es"
+                                    no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
                         </v-col>
@@ -140,42 +118,22 @@
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="6">
-                            <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
+                        <v-col cols="12">
+                            <v-menu ref="menu2" v-model="menu2" :close-on-content-click="false"
                                 transition="scale-transition" offset-y min-width="auto">
 
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechasUpd[0]" :rules="[rules.required]"
+                                    <v-text-field v-model="fechaUpd" :rules="[rules.required]"
                                         prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
                                         required>
                                         <template v-slot:label>
-                                            Fecha Inicio <span class="red--text">*</span>
+                                            Fecha <span class="red--text">*</span>
                                         </template>
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="fechasUpd" :min="hoy" @change="save('menu3', fechasUpd)"
-                                    locale="es" range no-title scrollable>
-                                </v-date-picker>
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="6">
-                            <v-menu ref="menu4" v-model="menu4" :close-on-content-click="false"
-                                transition="scale-transition" offset-y min-width="auto">
-
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="fechasUpd[1]" :rules="[rules.required]"
-                                        prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" readonly outlined
-                                        required>
-                                        <template v-slot:label>
-                                            Fecha Fin <span class="red--text">*</span>
-                                        </template>
-                                    </v-text-field>
-                                </template>
-
-                                <v-date-picker v-model="fechasUpd" :min="hoy" @change="save('menu4', fechasUpd)"
-                                    locale="es" range no-title scrollable>
+                                <v-date-picker v-model="fechaUpd" :min="hoy" @change="save('menu2', fechaUpd)"
+                                    locale="es" no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
                         </v-col>
@@ -228,27 +186,12 @@ export default {
         show: Boolean,
         room: Object,
     },
-    computed: {
-        fechaInicio() {
-            return this.fechas[0] || ''
-        },
-        fechaFinal() {
-            return this.fechas[1] || ''
-        },
-        fechaInicioUpd() {
-            return this.fechasUpd[0] || ''
-        },
-        fechaFinalUpd() {
-            return this.fechasUpd[1] || ''
-        },
-    },
     watch: {
         tarifaEspecial: {
             handler(newItem) {
                 if ('id' in newItem) {
                     this.precioUpd = this.comaEnMiles(newItem.precio)
-                    this.fechasUpd[0] = newItem.fechaInicio
-                    this.fechasUpd[1] = newItem.fechaFin
+                    this.fechaUpd = newItem.fecha
                     this.descripcionUpd = newItem.descripcion
                 }
             },
@@ -261,38 +204,6 @@ export default {
                 }
             },
             immediate: true,
-        },
-        fechaFinal: function () {
-            if (this.fechas.length > 1) {
-                let fecha1 = new Date(this.fechas[0])
-                let fecha2 = new Date(this.fechas[1])
-
-                // Ajusta la fecha de salida si es igual a la fecha de llegada
-                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
-                    fecha2.setDate(fecha2.getDate() + 1)
-                    this.fechas[1] = fecha2.toISOString().slice(0, 10)
-                }
-
-                // Ordena las fechas de llegada y salida
-                let sortfechas = this.fechas.toSorted()
-                this.fechas = sortfechas
-            }
-        },
-        fechaFinalUpd: function () {
-            if (this.fechasUpd.length > 1) {
-                let fecha1 = new Date(this.fechasUpd[0])
-                let fecha2 = new Date(this.fechasUpd[1])
-
-                // Ajusta la fecha de salida si es igual a la fecha de llegada
-                if (fecha1.toISOString().slice(0, 10) === fecha2.toISOString().slice(0, 10)) {
-                    fecha2.setDate(fecha2.getDate() + 1)
-                    this.fechasUpd[1] = fecha2.toISOString().slice(0, 10)
-                }
-
-                // Ordena las fechasUpd de llegada y salida
-                let sortfechasUpd = this.fechasUpd.toSorted()
-                this.fechasUpd = sortfechasUpd
-            }
         },
     },
     directives: {
@@ -318,18 +229,16 @@ export default {
         return {
             search: '',
             hoy: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            fechas: [],
+            fecha: '',
             precio: '',
             descripcion: '',
-            fechasUpd: [],
+            fechaUpd: '',
             precioUpd: '',
             descripcionUpd: '',
             loading: false,
             loadingbtn: false,
             menu1: false,
             menu2: false,
-            menu3: false,
-            menu4: false,
             validCreate: false,
             validUpdate: false,
             dialogCreate: false,
@@ -342,10 +251,8 @@ export default {
             },
             headers: [
                 { text: '', key: 'actions', sortable: false },
-                { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
-                { text: 'Fecha Final', key: 'fechaFin', value: 'fechaFin' },
+                { text: 'Fecha', key: 'fecha', value: 'fecha' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
-                { text: 'Precio Con IVA', key: 'precioConIva', value: 'precioConIva' },
                 { text: 'Descripción', key: 'descripcion', value: 'descripcion' },
             ],
         }
@@ -355,8 +262,7 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                fechaInicio: this.fechaInicio,
-                fechaFin: this.fechaFinal,
+                fecha: this.fecha,
                 precio: parseInt(this.precio.replace(/\./g, '')),
                 descripcion: this.descripcion,
                 room: this.room.id,
@@ -401,8 +307,7 @@ export default {
             this.loadingbtn = true
 
             let data = {
-                fechaInicio: this.fechaInicioUpd,
-                fechaFin: this.fechasUpd[1],
+                fecha: this.fechaUpd,
                 precio: parseInt(this.precioUpd.replace(/\./g, '')),
                 descripcion: this.descripcionUpd,
             }

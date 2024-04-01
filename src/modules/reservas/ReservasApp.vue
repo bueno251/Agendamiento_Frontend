@@ -78,8 +78,8 @@
                                 </v-tooltip>
                             </v-row>
                         </td>
-                        <td>{{ item.cedula }}</td>
-                        <td>{{ item.fullname }}</td>
+                        <td>{{ item.huesped.documento }}</td>
+                        <td>{{ item.huesped.fullname }}</td>
                         <td>$ {{ comaEnMiles(item.precio) }} COP</td>
                         <td>{{ item.estado }}</td>
                     </tr>
@@ -174,7 +174,7 @@ export default {
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
-                { text: 'Cedula', key: 'cedula', value: 'cedula' },
+                { text: 'Documento', key: 'documento', value: 'documento' },
                 { text: 'Huesped', key: 'huesped', value: 'huesped' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },

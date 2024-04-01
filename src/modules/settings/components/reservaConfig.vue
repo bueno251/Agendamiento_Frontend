@@ -30,6 +30,16 @@
                 <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
+                            Inhabilitar calendario?
+                        </p>
+                        <v-switch v-model="calendarioInhabilitado" :label="calendarioInhabilitado ? 'Si' : 'No'"
+                            inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
                             Correo obligatorio para el pago?
                         </p>
                         <v-switch v-model="correoRequired" :label="correoRequired ? 'Si' : 'No'" inset></v-switch>
@@ -162,6 +172,7 @@ export default {
             handler(newItem) {
                 if ('id' in newItem) {
                     this.canReservar = newItem.usuarioReserva
+                    this.calendarioInhabilitado = newItem.calendarioInhabilitado
                     this.correoRequired = newItem.correoObligatorio
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
@@ -194,6 +205,7 @@ export default {
             porcentSeparacion: 0,
             edadNiños: 2,
             canReservar: true,
+            calendarioInhabilitado: false,
             correoRequired: true,
             tarifasGenerales: false,
             loading: false,
@@ -225,6 +237,7 @@ export default {
             let data = {
                 configuracionId: this.config.id,
                 reservar: this.canReservar,
+                calendario: this.calendarioInhabilitado,
                 correo: this.correoRequired,
                 tarifasGenerales: this.tarifasGenerales,
                 porcentaje: this.porcentSeparacion,
