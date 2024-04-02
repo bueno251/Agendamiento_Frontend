@@ -49,6 +49,15 @@
                 <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
+                            Habilitar ventas en OTAS?
+                        </p>
+                        <v-switch v-model="ventasOtas" :label="ventasOtas ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
                             Usar tarifas generales?
                         </p>
                         <v-switch v-model="tarifasGenerales" :label="tarifasGenerales ? 'Si' : 'No'" inset></v-switch>
@@ -177,6 +186,7 @@ export default {
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
                     this.edadNiños = newItem.edadTarifaNiños
+                    this.ventasOtas = newItem.ventasOtas
                     this.loadingcard = false
                 }
             },
@@ -208,6 +218,7 @@ export default {
             calendarioInhabilitado: false,
             correoRequired: true,
             tarifasGenerales: false,
+            ventasOtas: false,
             loading: false,
             loadingcard: true,
             loadingbtn: false,
@@ -240,6 +251,7 @@ export default {
                 calendario: this.calendarioInhabilitado,
                 correo: this.correoRequired,
                 tarifasGenerales: this.tarifasGenerales,
+                ventasOtas: this.ventasOtas,
                 porcentaje: this.porcentSeparacion,
                 edadTarifaNiños: this.edadNiños,
             }

@@ -14,9 +14,10 @@ import ReservaService from './ReservaService'
 import ReservaMotivosService from './ReservaMotivosService'
 import RoomService from './RoomService'
 import SocrataService from './SocrataService'
-import TarifaService from './Tarifa'
-import TarifaGeneralService from './TarifasGenerales'
-import TarifaEspecialesService from './TerifasEspeciales'
+import TarifaService from './tarifas/Tarifa'
+import TarifasOtasService from './tarifas/TarifasOtas'
+import TarifaGeneralService from './tarifas/TarifasGenerales'
+import TarifaEspecialesService from './tarifas/TerifasEspeciales'
 import TipoCancelacionService from './TipoCancelacion'
 import TipoRoomService from './TipoRoom'
 import UbicacionService from './UbicacionService'
@@ -39,6 +40,7 @@ const service = {
     ...RoomService,
     ...SocrataService,
     ...TarifaService,
+    ...TarifasOtasService,
     ...TarifaGeneralService,
     ...TarifaEspecialesService,
     ...TipoCancelacionService,

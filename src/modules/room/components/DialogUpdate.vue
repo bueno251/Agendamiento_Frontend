@@ -51,6 +51,15 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
+                        <v-text-field v-model="cantidadOtas" :rules="[rules.required]" dense outlined required>
+
+                            <template v-slot:label>
+                                Cantidad OTAS<span class="red--text">*</span>
+                            </template>
+                        </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" md="3" sm="6">
                         <v-select v-model="decoracion" :items="yesNo" item-text="text" item-value="value" dense
                             outlined>
 
@@ -79,15 +88,6 @@
                         </v-select>
                     </v-col>
 
-                    <v-col cols="12" md="6" sm="6">
-                        <div class="flex">
-                            <p>
-                                Tiene Un Impuesto?
-                            </p>
-                            <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
-                        </div>
-                    </v-col>
-
                     <v-col v-if="tieneIva" cols="12" md="6" sm="6">
                         <v-select v-model="impuesto" :items="impuestos" :rules="[rules.required]"
                             :item-text="item => `${item.codigo} (${item.tasa}%)`" item-value="id" dense outlined
@@ -108,6 +108,15 @@
                                 <v-divider class="mt-2"></v-divider>
                             </template>
                         </v-select>
+                    </v-col>
+
+                    <v-col cols="12">
+                        <div class="flex">
+                            <p>
+                                Tiene Un Impuesto?
+                            </p>
+                            <v-switch v-model="tieneIva" :label="tieneIva ? 'Si' : 'No'" inset></v-switch>
+                        </div>
                     </v-col>
 
                     <v-col cols="12">
@@ -203,6 +212,7 @@ export default {
                     this.tipo = newRoom.tipoId
                     this.capacidad = newRoom.capacidad
                     this.cantidad = newRoom.countRooms
+                    this.cantidadOtas = newRoom.cantidadOtas
                     this.estado = newRoom.estadoId
                     this.selectedCaracteristicas = Array.from(newRoom.caracteristicas)
                     this.desayuno = newRoom.tieneDesayuno ? 1 : 0
@@ -222,6 +232,7 @@ export default {
             capacidad: '',
             estado: '',
             cantidad: '',
+            cantidadOtas: '',
             impuesto: '',
             desayuno: 0,
             decoracion: 0,
@@ -279,6 +290,7 @@ export default {
                 tipo: this.tipo,
                 capacidad: this.capacidad,
                 cantidad: this.cantidad,
+                cantidadOtas: this.cantidadOtas,
                 estado: this.estado,
                 estadoAntiguo: this.room.estadoId,
                 activar: this.selectedCaracteristicas,

@@ -80,12 +80,10 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <label>Monto <span class="red--text">*</span></label>
+                            <label>Pendiente de pago el dia de llegada ${{ monto }} {{
+                        divisa.codigo }} <span class="red--text">*</span></label>
                             <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
-
-                            Pendiente de pago el dia de llegada ${{ comaEnMiles(reserva.valorSeparacion) }} {{
-                        divisa.codigo }}
                         </v-col>
 
                         <v-col v-if="metodoPago.requiereComprobante" cols="12" md="6" sm="6">
@@ -105,11 +103,11 @@
             </v-form>
         </v-card>
 
-        <v-dialog :value="modalDatosUser" width="90%" persistent>
+        <v-dialog :value="modalDatosUser" width="95%" persistent>
             <v-card class="pa-5" elevation="5">
                 <v-toolbar elevation="0">
-                    <h2>{{ titulos[steps] }}</h2>
-                    <v-col v-if="steps == 0" class="py-0" cols="12" md="6" sm="6">
+                    <p class="text-sm-h6 py-0 ma-0">{{ titulos[steps] }}</p>
+                    <v-col v-if="steps == 0" class="d-none d-md-block py-0" cols="2" md="6" sm="6">
                         <v-select v-model="huesped" :items="huespedes" @change="changeHuesped"
                             :item-text="item => `${item.nombre} ${item.apellido}`" return-object hide-details dense
                             outlined required>
@@ -124,6 +122,13 @@
                         <v-form ref="form" v-model="validHuesped" @submit.prevent="reservar">
                             <v-row class="pt-5">
 
+                                <v-col v-if="steps == 0" class="d-block d-md-none" cols="12" md="6" sm="6">
+                                    <v-select v-model="huesped" :items="huespedes" @change="changeHuesped"
+                                        :item-text="item => `${item.nombre} ${item.apellido}`" return-object
+                                        hide-details dense outlined required>
+                                    </v-select>
+                                </v-col>
+
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>
                                         Tipo de documento <span class="red--text">*</span>
@@ -136,7 +141,7 @@
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>Número Documento <span class="red--text">*</span></label>
-                                    <v-text-field v-model="huesped.documento" :rules="[rules.required, rules.unique]"
+                                    <v-text-field ref="documento" v-model="huesped.documento" :rules="[rules.required, rules.unique]"
                                         type="number" hide-spin-buttons dense outlined required>
                                     </v-text-field>
                                 </v-col>
@@ -282,10 +287,10 @@ export default {
         return {
             reserva: vuex.state.reserva,
             roomid: vuex.state.reserva.room.id,
-            monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
+            monto: this.comaEnMiles(vuex.state.reserva.valorSeparacion),
             motivo: 1,
             steps: 0,
-            metodoPago: { id: 0 },
+            metodoPago: { id: 1 },
             porcentajeSeparacion: 0,
             validPagos: false,
             validInfo: false,
@@ -372,8 +377,6 @@ export default {
                 huesped.apellido2 = lastnames[1] ? lastnames[1] : null
             })
 
-            
-
             let data = {
                 dateIn: this.reserva.dateIn,
                 dateOut: this.reserva.dateOut,
@@ -385,7 +388,7 @@ export default {
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
-            if ('id' in this.reserva.cupon) {
+            if (!!this.reserva.cupon && 'id' in this.reserva.cupon) {
                 data.cupon = this.reserva.cupon
             }
 
@@ -429,6 +432,7 @@ export default {
 
                 if (!huesped.nombre || !huesped.apellido || !huesped.documento || !huesped.telefono || (!huesped.correo && this.correoRequired)) {
                     this.huesped = huesped
+                    this.$refs.documento.focus()
                     return
                 }
             }
@@ -438,6 +442,8 @@ export default {
             this.getDepartamentos('Procedencia')
             this.getCiudades('Residencia')
             this.getCiudades('Procedencia')
+
+            this.$refs.documento.focus()
         },
         async getDatos() {
             service.obtenerMetodosPago()

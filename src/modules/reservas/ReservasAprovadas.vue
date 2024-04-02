@@ -46,6 +46,21 @@
                         </v-menu>
                     </v-col>
 
+                    <v-col v-if="!twoDates && date == 'Reserva'" cols="12" md="2" sm="4">
+                        <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
+                            transition="scale-transition" offset-y min-width="auto">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field v-model="fechaCreacion" label="Fecha Creación"
+                                    prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" clearable readonly dense
+                                    outlined>
+                                </v-text-field>
+                            </template>
+                            <v-date-picker v-model="fechaCreacion"
+                                @change="save('menu3', fechaCreacion)" locale="es">
+                            </v-date-picker>
+                        </v-menu>
+                    </v-col>
+
                     <v-col cols="12" md="2" sm="4">
                         <v-text-field v-model="documento" label="Documento" dense outlined>
                         </v-text-field>
@@ -153,17 +168,28 @@ export default {
             handler() {
                 this.fechaLLegada = null
                 this.fechaSalida = null
+                this.fechaCreacion = null
             },
             immediate: true,
         },
         date: {
             handler(newItem) {
-                if (newItem == 'Llegada') {
-                    this.fechaSalida = null
+                let opciones = {
+                    Llegada: () => {
+                        this.fechaSalida = null
+                        this.fechaCreacion = null
+                    },
+                    Salida: () => {
+                        this.fechaLLegada = null
+                        this.fechaCreacion = null
+                    },
+                    Reserva: () => {
+                        this.fechaLLegada = null
+                        this.fechaSalida = null
+                    },
                 }
-                if (newItem == 'Salida') {
-                    this.fechaLLegada = null
-                }
+
+                opciones[newItem]()
             },
             immediate: true,
         }
@@ -175,12 +201,14 @@ export default {
             telefono: '',
             estado: '',
             date: 'Llegada',
-            fechaLLegada: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            fechaSalida: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            fechaLLegada: null,
+            fechaSalida: null,
+            fechaCreacion: null,
             loading: true,
             loadingbtn: false,
             menu1: false,
             menu2: false,
+            menu3: false,
             dialogAprobar: false,
             dialogRechazar: false,
             dialogComprobante: false,
@@ -192,6 +220,7 @@ export default {
             reservas: [],
             reservasFilter: [],
             dates: [
+                'Reserva',
                 'Llegada',
                 'Salida',
             ],
@@ -241,7 +270,8 @@ export default {
          */
         filtrar() {
             // Verifica si no se han proporcionado criterios de filtrado.
-            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida) {
+            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida && !this.fechaCreacion) {
+                // Si no se proporcionan criterios, se muestra la lista de reservas sin filtrar.
                 this.reservasFilter = this.reservas
                 return
             }
@@ -249,7 +279,8 @@ export default {
             // Filtra las reservas según los criterios proporcionados.
             this.reservasFilter = this.reservas.filter(reserva => {
                 // Verificar si ambas fechas están presentes.
-                if (this.fechaLLegada && this.fechaSalida) {
+                if (this.twoDates) {
+                    // Filtrar según documento, teléfono y rango de fechas si ambas fechas están presentes.
                     return (
                         reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
@@ -260,8 +291,9 @@ export default {
                     return (
                         reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
-                        (this.fechaLLegada && reserva.fechaEntrada >= this.fechaLLegada) ||
-                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida)
+                        (this.fechaLLegada && reserva.fechaEntrada == this.fechaLLegada) ||
+                        (this.fechaSalida && reserva.fechaSalida == this.fechaSalida) ||
+                        (this.fechaCreacion && reserva.created_at.split(' ')[0] == this.fechaCreacion)
                     )
                 }
             })

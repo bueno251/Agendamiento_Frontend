@@ -191,16 +191,17 @@ export default {
 
                     this.$refs.form.resetValidation()
 
-                    res.map((day) => {
-                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name)
-
-                        if (index !== -1) {
-                            this.week[index].precio = this.comaEnMiles(day.precio)
-                            this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
-                            this.week[index].jornada_id = day.jornada_id
-                        }
-                    });
-
+                    if(res.length){
+                        res.map((day) => {
+                            const index = this.week.findIndex((weekDay) => weekDay.name === day.name)
+    
+                            if (index !== -1) {
+                                this.week[index].precio = this.comaEnMiles(day.precio)
+                                this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
+                                this.week[index].jornada_id = day.jornada_id
+                            }
+                        });
+                    }
                 })
                 .catch(err => {
                     console.error(err)
