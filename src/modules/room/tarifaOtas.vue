@@ -1,8 +1,5 @@
 <template>
     <div class="content">
-        <h1>
-            Tarifas Otas
-        </h1>
         <v-card width="90%" elevation="5" class="my-5">
             <v-card-title>
                 <v-row>

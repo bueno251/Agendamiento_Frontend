@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%" elevation="5">
+    <v-card width="98%" elevation="5">
         <v-card-title class="blue lighten-2 white--text">
             Reservas En Proceso
         </v-card-title>
@@ -46,7 +46,7 @@
                         </v-menu>
                     </v-col>
 
-                    <v-col v-if="!twoDates && date == 'Reserva'" cols="12" md="2" sm="4">
+                    <v-col v-if="!twoDates && date == 'Creación Registro'" cols="12" md="2" sm="4">
                         <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
                             transition="scale-transition" offset-y min-width="auto">
                             <template v-slot:activator="{ on, attrs }">
@@ -135,7 +135,50 @@
                         <td>{{ item.huesped.documento }}</td>
                         <td>{{ item.huesped.telefono }}</td>
                         <td>{{ item.huesped.fullname }}</td>
-                        <td>$ {{ comaEnMiles(item.precio) }} COP</td>
+                        <td>${{ comaEnMiles(item.precio) }}</td>
+                        <td>${{ comaEnMiles(item.abono) }}</td>
+                        <td>
+                            <span v-if="item.cupon.esPorcentaje">
+                                {{ item.cupon.porcentaje }}% (${{ comaEnMiles(item.cupon.descuento) }})
+                            </span>
+                            <span v-else>
+                                ${{ comaEnMiles(item.cupon.descuento) }}
+                            </span>
+                            <div>
+                                {{ item.cupon.nombre }}
+                            </div>
+                        </td>
+                        <td>
+                            <v-row class="ma-0">
+                                <span class="mr-5">
+                                    ${{ comaEnMiles(item.descuentos.reduce((acum, item) => acum + item.descuento, 0)) }}
+                                </span>
+                                <v-tooltip right v-if="item.descuentos">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on">
+                                            <v-icon size="20px">mdi-help-circle</v-icon>
+                                        </span>
+                                    </template>
+                                    <v-row>
+                                        <v-col cols="12" v-for="descuento in item.descuentos"
+                                            :key="item.id + descuento.id">
+                                            <div>
+                                                Nombre: {{ descuento.nombre }}
+                                            </div>
+                                            <div>
+                                                <span v-if="descuento.esPorcentaje">
+                                                    Descuento: {{ descuento.porcentaje }}% (${{ comaEnMiles(descuento.descuento)
+                                                    }})
+                                                </span>
+                                                <span v-else>
+                                                    Descuento: ${{ comaEnMiles(descuento.descuento) }}
+                                                </span>
+                                            </div>
+                                        </v-col>
+                                    </v-row>
+                                </v-tooltip>
+                            </v-row>
+                        </td>
                         <td>{{ item.estado }}</td>
                     </tr>
                 </template>
@@ -223,7 +266,7 @@ export default {
                         this.fechaLLegada = null
                         this.fechaCreacion = null
                     },
-                    Reserva: () => {
+                    'Creación Registro': () => {
                         this.fechaLLegada = null
                         this.fechaSalida = null
                     },
@@ -259,7 +302,7 @@ export default {
             reservas: [],
             reservasFilter: [],
             dates: [
-                'Reserva',
+                'Creación Registro',
                 'Llegada',
                 'Salida',
             ],
@@ -273,6 +316,9 @@ export default {
                 { text: 'Telefono', key: 'huesped.telefono', value: 'huesped.telefono' },
                 { text: 'Huesped', key: 'huesped.fullname', value: 'huesped.fullname' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
+                { text: 'Abono', key: 'abono', value: 'abono' },
+                { text: 'Cupon', key: 'cupon.descuento', value: 'cupon.descuento' },
+                { text: 'Descuentos', key: 'descuentos', sortable: false },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
@@ -285,7 +331,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            service.obtenerReservas('No Confirmada')
+            service.obtenerReservas('Pendiente')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res

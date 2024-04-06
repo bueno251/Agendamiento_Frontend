@@ -110,9 +110,9 @@
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy" :readonly="calendarioInhabilitado"
-                                    @change="save('menu1', dates)" event-color="red lighten-1" locale="es" range
-                                    no-title scrollable>
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    :readonly="calendarioInhabilitado" @change="save('menu1', dates)"
+                                    event-color="red lighten-1" locale="es" range no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
                         </v-col>
@@ -129,9 +129,9 @@
                                     </v-text-field>
                                 </template>
 
-                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy" :readonly="calendarioInhabilitado"
-                                    @change="save('menu2', dates)" event-color="red lighten-1" locale="es" range
-                                    no-title scrollable>
+                                <v-date-picker v-model="dates" :allowed-dates="allowedDates" :min="hoy"
+                                    :readonly="calendarioInhabilitado" @change="save('menu2', dates)"
+                                    event-color="red lighten-1" locale="es" range no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
                         </v-col>
@@ -240,6 +240,8 @@
                                     <span v-if="cupon.tipoId == 1">%</span>
                                     en {{ cupon.precio }}
                                 </label>
+                                <p v-if="cupon.documento">Cupón valido para {{ cupon.cliente }} {{ cupon.documento }}
+                                </p>
                                 <sub v-if="!fechasValidasCupon()" class="red--text mb-5">Fecha del cupón no valida</sub>
                             </div>
 
@@ -363,11 +365,7 @@ export default {
         huespedes() {
             return this.adultos.cantidad + this.niños.cantidad
         },
-        /**
-         * Calcula el precio total del alojamiento, teniendo en cuenta las fechas de entrada y salida, los precios por día,
-         * los días festivos, los descuentos por estancia y los cupones.
-         */
-        precioAlojamiento() {
+        precioAlojamientoSinDescuento() {
             // Inicializa el precio total
             let precio = 0
 
@@ -420,6 +418,17 @@ export default {
             // Redondea el precio a 2 decimales
             precio = Number(precio.toFixed(2))
 
+            // Devuelve el precio total, asegurándose de que no sea negativo
+            return precio >= 0 ? precio : 0
+        },
+        /**
+         * Calcula el precio total del alojamiento, teniendo en cuenta las fechas de entrada y salida, los precios por día,
+         * los días festivos, los descuentos por estancia y los cupones.
+         */
+        precioAlojamiento() {
+
+            let precio = this.precioAlojamientoSinDescuento
+
             // Aplica descuentos de cupón si corresponde
             let descuentoCupon = 0
             if (this.cupon.precio === 'Alojamiento' || this.cupon.precio === 'Todo') {
@@ -449,36 +458,48 @@ export default {
 
             return nochesDeEstancia
         },
+        precioAdultosSinDescuento() {
+            let precio = Number(this.precioToDolar(this.adultos.val))
+
+            return precio >= 0 ? precio : 0
+        },
         /**
          * Calcula el precio de los adultos.
          */
         precioAdultos() {
-            // Convierte el precio de los adultos a dólares
-            let precio = Number(this.precioToDolar(this.adultos.val))
+            let precio = this.precioAdultosSinDescuento
 
             let descuentoCupon = 0
             if (this.cupon.precio == 'Adulto Adicional' || this.cupon.precio == 'Todo') {
                 descuentoCupon = this.valorDescuentoCupon(precio)
             }
 
-            precio -= this.valorDescuento(precio)
             precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
+        },
+        precioNiñosSinDescuento() {
+            let precio = Number(this.precioToDolar(this.niños.val))
+
             return precio >= 0 ? precio : 0
         },
         /**
          * Calcula el precio de los niños.
          */
         precioNiños() {
-            // Convierte el precio de los niños a dólares
-            let precio = Number(this.precioToDolar(this.niños.val))
+            let precio = this.precioNiñosSinDescuento
 
             let descuentoCupon = 0
             if (this.cupon.precio == 'Niño Adicional' || this.cupon.precio == 'Todo') {
                 descuentoCupon = this.valorDescuentoCupon(precio)
             }
 
-            precio -= this.valorDescuento(precio)
             precio -= descuentoCupon
+            return precio >= 0 ? precio : 0
+        },
+        precioDecoracionSinDescuento() {
+            // Convierte el precio de la decoración a dólares
+            let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
+
             return precio >= 0 ? precio : 0
         },
         /**
@@ -486,21 +507,17 @@ export default {
          */
         precioDecoracion() {
             // Convierte el precio de la decoración a dólares
-            let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
+            let precio = this.precioDecoracionSinDescuento
 
             let descuentoCupon = 0
             if (this.cupon.precio == 'Decoración' || this.cupon.precio == 'Todo') {
                 descuentoCupon = this.valorDescuentoCupon(precio)
             }
 
-            precio -= this.valorDescuento(precio)
             precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
-        /**
-         * Calcula el precio del desayuno.
-         */
-        precioDesayuno() {
+        precioDesayunoSinDescuento() {
             // Verifica si el desayuno está incluido en la habitación
             // Si está incluido, devuelve 0
             if (this.room.incluyeDesayuno) {
@@ -510,12 +527,19 @@ export default {
             // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes
             let precio = Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes))
 
+            return precio >= 0 ? precio : 0
+        },
+        /**
+         * Calcula el precio del desayuno.
+         */
+        precioDesayuno() {
+            let precio = this.precioDesayunoSinDescuento
+
             let descuentoCupon = 0
             if (this.cupon.precio == 'Desayuno' || this.cupon.precio == 'Todo') {
                 descuentoCupon = this.valorDescuentoCupon(precio)
             }
 
-            precio -= this.valorDescuento(precio)
             precio -= descuentoCupon
             return precio >= 0 ? precio : 0
         },
@@ -526,7 +550,21 @@ export default {
             // Verifica si hay un precio total
             // Si hay un precio total, calcula y devuelve el valor de la separación en dólares, redondeado a 2 decimales
             // Si no hay precio total, devuelve 0
-            return this.precioTotal ? (this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2) : 0.00
+            return this.precioTotal ? Number((this.precioTotal * (this.porcentajeSeparacion / 100)).toFixed(2)) : 0.00
+        },
+        precioTotalSinDescuento() {
+            // Inicializa el precio total en 0
+            let precio = 0
+
+            // Suma los precios individuales de alojamiento, adultos, niños, decoración y desayuno al precio total
+            precio += this.precioAdultosSinDescuento
+            precio += this.precioNiñosSinDescuento
+            precio += this.precioDecoracionSinDescuento
+            precio += this.precioDesayunoSinDescuento
+            precio += this.precioAlojamientoSinDescuento
+
+            // Devuelve el precio total de la reserva sin descuento
+            return precio
         },
         /**
          * Calcula el precio total de la reserva sumando los precios individuales de alojamiento, adultos, niños, decoración y desayuno.
@@ -536,11 +574,11 @@ export default {
             let precio = 0
 
             // Suma los precios individuales de alojamiento, adultos, niños, decoración y desayuno al precio total
-            precio += this.precioAlojamiento
             precio += this.precioAdultos
             precio += this.precioNiños
             precio += this.precioDecoracion
             precio += this.precioDesayuno
+            precio += this.precioAlojamiento
 
             // Devuelve el precio total de la reserva
             return precio
@@ -623,6 +661,28 @@ export default {
             // Devuelve el array de descuentos activos
             return array
         },
+        useTarifasEspeciales() {
+            if (this.dates.length === 2) {
+                // Convierte las fechas de entrada y salida en objetos Date
+                let fechaInicio = new Date(this.dates[0].replace(/-/g, '/'))
+                let fechaFinal = new Date(this.dates[1].replace(/-/g, '/'))
+                let tarifaEspecial
+
+                while (fechaInicio < fechaFinal) {
+
+                    tarifaEspecial = this.getTarifaEspecial(fechaInicio.toISOString().split('T')[0])
+
+                    if (tarifaEspecial) {
+                        return true
+                    }
+
+                    // Avanza al siguiente día
+                    fechaInicio.setDate(fechaInicio.getDate() + 1)
+                }
+            }
+
+            return false
+        }
     },
     watch: {
         /**
@@ -825,6 +885,7 @@ export default {
                 telefono: this.telefono,
                 noches: this.noches,
                 cantidad_rooms: this.cantidadRooms,
+                useTarifasEspeciales: this.useTarifasEspeciales,
             }
 
             // Verifica si se ha seleccionado un desayuno y lo agrega a los datos de la reserva si es necesario
@@ -837,8 +898,39 @@ export default {
                 data.decoracion = this.decoracion
             }
 
-            if ('id' in this.cupon) {
-                data.cupon = this.cupon
+            if (this.descuentosActive.length) {
+                let descuentos = this.descuentosActive.map(item => {
+                    return {
+                        id: item.id,
+                        nombre: item.nombre,
+                        esPorcentaje: item.tipo == 'Porcentaje',
+                        porcentaje: item.tipo == 'Porcentaje' ? item.descuento : null,
+                        descuento: item.tipo == 'Precio' ? item.descuento : (this.precioAlojamientoSinDescuento * item.descuento / 100),
+                    }
+                })
+
+                data.descuentos = descuentos
+            }
+
+            if ('id' in this.cupon && this.cupon.documento == this.documento) {
+
+                let descuentoCupon = {
+                    Alojamiento: this.valorDescuentoCupon(this.precioAlojamientoSinDescuento),
+                    'Adulto Adicional': this.valorDescuentoCupon(this.precioAdultosSinDescuento),
+                    Decoracion: this.valorDescuentoCupon(this.precioDecoracionSinDescuento),
+                    Desayuno: this.valorDescuentoCupon(this.precioDesayunoSinDescuento),
+                    'Niño Adicional': this.valorDescuentoCupon(this.precioNiñosSinDescuento),
+                    Todo: this.precioTotalSinDescuento,
+                }
+
+                data.cupon = {
+                    id: this.cupon.id,
+                    codigo: this.cupon.codigo,
+                    nombre: this.cupon.nombre,
+                    esPorcentaje: this.cupon.tipo == 'Porcentaje',
+                    porcentaje: this.cupon.tipo == 'Porcentaje' ? this.cupon.descuento : null,
+                    descuento: this.cupon.tipo == 'Precio' ? this.cupon.descuento : descuentoCupon[this.cupon.precio],
+                }
             }
 
             // Despacha la acción para establecer los datos de la reserva en el almacenamiento global
@@ -1107,6 +1199,10 @@ export default {
 
             // Verifica si las fechas del cupón son válidas
             if (!this.fechasValidasCupon()) {
+                return 0
+            }
+
+            if (this.cupon.documento != null && this.cupon.documento != this.documento) {
                 return 0
             }
 

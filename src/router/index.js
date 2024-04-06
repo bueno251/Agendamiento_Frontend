@@ -60,12 +60,7 @@ const routes = [
 			{
 				path: 'habitaciones/tarifas',
 				name: 'habitacionesTarifas',
-				component: () => import('@/modules/room/roomTarifas.vue')
-			},
-			{
-				path: 'habitaciones/tarifas/otas',
-				name: 'tarifasOtas',
-				component: () => import('@/modules/room/tarifaOtas.vue')
+				component: () => import('@/modules/room/layoutTarifas.vue')
 			},
 			{
 				path: 'habitaciones/descuentos-cupones',

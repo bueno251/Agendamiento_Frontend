@@ -40,6 +40,7 @@
                         </v-menu>
                     </td>
                     <td>{{ item.nombre }}</td>
+                    <td>{{ item.cliente }}</td>
                     <td>{{ item.fechaInicio }}</td>
                     <td>{{ item.fechaFin }}</td>
                     <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
@@ -187,6 +188,10 @@
                                     range no-title scrollable>
                                 </v-date-picker>
                             </v-menu>
+                        </v-col>
+
+                        <v-col cols="12">
+                            <v-autocomplete v-model="cliente" :items="clientes" :item-text="item => `${item.documento} - ${item.nombre1} ${item.apellido1}`" item-value="id" label="Cliente" auto-select-first outlined></v-autocomplete>
                         </v-col>
 
                     </v-row>
@@ -343,6 +348,10 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-autocomplete v-model="clienteUpdate" :items="clientes" :item-text="item => `${item.documento} - ${item.nombre1} ${item.apellido1}`" item-value="id" label="Cliente" auto-select-first outlined></v-autocomplete>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
                             <div class="flex">
                                 <p>
                                     Activo
@@ -458,6 +467,7 @@ export default {
             handler(newItem) {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
+                    this.clienteUpdate = newItem.clienteId
                     this.tipoUpdate = newItem.tipoId
                     this.precioUpdate = {
                         id: newItem.precioId,
@@ -548,6 +558,7 @@ export default {
     data() {
         return {
             search: '',
+            cliente: '',
             codigo: '',
             nombre: '',
             cantidad: 1,
@@ -556,6 +567,7 @@ export default {
             tipo: 1,
             precio: 1,
             habitacionesSelected: '',
+            clienteUpdate: '',
             codigoUpdate: '',
             nombreUpdate: '',
             descuentoUpdate: '',
@@ -585,9 +597,11 @@ export default {
             habitaciones: [],
             tipos: [],
             precios: [],
+            clientes: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
+                { text: 'cliente', key: 'cliente', value: 'cliente' },
                 { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
                 { text: 'Fecha Fin', key: 'fechaFin', value: 'fechaFin' },
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
@@ -618,6 +632,7 @@ export default {
             let data = {
                 fechaInicio: this.fechaInicio,
                 fechaFin: this.fechaFinal,
+                cliente: this.cliente,
                 nombre: this.nombre,
                 descuento: this.descuento,
                 habitaciones: this.habitacionesSelected,
@@ -681,6 +696,7 @@ export default {
             let data = {
                 fechaInicio: this.fechaInicioUpd,
                 fechaFin: this.fechasUpd[1],
+                cliente: this.clienteUpdate,
                 nombre: this.nombreUpdate,
                 descuento: this.descuentoUpdate,
                 habitaciones: this.habitacionesSelectedUpdate.map(item => item.id),
@@ -820,6 +836,14 @@ export default {
             service.obtenerTiposDescuento()
                 .then(res => {
                     this.tipos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerClientes()
+                .then(res => {
+                    this.clientes = res
                 })
                 .catch(err => {
                     console.error(err)

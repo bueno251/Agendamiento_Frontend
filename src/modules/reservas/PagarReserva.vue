@@ -80,9 +80,9 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <label>Pendiente de pago el dia de llegada ${{ monto }} {{
+                            <label>Pendiente de pago el dia de llegada ${{ abono }} {{
                         divisa.codigo }} <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
+                            <v-text-field v-model="abono" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
 
@@ -141,8 +141,9 @@
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>Número Documento <span class="red--text">*</span></label>
-                                    <v-text-field ref="documento" v-model="huesped.documento" :rules="[rules.required, rules.unique]"
-                                        type="number" hide-spin-buttons dense outlined required>
+                                    <v-text-field ref="documento" v-model="huesped.documento"
+                                        :rules="[rules.required, rules.unique]" type="number" hide-spin-buttons dense
+                                        outlined required>
                                     </v-text-field>
                                 </v-col>
 
@@ -287,7 +288,7 @@ export default {
         return {
             reserva: vuex.state.reserva,
             roomid: vuex.state.reserva.room.id,
-            monto: this.comaEnMiles(vuex.state.reserva.valorSeparacion),
+            abono: this.comaEnMiles(vuex.state.reserva.valorSeparacion),
             motivo: 1,
             steps: 0,
             metodoPago: { id: 1 },
@@ -385,11 +386,17 @@ export default {
                 niños: this.reserva.niños,
                 precio: this.reserva.precioTotal,
                 huespedes: this.huespedes,
+                abono: this.reserva.valorSeparacion,
+                useTarifasEspeciales: this.reserva.useTarifasEspeciales,
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
             if (!!this.reserva.cupon && 'id' in this.reserva.cupon) {
                 data.cupon = this.reserva.cupon
+            }
+            
+            if(this.reserva.descuentos){
+                data.descuentos = this.reserva.descuentos
             }
 
             // Realiza la llamada al servicio para reservar
@@ -496,7 +503,7 @@ export default {
                     console.error(err)
                 })
 
-            service.obtenerConfigFormReserva()
+            await service.obtenerConfigFormReserva()
                 .then(async res => {
                     if ('id' in res) {
 
