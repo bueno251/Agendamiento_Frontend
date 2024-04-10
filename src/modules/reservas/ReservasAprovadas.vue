@@ -55,8 +55,7 @@
                                     outlined>
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="fechaCreacion"
-                                @change="save('menu3', fechaCreacion)" locale="es">
+                            <v-date-picker v-model="fechaCreacion" @change="save('menu3', fechaCreacion)" locale="es">
                             </v-date-picker>
                         </v-menu>
                     </v-col>
@@ -100,13 +99,16 @@
                                     <v-list-item link @click="reserva = item">
                                         <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
                                     </v-list-item>
+
                                     <v-list-item v-if="item.comprobante" link
                                         @click="reserva = item, dialogComprobante = true">
                                         <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
                                     </v-list-item>
-                                    <v-list-item link @click="reserva = item">
-                                        <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
+
+                                    <v-list-item link @click="reserva = item, dialogReprogramar = true">
+                                        <v-list-item-title v-text="'Reprogramar'"></v-list-item-title>
                                     </v-list-item>
+
                                     <v-list-item link @click="reserva = item, dialogCancelar = true">
                                         <v-list-item-title v-text="'Cancelar'"></v-list-item-title>
                                     </v-list-item>
@@ -148,6 +150,9 @@
             </v-data-table>
         </v-container>
 
+        <ReprogramarReserva :show="dialogReprogramar" :reserva="reserva" @close="dialogReprogramar = false"
+            @update="getReservas()" />
+
         <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
             @update="getReservas()" />
     </v-card>
@@ -157,11 +162,13 @@
 
 import service from '@/services/service'
 import CancelacionReserva from './components/CancelacionReserva.vue'
+import ReprogramarReserva from './components/ReprogramarReserva'
 
 export default {
     name: 'ReservasAprobadas',
     components: {
         CancelacionReserva,
+        ReprogramarReserva,
     },
     watch: {
         twoDates: {
@@ -213,6 +220,7 @@ export default {
             dialogRechazar: false,
             dialogComprobante: false,
             dialogCancelar: false,
+            dialogReprogramar: false,
             twoDates: false,
             reserva: {
                 comprobante: '',
@@ -230,9 +238,9 @@ export default {
                 { text: 'Fecha Llegada', key: 'datein', value: 'fechaEntrada' },
                 { text: 'Fecha Salida', key: 'dateout', value: 'fechaSalida' },
                 { text: 'Huespedes', key: 'huespedes', value: 'huespedes' },
-                { text: 'Documento', key: 'documento', value: 'documento' },
-                { text: 'Telefono', key: 'telefono', value: 'telefono' },
-                { text: 'Huesped', key: 'huesped', value: 'huesped' },
+                { text: 'Documento', key: 'documento', value: 'huesped.documento' },
+                { text: 'Telefono', key: 'telefono', value: 'huesped.telefono' },
+                { text: 'Huesped', key: 'huesped', value: 'huesped.fullname' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
@@ -282,15 +290,15 @@ export default {
                 if (this.twoDates) {
                     // Filtrar según documento, teléfono y rango de fechas si ambas fechas están presentes.
                     return (
-                        reserva.cedula == this.documento ||
-                        reserva.telefono == this.telefono ||
+                        reserva.huesped.documento == this.documento ||
+                        reserva.huesped.telefono == this.telefono ||
                         (reserva.fechaEntrada >= this.fechaLLegada && reserva.fechaSalida <= this.fechaSalida)
                     )
                 } else {
                     // Solo hay una fecha, realizar la comprobación correspondiente.
                     return (
-                        reserva.cedula == this.documento ||
-                        reserva.telefono == this.telefono ||
+                        reserva.huesped.documento == this.documento ||
+                        reserva.huesped.telefono == this.telefono ||
                         (this.fechaLLegada && reserva.fechaEntrada == this.fechaLLegada) ||
                         (this.fechaSalida && reserva.fechaSalida == this.fechaSalida) ||
                         (this.fechaCreacion && reserva.created_at.split(' ')[0] == this.fechaCreacion)

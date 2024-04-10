@@ -85,6 +85,11 @@ const routes = [
 		redirect: { name: 'viewRooms' },
 		children: [
 			{
+				path: '/confirmacion_reserva',
+				name: 'confirmacionReserva',
+				component: () => import('@/modules/reservas/ConfirmacionReserva.vue'),
+			},
+			{
 				path: '/reservas_clientes',
 				name: 'viewRooms',
 				component: () => import('@/modules/reservas/ViewRooms.vue'),

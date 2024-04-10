@@ -1,6 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
-import CacheManager from "./CacheManager/CacheManager"
+import CacheManager from "../CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -21,17 +21,17 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const roomService = {
+const DesayunoService = {
 
     /**
-     * Crea un nuevo estado de habitación mediante una solicitud POST a la API.
+     * Crea un nuevo desayuno mediante una solicitud POST a la API.
      * @function
-     * @memberof RoomService
-     * @param {Object} data - Datos del estado de habitación a crear.
+     * @memberof DesayunoService
+     * @param {Object} data - Datos del desayuno a crear.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    crearEstadoRoom(data) {
-        let url = 'estado-room'
+    crearDesayuno(data) {
+        let url = 'desayuno'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -45,30 +45,30 @@ const roomService = {
     },
 
     /**
-     * Obtiene todos los estados de habitaciones mediante una solicitud GET a la API.
+     * Obtiene la lista de desayunos disponibles mediante una solicitud GET a la API.
      * @function
-     * @memberof RoomService
-     * @returns {Promise} Promesa que se resuelve con la lista de estados de habitaciones o se rechaza con un error.
+     * @memberof DesayunoService
+     * @returns {Promise} Promesa que se resuelve con la lista de desayunos o se rechaza con un error.
      */
-    obtenerEstadosRoom() {
-        let url = 'estados-room'
+    obtenerDesayunos() {
+        let url = 'desayunos'
 
-        return cacheManager.obtenerDatos('estados-room', url)
+        return cacheManager.obtenerDatos('desayunos', url)
     },
 
     /**
-     * Actualiza un estado de habitación existente mediante una solicitud PATCH a la API.
+     * Actualiza la información de un desayuno existente mediante una solicitud PATCH a la API.
      * @function
-     * @memberof RoomService
-     * @param {Object} data - Datos actualizados del estado de habitación.
-     * @param {number} id - Identificador único del estado de habitación a actualizar.
+     * @memberof DesayunoService
+     * @param {Object} data - Nuevos datos del desayuno a actualizar.
+     * @param {number} id - Identificador único del desayuno.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarEstadoRoom(data, id) {
-        let url = `estado-room/${id}`
+    actualizarDesayuno(data, id) {
+        let url = `desayuno/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.patch(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -79,14 +79,14 @@ const roomService = {
     },
 
     /**
-     * Elimina un estado de habitación existente mediante una solicitud DELETE a la API.
+     * Elimina un desayuno existente mediante una solicitud DELETE a la API.
      * @function
-     * @memberof RoomService
-     * @param {number} id - Identificador único del estado de habitación a eliminar.
+     * @memberof DesayunoService
+     * @param {number} id - Identificador único del desayuno a eliminar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    eliminarEstadoRoom(id) {
-        let url = `estado-room/${id}`
+    eliminarDesayuno(id) {
+        let url = `desayuno/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -101,4 +101,4 @@ const roomService = {
 
 }
 
-export default roomService
+export default DesayunoService

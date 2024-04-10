@@ -409,7 +409,11 @@ export default {
         aprobar() {
             this.loadingbtn = true
 
-            service.aprobarReserva(this.reserva.id)
+            let data = {
+                esTemporal: this.reserva.esTemporal
+            }
+
+            service.aprobarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
@@ -435,7 +439,11 @@ export default {
         rechazar() {
             this.loadingbtn = true
 
-            service.rechazarReserva(this.reserva.id)
+            let data = {
+                esTemporal: this.reserva.esTemporal
+            }
+
+            service.rechazarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false

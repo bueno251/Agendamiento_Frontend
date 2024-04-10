@@ -110,11 +110,11 @@ const ReservaService = {
      * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la reserva aprobada.
      * @throws {Error} - Error si la aprobación de la reserva falla.
      */
-    aprobarReserva(id) {
+    aprobarReserva(data, id) {
         let url = `reserva/approve/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.patch(url)
+            LOCAL.api.patch(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -132,11 +132,11 @@ const ReservaService = {
      * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la reserva rechazada.
      * @throws {Error} - Error si el rechazo de la reserva falla.
      */
-    rechazarReserva(id) {
+    rechazarReserva(data, id) {
         let url = `reserva/reject/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.patch(url)
+            LOCAL.api.patch(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })

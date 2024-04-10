@@ -81,7 +81,7 @@
 
                         <v-col cols="12" md="6" sm="6">
                             <label>Pendiente de pago el dia de llegada ${{ abono }} {{
-                        divisa.codigo }} <span class="red--text">*</span></label>
+                                divisa.codigo }} <span class="red--text">*</span></label>
                             <v-text-field v-model="abono" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
                         </v-col>
@@ -394,10 +394,13 @@ export default {
             if (!!this.reserva.cupon && 'id' in this.reserva.cupon) {
                 data.cupon = this.reserva.cupon
             }
-            
-            if(this.reserva.descuentos){
+
+            if (this.reserva.descuentos) {
                 data.descuentos = this.reserva.descuentos
             }
+
+            console.log({ ...data, ...this.reserva });
+            this.$store.dispatch('setReserva', { ...data, ...this.reserva })
 
             // Realiza la llamada al servicio para reservar
             service.reservar(data)
@@ -407,7 +410,9 @@ export default {
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
-                    }).then(this.$router.back())
+                    })
+
+                    this.$router.push({ name: 'confirmacionReserva' })
                 })
                 .catch(err => {
                     console.error(err)

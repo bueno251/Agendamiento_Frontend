@@ -66,6 +66,12 @@ const ConfigService = {
         })
     },
 
+    obtenerEmpresa() {
+        let url = 'settings/empresa'
+
+        return cacheManager.obtenerDatos('settings/empresa', url)
+    },
+
     obtenerTiposEmpresa() {
         let url = 'settings/empresa/tipos'
 
@@ -131,7 +137,7 @@ const ConfigService = {
         return cacheManager.obtenerDatos('formReserva', url)
     },
 
-    guardarConfigFormReserva(data){
+    guardarConfigFormReserva(data) {
         let url = `formReserva`
 
         return new Promise((resolve, reject) => {

@@ -1,6 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
-import CacheManager from "./CacheManager/CacheManager"
+import CacheManager from "../CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -21,17 +21,17 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const TipoRoomService = {
+const DecoracionService = {
 
     /**
-     * Crea un nuevo tipo de habitación mediante una solicitud POST a la API.
+     * Crea una nueva decoración mediante una solicitud POST a la API.
      * @function
-     * @memberof TipoRoomService
-     * @param {Object} data - Datos del tipo de habitación a crear.
+     * @memberof DecoracionService
+     * @param {Object} data - Datos de la decoración a crear.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    crearTipoRoom(data) {
-        let url = 'tipo-room'
+    crearDecoracion(data) {
+        let url = 'decoracion'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -45,30 +45,30 @@ const TipoRoomService = {
     },
 
     /**
-     * Obtiene todos los tipos de habitaciones mediante una solicitud GET a la API.
+     * Obtiene la lista de decoraciones disponibles mediante una solicitud GET a la API.
      * @function
-     * @memberof TipoRoomService
-     * @returns {Promise} Promesa que se resuelve con la lista de tipos de habitaciones o se rechaza con un error.
+     * @memberof DecoracionService
+     * @returns {Promise} Promesa que se resuelve con la lista de decoraciones o se rechaza con un error.
      */
-    obtenerTiposRoom() {
-        let url = 'tipos-room'
+    obtenerDecoraciones() {
+        let url = 'decoraciones'
 
-        return cacheManager.obtenerDatos('tipos-room', url)
+        return cacheManager.obtenerDatos('decoraciones', url)
     },
 
     /**
-     * Actualiza un tipo de habitación existente mediante una solicitud PATCH a la API.
+     * Actualiza la información de una decoración existente mediante una solicitud PATCH a la API.
      * @function
-     * @memberof TipoRoomService
-     * @param {Object} data - Datos actualizados del tipo de habitación.
-     * @param {number} id - Identificador único del tipo de habitación a actualizar.
+     * @memberof DecoracionService
+     * @param {Object} data - Nuevos datos de la decoración a actualizar.
+     * @param {number} id - Identificador único de la decoración.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarTipoRoom(data, id) {
-        let url = `tipo-room/${id}`
+    actualizarDecoracion(data, id) {
+        let url = `decoracion/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.patch(url, data)
+            LOCAL.api.post(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -79,14 +79,14 @@ const TipoRoomService = {
     },
 
     /**
-     * Elimina un tipo de habitación existente mediante una solicitud DELETE a la API.
+     * Elimina una decoración existente mediante una solicitud DELETE a la API.
      * @function
-     * @memberof TipoRoomService
-     * @param {number} id - Identificador único del tipo de habitación a eliminar.
+     * @memberof DecoracionService
+     * @param {number} id - Identificador único de la decoración a eliminar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    eliminarTipoRoom(id) {
-        let url = `tipo-room/${id}`
+    eliminarDecoracion(id) {
+        let url = `decoracion/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -98,7 +98,6 @@ const TipoRoomService = {
                 })
         })
     },
-
 }
 
-export default TipoRoomService
+export default DecoracionService

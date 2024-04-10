@@ -22,6 +22,7 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
+
                                     <v-list-item v-if="item.comprobante" link
                                         @click="reserva = item, dialogComprobante = true">
                                         <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
@@ -32,8 +33,8 @@
                                             <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
                                         </v-list-item>
 
-                                        <v-list-item link @click="reserva = item">
-                                            <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
+                                        <v-list-item link @click="reserva = item, dialogReprogramar = true">
+                                            <v-list-item-title v-text="'Reprogramar'"></v-list-item-title>
                                         </v-list-item>
 
                                         <v-list-item link @click="reserva = item, dialogCancelar = true">
@@ -139,6 +140,9 @@
             </v-card>
         </v-dialog>
 
+        <ReprogramarReserva :show="dialogReprogramar" :reserva="reserva" @close="dialogReprogramar = false"
+            @update="getReservas()" />
+
         <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
             @update="getReservas()" />
     </div>
@@ -148,12 +152,14 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import CancelacionReserva from './components/CancelacionReserva.vue'
+import CancelacionReserva from './components/CancelacionReserva'
+import ReprogramarReserva from './components/ReprogramarReserva'
 
 export default {
     name: 'ReservasApp',
     components: {
-        CancelacionReserva
+        CancelacionReserva,
+        ReprogramarReserva,
     },
     data() {
         return {
@@ -164,6 +170,7 @@ export default {
             dialogRechazar: false,
             dialogComprobante: false,
             dialogCancelar: false,
+            dialogReprogramar: false,
             reserva: {
                 comprobante: '',
             },
@@ -237,7 +244,7 @@ export default {
                 .catch(err => {
                     this.loadingbtn = false
                     Swal.fire({
-                        icon: 'success',
+                        icon: 'error',
                         text: err.response.data.message,
                     })
                     console.error(err)
@@ -262,7 +269,7 @@ export default {
                 .catch(err => {
                     this.loadingbtn = false
                     Swal.fire({
-                        icon: 'success',
+                        icon: 'error',
                         text: err.response.data.message,
                     })
                     console.error(err)
