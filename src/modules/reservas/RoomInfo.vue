@@ -269,7 +269,7 @@
 
                     <div class="buttons mt-5">
                         <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                        <v-btn @click="datosCliente = true" :disabled="!valid || !canReservar" color="light-green">
+                        <v-btn @click="datosCliente = true" :disabled="!valid || !canReservar" class="light-green black--text">
                             reservar
                         </v-btn>
                     </div>
@@ -279,6 +279,10 @@
 
         <v-dialog :value="datosCliente" width="90%" max-width="500px" persistent>
             <v-card class="pa-5 sticky" elevation="5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="datosCliente = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
                 <v-form v-model="validDatosCliente" @submit.prevent="agendar">
                     <v-row>
                         <v-col cols="12">
@@ -296,7 +300,7 @@
 
                     <div class="buttons mt-5">
                         <v-btn @click="datosCliente = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validDatosCliente" color="light-green" type="submit">
+                        <v-btn :disabled="!validDatosCliente" class="light-green black--text" type="submit">
                             siguiente
                         </v-btn>
                     </div>
@@ -1051,6 +1055,7 @@ export default {
             return extensionesImagen.includes(extension)
         },
         getTarifaEspecial(date) {
+            if(this.room.tarifasEspeciales == null) return false
             return this.room.tarifasEspeciales.find(tarifa => date == tarifa.fecha)
         },
         /**

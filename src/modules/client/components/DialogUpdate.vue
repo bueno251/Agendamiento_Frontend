@@ -1,6 +1,10 @@
 <template>
     <v-dialog :value="show" width="90%" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer></v-spacer>
+                <v-btn icon class="ml-3" @click="$emit('close')"><v-icon>mdi-close-box</v-icon></v-btn>
+            </v-toolbar>
             <v-form ref="form" v-model="valid" @submit.prevent="updateClient">
                 <v-row>
 
@@ -96,9 +100,9 @@
                     </v-col>
 
                     <v-col cols="12" md="3" sm="6">
-                        <v-select v-model="departamento" :items="departamentos" item-text="nombre"
-                            item-value="id" :loading="loadingDepartamentos" @change="getCiudades"
-                            no-data-text="Seleccione un pais" dense outlined>
+                        <v-select v-model="departamento" :items="departamentos" item-text="nombre" item-value="id"
+                            :loading="loadingDepartamentos" @change="getCiudades" no-data-text="Seleccione un pais"
+                            dense outlined>
                             <template v-slot:label>
                                 Departamento <span class="red--text">*</span>
                             </template>
@@ -153,7 +157,7 @@
 
                 <div class="buttons">
                     <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">actualizar</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">actualizar</v-btn>
                 </div>
             </v-form>
         </v-card>

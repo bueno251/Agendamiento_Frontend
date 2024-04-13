@@ -1,6 +1,10 @@
 <template>
     <v-dialog :value="show" width="90%" max-width="500px" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer></v-spacer>
+                <v-btn icon class="ml-3" @click="$emit('close')"><v-icon>mdi-close-box</v-icon></v-btn>
+            </v-toolbar>
             <v-form ref="formReprogramar" v-model="validReprogramar" @submit.prevent="reprogramar">
                 <v-row>
                     <v-col cols="12" md="6" sm="6">
@@ -54,8 +58,7 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="$emit('close')" color="error"
-                        class="white--text text--accent-4">cancelar</v-btn>
+                    <v-btn @click="$emit('close')" color="error" class="white--text text--accent-4">cancelar</v-btn>
                     <v-btn type="submit" :loading="loadingbtn" color="primary">reprogramar</v-btn>
                 </div>
             </v-form>

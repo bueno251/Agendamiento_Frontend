@@ -1,6 +1,12 @@
 <template>
     <v-dialog :value="show" width="90%" max-width="500px" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer />
+                <v-btn icon class="ml-3" @click="$emit('close')">
+                    <v-icon>mdi-close-box</v-icon>
+                </v-btn>
+            </v-toolbar>
             <v-form v-model="valid" @submit.prevent="save()">
                 <v-row>
 
@@ -57,8 +63,12 @@
                 </v-row>
 
                 <div class="buttons pt-5">
-                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">
+                        cancelar
+                    </v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" class="light-green black--text">
+                        guardar
+                    </v-btn>
                 </div>
             </v-form>
         </v-card>

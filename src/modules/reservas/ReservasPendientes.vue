@@ -138,18 +138,20 @@
                         <td>${{ comaEnMiles(item.precio) }}</td>
                         <td>${{ comaEnMiles(item.abono) }}</td>
                         <td>
-                            <span v-if="item.cupon.esPorcentaje">
-                                {{ item.cupon.porcentaje }}% (${{ comaEnMiles(item.cupon.descuento) }})
-                            </span>
-                            <span v-else>
-                                ${{ comaEnMiles(item.cupon.descuento) }}
-                            </span>
-                            <div>
-                                {{ item.cupon.nombre }}
-                            </div>
+                            <template v-if="item.cupon">
+                                <span v-if="item.cupon.esPorcentaje">
+                                    {{ item.cupon.porcentaje }}% (${{ comaEnMiles(item.cupon.descuento) }})
+                                </span>
+                                <span v-else>
+                                    ${{ comaEnMiles(item.cupon.descuento) }}
+                                </span>
+                                <div>
+                                    {{ item.cupon.nombre }}
+                                </div>
+                            </template>
                         </td>
                         <td>
-                            <v-row class="ma-0">
+                            <v-row class="ma-0" v-if="item.descuentos">
                                 <span class="mr-5">
                                     ${{ comaEnMiles(item.descuentos.reduce((acum, item) => acum + item.descuento, 0)) }}
                                 </span>
@@ -167,7 +169,8 @@
                                             </div>
                                             <div>
                                                 <span v-if="descuento.esPorcentaje">
-                                                    Descuento: {{ descuento.porcentaje }}% (${{ comaEnMiles(descuento.descuento)
+                                                    Descuento: {{ descuento.porcentaje }}% (${{
+                                                        comaEnMiles(descuento.descuento)
                                                     }})
                                                 </span>
                                                 <span v-else>
@@ -186,22 +189,37 @@
         </v-container>
 
         <v-dialog :value="dialogAprobar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Aprobar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogAprobar = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Aprobar la Reserva?
+                    </h3>
                     <div class="buttons">
-                        <v-btn @click="dialogAprobar = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="aprobar" :loading="loadingbtn" color="primary">confirmar</v-btn>
+                        <v-btn @click="dialogAprobar = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+                        <v-btn @click="aprobar" :loading="loadingbtn" color="primary">
+                            confirmar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>
         </v-dialog>
 
         <v-dialog :value="dialogRechazar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Rechazar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogRechazar = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Rechazar la Reserva?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogRechazar = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>

@@ -45,6 +45,12 @@
 
         <v-dialog :value="dialogPrecio" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogPrecio = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formCreate" v-model="valid" @submit.prevent="saveTarifaOta">
                     <v-row>
 
@@ -78,8 +84,12 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogPrecio = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!valid" :loading="loadingbtn" type="submit" color="light-green">guardar</v-btn>
+                        <v-btn @click="dialogPrecio = false" color="blue">
+                            cancelar
+                        </v-btn>
+                        <v-btn :disabled="!valid" :loading="loadingbtn" type="submit" class="light-green black--text">
+                            guardar
+                        </v-btn>
                     </div>
 
                 </v-form>

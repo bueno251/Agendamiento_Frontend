@@ -96,7 +96,7 @@
 
                 <div class="buttons">
                     <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
+                    <v-btn :disabled="!validPagos" :loading="loading" class="light-green black--text" type="submit">
                         {{ metodoPago.requiereComprobante ? 'Guardar' : 'Pagar' }}
                     </v-btn>
                 </div>
@@ -245,10 +245,10 @@
                                     cancelar
                                 </v-btn>
                                 <v-btn v-if="!validHuespedes" :disabled="!validHuesped" :loading="loading"
-                                    color="light-green" @click="checkHuespedes()">
+                                    class="light-green black--text" @click="checkHuespedes()">
                                     continuar
                                 </v-btn>
-                                <v-btn v-else :disabled="!validHuesped" :loading="loading" color="light-green"
+                                <v-btn v-else :disabled="!validHuesped" :loading="loading" class="light-green black--text"
                                     type="submit">
                                     guardar
                                 </v-btn>
@@ -399,7 +399,6 @@ export default {
                 data.descuentos = this.reserva.descuentos
             }
 
-            console.log({ ...data, ...this.reserva });
             this.$store.dispatch('setReserva', { ...data, ...this.reserva })
 
             // Realiza la llamada al servicio para reservar
@@ -416,6 +415,10 @@ export default {
                 })
                 .catch(err => {
                     console.error(err)
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
                     this.loading = false
                 })
         },

@@ -5,11 +5,17 @@
         </h1>
         <v-card width="90%" class="my-5">
             <v-card-title>
-                <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details></v-text-field>
-                <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
-                    <v-icon>mdi-plus-circle</v-icon> agregar cliente
-                </v-btn>
+                <v-row>
+                    <v-col cols="12" md="10" sm="8">
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                            hide-details></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="2" sm="4">
+                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                            <v-icon>mdi-plus-circle</v-icon> agregar
+                        </v-btn>
+                    </v-col>
+                </v-row>
             </v-card-title>
             <v-data-table :headers="headers" :items="desserts" :search="search" :loading="loading"
                 no-results-text="No hay ningún cliente que coincida" no-data-text="No hay clientes"
@@ -46,11 +52,15 @@
         <DialogCreate :show="dialogCreate" @close="dialogCreate = false" @update="getClients()" />
 
         <DialogUpdate :show="dialogUpdate" :client="client" @close="dialogUpdate = false" @update="getClients()" />
-        
+
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar al cliente {{ client.fullname }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogDelete = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Eliminar al cliente {{ client.fullname }}?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>

@@ -94,6 +94,12 @@
 
         <v-dialog :value="tarifasGeneralesDialog" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="tarifasGeneralesDialog = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form v-model="valid" @submit.prevent="saveTarifas()">
                     <v-row>
 
@@ -149,9 +155,13 @@
                     </v-row>
 
                     <div class="buttons pt-5">
-                        <v-btn @click="tarifasGeneralesDialog = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn"
-                            color="light-green">guardar</v-btn>
+                        <v-btn @click="tarifasGeneralesDialog = false" color="blue">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            guardar
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>

@@ -31,6 +31,12 @@
 
         <v-dialog :value="dialogCreate" width="90%" max-width="600px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogCreate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="form" v-model="valid" @submit.prevent="crear()">
                     <v-row>
                         <v-col cols="12">
@@ -44,7 +50,7 @@
 
                     <div class="buttons">
                         <v-btn @click="dialogCreate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" color="light-green">crear</v-btn>
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">crear</v-btn>
                     </div>
                 </v-form>
             </v-card>

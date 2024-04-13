@@ -1,6 +1,12 @@
 <template>
     <v-dialog :value="show" width="90%" max-width="800px" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer />
+                <v-btn icon class="ml-3" @click="$emit('close')">
+                    <v-icon>mdi-close-box</v-icon>
+                </v-btn>
+            </v-toolbar>
             <v-form ref="form" v-model="valid" @submit.prevent="update">
                 <v-row>
                     <template v-for="room in rooms">
@@ -14,7 +20,8 @@
 
                         <v-col cols="12" md="5" sm="4" :key="room.id">
                             <v-select v-model="room.estado_id" :items="estados" no-data-text="Espere un momento..."
-                                :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" dense outlined>
+                                :rules="[rules.required]" label="Estado" item-text="estado" item-value="id" dense
+                                outlined>
 
                                 <template v-slot:label>
                                     Estado <span class="red--text">*</span>
@@ -32,20 +39,35 @@
                     </template>
                 </v-row>
                 <div class="buttons pt-5">
-                    <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
+                    <v-btn @click="$emit('close')" color="blue">
+                        cancelar
+                    </v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" class="light-green black--text">
+                        guardar
+                    </v-btn>
                 </div>
             </v-form>
         </v-card>
 
         <v-dialog :value="dialogDelete" width="90%" max-width="600px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar la habitación {{ habitacion.nombre }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogDelete = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Eliminar la habitación {{ habitacion.nombre }}?
+                    </h3>
                     <div class="buttons">
-                        <v-btn @click="dialogDelete = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                        <v-btn @click="dialogDelete = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">
+                            eliminar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>

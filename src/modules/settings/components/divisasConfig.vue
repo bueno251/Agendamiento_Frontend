@@ -44,6 +44,12 @@
 
         <v-dialog :value="dialogCreate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogCreate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
                     <v-row>
                         <v-col cols="12">
@@ -67,9 +73,12 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
-                            color="light-green">crear</v-btn>
+                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">
+                            cancelar
+                        </v-btn>
+                        <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit" class="light-green black--text">
+                            crear
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -77,6 +86,12 @@
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogUpdate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="actualizar">
                     <v-row>
                         <v-col cols="12">
@@ -100,18 +115,29 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validUpdate" :loading="loadingbtn" type="submit"
-                            color="light-green">actualizar</v-btn>
+                        <v-btn @click="dialogUpdate = false" color="blue">
+                            cancelar
+                        </v-btn>
+                        <v-btn :disabled="!validUpdate" :loading="loadingbtn" type="submit" class="light-green black--text">
+                            actualizar
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
         </v-dialog>
 
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar la divisa {{ divisaSelected.nombre }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogDelete = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Eliminar la divisa {{ divisaSelected.nombre }}?
+                    </h3>
                     <div class="buttons">
                         <v-btn @click="dialogDelete = false" color="error" class="white--text text--accent-4">
                             cancelar
