@@ -76,6 +76,14 @@ export default {
 
     props: {
         room: Object,
+        route: {
+            default: 'room',
+            type: String,
+        },
+        dateIn: {
+            default: '',
+            type: String,
+        },
         buttonText: {
             default: 'Disponibilidad',
             type: String,
@@ -101,7 +109,16 @@ export default {
          * @param {number} id - ID de la habitación a la que se redirigirá.
          */
         goToRoom(id) {
-            this.$router.push({ name: 'room', params: { id: id } })
+
+            let params = {
+                id: id
+            }
+
+            if (this.dateIn) {
+                params.dateIn = this.dateIn                
+            }
+
+            this.$router.push({ name: this.route, params: params })
         },
         /**
          * Formatea un número agregando comas para separar miles y acepta decimales.

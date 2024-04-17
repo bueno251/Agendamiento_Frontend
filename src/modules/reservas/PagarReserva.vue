@@ -248,8 +248,8 @@
                                     class="light-green black--text" @click="checkHuespedes()">
                                     continuar
                                 </v-btn>
-                                <v-btn v-else :disabled="!validHuesped" :loading="loading" class="light-green black--text"
-                                    type="submit">
+                                <v-btn v-else :disabled="!validHuesped" :loading="loading"
+                                    class="light-green black--text" type="submit">
                                     guardar
                                 </v-btn>
                             </div>
@@ -391,6 +391,16 @@ export default {
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
+            let route = this.$route.path
+
+            let isForAdmin = route.includes('admin')
+
+            if (isForAdmin) {
+                data.origen = 2
+            } else {
+                data.origen = 1
+            }
+
             if (!!this.reserva.cupon && 'id' in this.reserva.cupon) {
                 data.cupon = this.reserva.cupon
             }
@@ -411,7 +421,11 @@ export default {
                         text: res.message,
                     })
 
-                    this.$router.push({ name: 'confirmacionReserva' })
+                    if (isForAdmin) {
+                        this.$router.push({ name: 'reservasApp' })
+                    } else {
+                        this.$router.push({ name: 'confirmacionReserva' })
+                    }
                 })
                 .catch(err => {
                     console.error(err)

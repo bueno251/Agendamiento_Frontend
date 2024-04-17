@@ -164,7 +164,7 @@
                     <v-btn icon class="ml-3" @click="dialogCreate = false"><v-icon>mdi-close-box</v-icon></v-btn>
                 </v-toolbar>
                 <div class='calendario'>
-                    <CalendarioDisponibilidad  />
+                    <CalendarioDisponibilidad :route="'roomAdmin'" />
                 </div>
             </v-card>
         </v-dialog>

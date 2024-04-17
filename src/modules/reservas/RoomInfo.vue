@@ -269,7 +269,8 @@
 
                     <div class="buttons mt-5">
                         <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                        <v-btn @click="datosCliente = true" :disabled="!valid || !canReservar" class="light-green black--text">
+                        <v-btn @click="datosCliente = true" :disabled="!valid || !canReservar"
+                            class="light-green black--text">
                             reservar
                         </v-btn>
                     </div>
@@ -743,8 +744,9 @@ export default {
             useGenerales: false,
             menu1: false,
             menu2: false,
-            dates: [],
-            datesInvalid: [],
+            dates: [
+                this.$route.params.dateIn
+            ],
             festivos: [],
             caracteristicas: [],
             precios: [],
@@ -784,18 +786,20 @@ export default {
                 capacidad: '',
                 descripcion: '',
                 tipo: '',
+                reservas: [],
             },
             rules: {
                 required: value => !!value || 'Campo requerido.',
                 date: () => {
-                    for (let dates of this.datesInvalid) {
-                        if (
-                            (this.dates[0] >= dates.fecha_entrada && this.dates[0] <= dates.fecha_salida) ||
-                            (this.dates[1] >= dates.fecha_entrada && this.dates[1] <= dates.fecha_salida) ||
-                            (this.dates[0] <= dates.fecha_entrada && this.dates[1] >= dates.fecha_salida)
-                        ) {
+                    let invalidDates = this.invalidDates()
+
+                    for (let i = 0; i < invalidDates.length; i++) {
+                        const date = invalidDates[i]
+
+                        if (this.dates[0] <= date && date <= this.dates[1]) {
                             return 'Fecha No Valida'
                         }
+
                     }
 
                     return true
@@ -860,7 +864,7 @@ export default {
             } catch (err) {
                 // Maneja el error y redirige a la vista de habitaciones en caso de fallo
                 console.error(err)
-                this.$router.push({ name: 'viewRooms' })
+                this.$router.back()
             }
         },
         /**
@@ -941,7 +945,14 @@ export default {
             this.$store.dispatch('setReserva', data)
 
             // Redirige a la página de pago
-            this.$router.push({ name: 'pagar' })
+            let route = this.$route.path
+
+            if (route.includes('admin')) {
+                this.$router.push({ name: 'pagarAdmin' })
+            } else {
+                this.$router.push({ name: 'pagar' })
+            }
+
         },
         /**
          * Formatea un número agregando comas para separar miles y acepta decimales.
@@ -1008,27 +1019,41 @@ export default {
          * @returns {boolean} - Indica si la fecha está permitida.
          */
         allowedDates(value) {
-            for (let dates of this.datesInvalid) {
-                if (value >= dates.fecha_entrada && value <= dates.fecha_salida) {
-                    return false
+            if (!this.room.reservas) {
+                return true
+            }
+
+            let invalidDates = this.invalidDates()
+
+            let result = invalidDates.findIndex(date => date == value)
+
+            return result == -1
+        },
+        invalidDates() {
+            let dates = []
+
+            if (!this.room.reservas) {
+                return []
+            }
+
+            for (let i = 0; i < this.room.reservas.length; i++) {
+                const { fechaEntrada, fechaSalida } = this.room.reservas[i]
+
+                const fechaInicio = new Date(fechaEntrada);
+                const fechaFin = new Date(fechaSalida);
+
+                for (let fecha = fechaInicio; fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
+                    const fechaString = fecha.toISOString().slice(0, 10); // Convertir la fecha a string en formato YYYY-MM-DD
+
+                    !dates[fechaString] ?
+                        dates[fechaString] = 1 :
+                        dates[fechaString]++
                 }
             }
 
-            return true
-        },
-        /**
-         * Obtiene las fechas invalidas para la habitación actual y actualiza la variable 'datesInvalid'.
-         */
-        getDates() {
-            let id = this.$route.params.id
+            dates = Object.keys(dates).filter(key => dates[key] == this.room.cantidad)
 
-            service.getFechasRoom(id)
-                .then(res => {
-                    this.datesInvalid = res
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+            return dates
         },
         /**
          * Verifica si una característica está incluida en las características de una habitación.
@@ -1055,7 +1080,7 @@ export default {
             return extensionesImagen.includes(extension)
         },
         getTarifaEspecial(date) {
-            if(this.room.tarifasEspeciales == null) return false
+            if (this.room.tarifasEspeciales == null) return false
             return this.room.tarifasEspeciales.find(tarifa => date == tarifa.fecha)
         },
         /**
@@ -1299,7 +1324,6 @@ export default {
     async mounted() {
         await this.getRoom()
         await this.getDefault()
-        this.getDates()
         this.getDatos()
         this.getFestivos()
     },

@@ -11,7 +11,7 @@
         </div>
 
         <v-calendar ref="calendar" v-model="value" color="primary" :type="type" locale="es"
-            :event-overlap-threshold="30" @change="getRooms" @click:date="filterRooms">
+            :event-overlap-threshold="30" @click:date="filterRooms">
 
             <template v-slot:day-label>
                 <div></div>
@@ -19,7 +19,7 @@
 
             <template v-slot:day="item">
                 <div :class="`day ${availableDate(item.date) ? 'clickeable' : ''}`"
-                    @click="availableDate(item.date) ? filterRooms(item) : ''">
+                    @click="availableDate(item.date) ? filterRooms(item) : '', value = item.date">
                     <h2>
                         {{ item.day }}
                     </h2>
@@ -36,7 +36,7 @@
                 </v-toolbar>
                 <v-row class="pt-5 ma-0 w-100">
                     <v-col cols="12" lg="4" md="6" sm="6" v-for="room in roomsFiltered" :key="room.id">
-                        <CardRoom :room="room" buttonText="reservar" />
+                        <CardRoom :room="room" :route="route" :dateIn="value" buttonText="reservar" />
                     </v-col>
                 </v-row>
             </v-card>
@@ -56,6 +56,13 @@ export default {
         CardRoom,
     },
 
+    props: {
+        route: {
+            default: 'room',
+            type: String,
+        },
+    },
+
     data: () => ({
         type: 'month',
         value: '',
@@ -66,8 +73,8 @@ export default {
     }),
 
     methods: {
-        getRooms({ start, end }) {
-            service.obtenerRooms(start.date, end.date)
+        getRooms() {
+            service.obtenerRooms()
                 .then(res => {
                     this.rooms = res
 
@@ -148,6 +155,10 @@ export default {
                 return false
             }
 
+            if (!this.rooms.length) {
+                return true
+            }
+
             for (let i = 0; i < this.rooms.length; i++) {
                 const room = this.rooms[i];
 
@@ -195,6 +206,10 @@ export default {
             return resultado;
         },
     },
+
+    mounted() {
+        this.getRooms()
+    },
 }
 </script>
 
@@ -211,6 +226,7 @@ export default {
     align-items: center;
     justify-content: center;
     background: #20202044;
+    margin: 0 4px 4px 4px;
 }
 
 .clickeable {

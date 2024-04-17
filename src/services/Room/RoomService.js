@@ -70,12 +70,8 @@ const roomService = {
      * @returns {Promise<Object>} - Promesa que se resuelve con los datos de la respuesta.
      * @throws {Error} - Error si la obtención de habitaciones falla.
      */
-    obtenerRooms(dateInicio = '', dateFin = '') {
+    obtenerRooms() {
         let url = 'rooms'
-
-        if (dateInicio && dateFin) {
-            url = `${url}-${dateInicio}&${dateFin}`
-        }
 
         return cacheManager.obtenerDatos(url, url)
     },

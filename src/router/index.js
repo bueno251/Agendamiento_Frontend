@@ -18,9 +18,15 @@ const routes = [
 		},
 		children: [
 			{
-				path: 'reservas/interno',
-				name: 'reservas',
-				component: () => import('@/modules/reservas/ReservasInterno.vue'),
+				path: 'reservas/interno?:id(\\d+):dateIn(\\d{4}-\\d{2}-\\d{2})?',
+				name: 'roomAdmin',
+				component: () => import('@/modules/reservas/RoomInfo.vue'),
+				props: true,
+			},
+			{
+				path: 'pagar',
+				name: 'pagarAdmin',
+				component: () => import('@/modules/reservas/PagarReserva.vue'),
 			},
 			{
 				path: 'reservas/app',
@@ -100,7 +106,7 @@ const routes = [
 				component: () => import('@/modules/reservas/ViewRooms.vue'),
 			},
 			{
-				path: '/reservas_clientes/:id(\\d+)',
+				path: '/reservas_clientes?:id(\\d+):dateIn(\\d{4}-\\d{2}-\\d{2})?',
 				name: 'room',
 				component: () => import('@/modules/reservas/RoomInfo.vue'),
 				props: true,
