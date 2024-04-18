@@ -49,6 +49,15 @@
                 <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
+                            Extrangeros pagan impuestos?
+                        </p>
+                        <v-switch v-model="extrangerosPaganImpuestos" :label="extrangerosPaganImpuestos ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
                             Habilitar ventas en OTAS?
                         </p>
                         <v-switch v-model="ventasOtas" :label="ventasOtas ? 'Si' : 'No'" inset></v-switch>
@@ -193,6 +202,7 @@ export default {
                     this.canReservar = newItem.usuarioReserva
                     this.calendarioInhabilitado = newItem.calendarioInhabilitado
                     this.correoRequired = newItem.correoObligatorio
+                    this.extrangerosPaganImpuestos = newItem.extrangerosPaganImpuestos
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
                     this.edadNiños = newItem.edadTarifaNiños
@@ -227,6 +237,7 @@ export default {
             canReservar: true,
             calendarioInhabilitado: false,
             correoRequired: true,
+            extrangerosPaganImpuestos: true,
             tarifasGenerales: false,
             ventasOtas: false,
             loading: false,
@@ -260,6 +271,7 @@ export default {
                 reservar: this.canReservar,
                 calendario: this.calendarioInhabilitado,
                 correo: this.correoRequired,
+                extrangerosPaganImpuestos: this.extrangerosPaganImpuestos,
                 tarifasGenerales: this.tarifasGenerales,
                 ventasOtas: this.ventasOtas,
                 porcentaje: this.porcentSeparacion,

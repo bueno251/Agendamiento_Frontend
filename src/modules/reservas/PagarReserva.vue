@@ -142,8 +142,8 @@
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>Número Documento <span class="red--text">*</span></label>
                                     <v-text-field ref="documento" v-model="huesped.documento"
-                                        :rules="[rules.required, rules.unique]" type="number" hide-spin-buttons dense
-                                        outlined required>
+                                        :rules="[rules.required, rules.unique]" @focusout="getUser(huesped.documento)"
+                                        type="number" hide-spin-buttons dense outlined required>
                                     </v-text-field>
                                 </v-col>
 
@@ -271,6 +271,7 @@ import service from "@/services/service"
 
 export default {
     name: 'PagarReserva',
+
     computed: {
         validHuespedes() {
             for (let i = 0; i < this.huespedes.length; i++) {
@@ -284,6 +285,7 @@ export default {
             return true
         },
     },
+
     data() {
         return {
             reserva: vuex.state.reserva,
@@ -294,7 +296,6 @@ export default {
             metodoPago: { id: 1 },
             porcentajeSeparacion: 0,
             validPagos: false,
-            validInfo: false,
             validHuesped: false,
             modalDatosUser: false,
             loading: false,
@@ -566,12 +567,12 @@ export default {
             await service.encontrarClienteDocumento(this.reserva.documento)
                 .then(res => {
                     if ('id' in res) {
-                        this.tipoDocumento = res.tipo_documento_id
+                        this.huespedes[0].tipoDocumento = res.tipo_documento_id
                         this.huespedes[0].nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
                         this.huespedes[0].apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
-                        this.paisResidencia = res.paisId
-                        this.departamentoResidencia = res.departamentoId
-                        this.ciudadResidencia = res.ciudadId
+                        this.huespedes[0].paisResidencia = res.paisId
+                        this.huespedes[0].departamentoResidencia = res.departamentoId
+                        this.huespedes[0].ciudadResidencia = res.ciudadId
                     }
                 })
                 .catch(err => {
@@ -637,6 +638,30 @@ export default {
                 console.error(err)
                 this[loading] = false
             }
+        },
+        /**
+        * Obtiene la información del usuario mediante su número de cédula y actualiza el teléfono del usuario actual.
+        */
+        getUser(documento) {
+            // Busca al cliente usando su número de cédula
+            service.encontrarClienteDocumento(documento)
+                .then(res => {
+                    // Verifica si se encontró al cliente y actualiza el teléfono si está disponible
+                    if ('id' in res) {
+                        this.huesped.tipoDocumento = res.tipo_documento_id
+                        this.huesped.nombre = `${res.nombre1} ${res.nombre2 ? res.nombre2 : ''}`
+                        this.huesped.apellido = `${res.apellido1} ${res.apellido2 ? res.apellido2 : ''}`
+                        this.huesped.correo = res.correo
+                        this.huesped.telefono = res.telefono
+                        this.huesped.paisResidencia = res.paisId
+                        this.huesped.departamentoResidencia = res.departamentoId
+                        this.huesped.ciudadResidencia = res.ciudadId
+                    }
+                })
+                .catch(err => {
+                    // Maneja cualquier error que pueda ocurrir durante la búsqueda del cliente
+                    console.error(err)
+                })
         },
     },
     mounted() {
