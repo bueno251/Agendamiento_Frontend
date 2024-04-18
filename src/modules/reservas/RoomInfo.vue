@@ -745,7 +745,7 @@ export default {
             menu1: false,
             menu2: false,
             dates: [
-                this.$route.params.dateIn
+                this.$route.params.dateIn ? this.$route.params.dateIn : (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             ],
             festivos: [],
             caracteristicas: [],
@@ -1127,9 +1127,11 @@ export default {
 
             service.obtenerDescuentosEstadia(this.room.id)
                 .then(res => {
-                    this.descuentoEstadia = res.reduce((menorDescuento, descuento) => {
-                        return descuento.diasEstadia < menorDescuento.diasEstadia ? descuento : menorDescuento
-                    })
+                    if (res && res.length) {
+                        this.descuentoEstadia = res.reduce((menorDescuento, descuento) => {
+                            return descuento.diasEstadia < menorDescuento.diasEstadia ? descuento : menorDescuento
+                        })
+                    }
                 })
                 .catch(err => {
                     console.error(err)

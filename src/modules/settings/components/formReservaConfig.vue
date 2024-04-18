@@ -17,7 +17,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>País De Residencia <span class="red--text">*</span></label>
                         <v-select v-model="paisResidencia" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
+                            @focusout="getDepartamentos('Residencia')" :rules="[rules.required]" item-text="nombre"
                             item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
@@ -25,7 +25,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento De Residencia <span class="red--text">*</span></label>
                         <v-select v-model="departamentoResidencia" :items="departamentosResidencia"
-                            no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                            no-data-text="Seleccione un pais" @focusout="getCiudades('Residencia')"
                             :rules="[rules.required]" :loading="loadingDepartamentosResidencia" item-text="nombre"
                             item-value="id" outlined dense required>
                         </v-select>
@@ -43,7 +43,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>País Procedencia <span class="red--text">*</span></label>
                         <v-select v-model="paisProcedencia" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
+                            @focusout="getDepartamentos('Procedencia')" :rules="[rules.required]" item-text="nombre"
                             item-value="id" outlined dense required>
                         </v-select>
                     </v-col>
@@ -51,7 +51,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento Procedencia<span class="red--text">*</span></label>
                         <v-select v-model="departamentoProcedencia" :items="departamentosProcedencia"
-                            no-data-text="Seleccione un pais" @change="getCiudades('Procedencia')"
+                            no-data-text="Seleccione un pais" @focusout="getCiudades('Procedencia')"
                             :rules="[rules.required]" :loading="loadingDepartamentosProcedencia" item-text="nombre"
                             item-value="id" outlined dense required>
                         </v-select>

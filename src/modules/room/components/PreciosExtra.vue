@@ -107,7 +107,7 @@ export default {
                     newItem.precios.map((tarifa) => {
 
                         if (tarifa.name == 'Adicional' || tarifa.name == 'Niños') {
-                            this[tarifa.name] = this.comaEnMiles(tarifa.precio)
+                            this[tarifa.name] = this.comaEnMiles(tarifa.precio != 0 ? tarifa.precio : 60000)
                             if (tarifa.impuestoId) {
                                 this.impuesto = tarifa.impuestoId
                                 this.tieneIva = true

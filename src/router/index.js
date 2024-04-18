@@ -88,17 +88,11 @@ const routes = [
 	{
 		path: '/',
 		component: () => import('@/components/baseUser.vue'),
-		redirect: { name: 'viewRooms' },
 		children: [
 			{
 				path: '/calendario_disponibilidad',
 				name: 'calendarioDisponibilidad',
 				component: () => import('@/modules/reservas/CalendarioDisponibilidad.vue'),
-			},
-			{
-				path: '/confirmacion_reserva',
-				name: 'confirmacionReserva',
-				component: () => import('@/modules/reservas/ConfirmacionReserva.vue'),
 			},
 			{
 				path: '/reservas_clientes',
@@ -115,6 +109,25 @@ const routes = [
 				path: '/pagar',
 				name: 'pagar',
 				component: () => import('@/modules/reservas/PagarReserva.vue'),
+				beforeEnter: (to, from, next) => {
+					if (!vuex.state.reserva) {
+						next()
+					} else {
+						next({ name: 'viewRooms' })
+					}
+				},
+			},
+			{
+				path: '/confirmacion_reserva',
+				name: 'confirmacionReserva',
+				component: () => import('@/modules/reservas/ConfirmacionReserva.vue'),
+				beforeEnter: (to, from, next) => {
+					if (!vuex.state.reserva) {
+						next()
+					} else {
+						next({ name: 'viewRooms' })
+					}
+				},
 			},
 		],
 	},

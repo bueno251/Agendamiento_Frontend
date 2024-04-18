@@ -91,7 +91,7 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <v-select v-model="pais" :items="paises" item-text="nombre" item-value="id"
-                            :rules="[rules.required]" @change="getDepartamentos" no-data-text="Espere un momento..."
+                            :rules="[rules.required]" @focusout="getDepartamentos" no-data-text="Espere un momento..."
                             dense outlined required>
                             <template v-slot:label>
                                 País <span class="red--text">*</span>
@@ -101,7 +101,7 @@
 
                     <v-col cols="12" md="3" sm="6">
                         <v-select v-model="departamento" :items="departamentos" item-text="nombre" item-value="id"
-                            :loading="loadingDepartamentos" @change="getCiudades" no-data-text="Seleccione un pais"
+                            :loading="loadingDepartamentos" @focusout="getCiudades" no-data-text="Seleccione un pais"
                             dense outlined>
                             <template v-slot:label>
                                 Departamento <span class="red--text">*</span>

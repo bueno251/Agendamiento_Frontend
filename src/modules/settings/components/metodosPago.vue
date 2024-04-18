@@ -11,15 +11,37 @@
                 </v-btn>
             </div>
         </v-card-title>
+
         <template v-if="loadingcard">
             <div class="text-center my-5 w-100">
                 <v-progress-circular class="text-center" color="primary" indeterminate></v-progress-circular>
             </div>
         </template>
+
         <v-container fluid v-else>
             <v-row>
                 <v-col cols="auto" v-for="metodo in metodosPago" :key="metodo.id">
-                    <v-checkbox v-model="metodosPagoActive" :label="metodo.nombre" :value="metodo"></v-checkbox>
+                    <v-edit-dialog v-if="metodo.nombre == 'Transferencia'"
+                        :return-value.sync="metodo.requiereComprobante" cancel-text="cancelar" save-text="guardar" large>
+
+                        <div class="d-flex justify-center">
+                            <v-checkbox v-model="metodosPagoActive" :label="metodo.nombre" :value="metodo"></v-checkbox>
+                        </div>
+
+                        <template v-slot:input>
+                            <div class="flex">
+                                <span>
+                                    Requiere comprobante?
+                                </span>
+                                <v-switch v-model="metodo.requiereComprobante"
+                                    :label="metodo.requiereComprobante ? 'Si' : 'No'" inset></v-switch>
+                            </div>
+                        </template>
+
+                    </v-edit-dialog>
+
+                    <v-checkbox v-else v-model="metodosPagoActive" :label="metodo.nombre" :value="metodo"></v-checkbox>
+
                 </v-col>
             </v-row>
             <div class="buttons">
@@ -49,8 +71,13 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogCreate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">crear</v-btn>
+                        <v-btn @click="dialogCreate = false" color="blue">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            crear
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -146,6 +173,7 @@ export default {
                 let newMetodo = {
                     id: metodo.id,
                     nombre: metodo.nombre,
+                    requiereComprobante: metodo.requiereComprobante,
                     estado: 0,
                 }
 
@@ -212,5 +240,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
+    gap: 20px;
 }
 </style>

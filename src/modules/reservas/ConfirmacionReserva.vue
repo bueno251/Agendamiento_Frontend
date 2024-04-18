@@ -55,16 +55,22 @@
                 </p>
             </div>
 
-            <v-btn class="py-10 white--text" color="light-green" :href="linkGoogleCalendar()" target="_blank" link>
-                <span class="d-flex flex-column">
-                    <v-icon>
-                        mdi-calendar-month
-                    </v-icon>
-                    <span>
-                        Añadir a Google Calendar
+            <div class="btn">
+                <v-btn class="py-10 white--text" color="light-green" :href="linkGoogleCalendar()" target="_blank" link>
+                    <span class="d-flex flex-column">
+                        <v-icon>
+                            mdi-calendar-month
+                        </v-icon>
+                        <span>
+                            Añadir a Google Calendar
+                        </span>
                     </span>
-                </span>
-            </v-btn>
+                </v-btn>
+
+                <v-btn color="primary" @click="goTo">
+                    volver
+                </v-btn>
+            </div>
         </div>
     </div>
 </template>
@@ -166,6 +172,10 @@ export default {
                 })
 
         },
+        goTo() {
+            this.$store.dispatch('setReserva', {})
+            this.$router.push({ name: 'viewRooms' })
+        },
     },
 
     mounted() {
@@ -189,5 +199,11 @@ export default {
     gap: 50px;
     background-color: #efefef;
     border-radius: 5px;
+}
+
+.btn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 </style>
