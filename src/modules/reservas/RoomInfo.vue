@@ -141,7 +141,7 @@
                             <a v-if="desayuno.id != null" class="text-small" @click="dialogMediaDesayunos = true">Ver
                                 Fotos/Videos</a>
                             <v-select v-model="desayuno" :items="desayunos" no-data-text="No hay desayunos"
-                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno && item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
+                                :item-text="item => `${item.nombre} ${!room.incluyeDesayuno ? showPrecioSelect(item) : ''}`"
                                 :readonly="room.incluyeDesayuno" return-object dense outlined>
                             </v-select>
                         </v-col>
@@ -152,8 +152,8 @@
                                 @click="dialogMediaDecoraciones = true">Ver
                                 Fotos/Videos</a>
                             <v-select v-model="decoracion" :items="decoraciones" no-data-text="No hay decoraciones"
-                                :item-text="item => `${item.nombre} ${item.precioConIva > 0 ? '+ $' + comaEnMiles(precioToDolar(item.precioConIva)) : ''} ${item.impuesto ? 'IVA:(' + item.impuesto + '%)' : ''}`"
-                                return-object dense outlined>
+                                :item-text="item => `${item.nombre} ${showPrecioSelect(item)}`" return-object dense
+                                outlined>
                             </v-select>
                         </v-col>
 
@@ -172,6 +172,10 @@
                                 return-object dense outlined>
                             </v-select>
                         </v-col>
+
+                    </v-row>
+
+                    <v-row>
 
                         <v-col cols="6" class="py-0">
                             <label>Valor Adulto Adicional</label>
@@ -286,16 +290,23 @@
                 </v-toolbar>
                 <v-form v-model="validDatosCliente" @submit.prevent="agendar">
                     <v-row>
-                        <v-col cols="12">
+                        <v-col class="py-0" cols="12">
                             <v-text-field v-model="documento" :rules="[rules.required]" @focusout="getUser()"
                                 label="Documento" type="number" hide-spin-buttons dense outlined required>
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="12">
+                        <v-col class="py-0" cols="12">
                             <v-text-field v-model="telefono" :rules="[rules.required]" label="Telefono" type="number"
                                 hide-spin-buttons dense outlined required>
                             </v-text-field>
+                        </v-col>
+
+                        <v-col class="py-0" cols="12">
+                            <v-select v-model="nacionalidad" :items="paises" label="Nacionalidad"
+                                no-data-text="Espere un momento..." :rules="[rules.required]" item-text="nombre"
+                                item-value="id" outlined dense required>
+                            </v-select>
                         </v-col>
                     </v-row>
 
@@ -351,7 +362,11 @@ import colombiaHolidays from 'colombia-holidays'
 
 export default {
     name: 'RoomInfo',
+
     computed: {
+        esExtrangero() {
+            return this.nacionalidad != this.empresa.paisId
+        },
         /**
          * Devuelve la fecha de llegada seleccionada.
          */
@@ -503,7 +518,16 @@ export default {
         },
         precioDecoracionSinDescuento() {
             // Convierte el precio de la decoración a dólares
-            let precio = Number(this.precioToDolar(this.decoracion.precioConIva))
+            let usePrecioSinIva = (!this.extrangerosPagan && this.esExtrangero)
+            let precio
+
+            if (usePrecioSinIva) {
+                precio = this.decoracion.precio
+            } else {
+                precio = this.decoracion.precioConIva
+            }
+
+            precio = Number(this.precioToDolar(precio))
 
             return precio >= 0 ? precio : 0
         },
@@ -530,7 +554,17 @@ export default {
             }
 
             // Si no está incluido, calcula el precio en dólares del desayuno por el número de huéspedes
-            let precio = Number(this.precioToDolar(this.desayuno.precioConIva * this.huespedes))
+            let usePrecioSinIva = (!this.extrangerosPagan && this.esExtrangero)
+            let precio
+
+            if (usePrecioSinIva) {
+                precio = this.desayuno.precio
+            } else {
+                precio = this.desayuno.precioConIva
+            }
+
+            precio *= this.huespedes
+            precio = Number(this.precioToDolar(precio))
 
             return precio >= 0 ? precio : 0
         },
@@ -602,7 +636,16 @@ export default {
 
                 // Asigna el valor del precio de adultos adicionales si está disponible
                 if (this.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.precios[7].precioConIva
+
+                    let usePrecioSinIva = (!this.extrangerosPagan && this.esExtrangero)
+                    let precio
+
+                    if (usePrecioSinIva) {
+                        precio = this.useGenerales ? this.room.tarifasGenerales[0].precio : this.precios[7].precio
+                    } else {
+                        precio = this.useGenerales ? this.room.tarifasGenerales[0].precioConIva : this.precios[7].precioConIva
+                    }
+
                     value = i > 1 ? precio : 0
                 }
 
@@ -635,7 +678,15 @@ export default {
 
                 // Asigna el valor del precio de niños adicionales si está disponible
                 if (this.precios.length > 7) {
-                    let precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.precios[8].precioConIva
+                    let usePrecioSinIva = (!this.extrangerosPagan && this.esExtrangero)
+                    let precio
+
+                    if (usePrecioSinIva) {
+                        precio = this.useGenerales ? this.room.tarifasGenerales[1].precio : this.precios[8].precio
+                    } else {
+                        precio = this.useGenerales ? this.room.tarifasGenerales[1].precioConIva : this.precios[8].precioConIva
+                    }
+
                     value = precio
                 }
 
@@ -689,6 +740,7 @@ export default {
             return false
         }
     },
+
     watch: {
         /**
          * Observa cambios en la fecha de salida y ajusta las fechas si es necesario.
@@ -710,10 +762,12 @@ export default {
             }
         },
     },
+
     data() {
         return {
             documento: '',
             telefono: '',
+            nacionalidad: '',
             desayuno: {
                 id: null,
                 nombre: 'Ninguno',
@@ -744,6 +798,7 @@ export default {
             useGenerales: false,
             menu1: false,
             menu2: false,
+            extrangerosPagan: false,
             dates: [
                 this.$route.params.dateIn ? this.$route.params.dateIn : (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
             ],
@@ -753,7 +808,9 @@ export default {
             descuentos: [],
             descuentoEstadia: [],
             cupones: [],
+            paises: [],
             cupon: {},
+            empresa: {},
             adultos: {
                 cantidad: 2,
                 val: 0
@@ -808,6 +865,7 @@ export default {
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
         }
     },
+
     methods: {
         /**
          * Obtiene la información de una habitación según su ID de la ruta.
@@ -891,6 +949,7 @@ export default {
                 precioNeto: this.precioNeto,
                 documento: this.documento,
                 telefono: this.telefono,
+                nacionalidad: this.nacionalidad,
                 noches: this.noches,
                 cantidad_rooms: this.cantidadRooms,
                 useTarifasEspeciales: this.useTarifasEspeciales,
@@ -944,8 +1003,8 @@ export default {
             // Despacha la acción para establecer los datos de la reserva en el almacenamiento global
             this.$store.dispatch('setReserva', data)
 
-            // Redirige a la página de pago
             let route = this.$route.path
+            // Redirige a la página de pago
 
             if (route.includes('admin')) {
                 this.$router.push({ name: 'pagarAdmin' })
@@ -1144,6 +1203,25 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
+
+            service.obtenerEmpresa()
+                .then(res => {
+                    if ('id' in res) {
+                        this.empresa = res
+                        this.nacionalidad = res.paisId
+                    }
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerPaises()
+                .then(res => {
+                    this.paises = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
         },
         /**
          * Obtiene los valores predeterminados, como la configuración de reserva, la divisa, y los valores relacionados con los precios en dólares.
@@ -1159,6 +1237,7 @@ export default {
                         this.edadNiños = res.edadTarifaNiños
                         this.canReservar = res.usuarioReserva
                         this.calendarioInhabilitado = res.calendarioInhabilitado
+                        this.extrangerosPagan = res.extrangerosPaganImpuestos
                     })
                     .catch(err => {
                         console.error(err)
@@ -1322,7 +1401,28 @@ export default {
                     console.error(err)
                 })
         },
+        showPrecioSelect(item) {
+
+            if (item.id == null) {
+                return ''
+            }
+
+            let precio = !this.extrangerosPagan && this.esExtrangero ? item.precio : item.precioConIva
+
+            precio = this.comaEnMiles(this.precioToDolar(precio))
+
+            let text
+
+            if ((!this.extrangerosPagan && this.esExtrangero) || !item.impuesto) {
+                text = `${precio}`
+            } else {
+                text = `${precio} IVA:(${item.impuesto}%)`
+            }
+
+            return text
+        },
     },
+
     async mounted() {
         await this.getRoom()
         await this.getDefault()

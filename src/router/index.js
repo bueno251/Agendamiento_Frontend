@@ -88,6 +88,7 @@ const routes = [
 	{
 		path: '/',
 		component: () => import('@/components/baseUser.vue'),
+		redirect: { name: 'viewRooms' },
 		children: [
 			{
 				path: '/calendario_disponibilidad',
@@ -110,10 +111,11 @@ const routes = [
 				name: 'pagar',
 				component: () => import('@/modules/reservas/PagarReserva.vue'),
 				beforeEnter: (to, from, next) => {
+					console.log(vuex.state.reserva);
 					if (!vuex.state.reserva) {
-						next()
-					} else {
 						next({ name: 'viewRooms' })
+					} else {
+						next()
 					}
 				},
 			},
@@ -123,9 +125,9 @@ const routes = [
 				component: () => import('@/modules/reservas/ConfirmacionReserva.vue'),
 				beforeEnter: (to, from, next) => {
 					if (!vuex.state.reserva) {
-						next()
-					} else {
 						next({ name: 'viewRooms' })
+					} else {
+						next()
 					}
 				},
 			},

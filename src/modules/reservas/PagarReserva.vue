@@ -299,7 +299,7 @@ export default {
             validHuesped: false,
             modalDatosUser: false,
             loading: false,
-            correoRequired: true,
+            correoRequired: false,
             loadingDepartamentosProcedencia: false,
             loadingCiudadesProcedencia: false,
             loadingDepartamentosResidencia: false,
@@ -358,6 +358,7 @@ export default {
             },
         }
     },
+
     methods: {
         /**
         * Realiza la reserva de una habitación.
@@ -664,6 +665,7 @@ export default {
                 })
         },
     },
+
     mounted() {
         this.getDatos()
     },

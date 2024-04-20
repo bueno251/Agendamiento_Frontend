@@ -18,13 +18,24 @@
                     </v-col>
 
                     <v-col cols="12">
-                        <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
-                            append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" dense outlined
-                            required>
+                        <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`" dense
+                            outlined required>
                             <template v-slot:label>
                                 Icono <span class="red--text">*</span>
                             </template>
+
+                            <template v-slot:append-outer>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-icon color="primary" dark v-bind="attrs" v-on="on" @click="toIcons">
+                                            mdi-help-circle-outline
+                                        </v-icon>
+                                    </template>
+                                    <span>Buscar icono y copiar nombre en el input</span>
+                                </v-tooltip>
+                            </template>
                         </v-text-field>
+
                     </v-col>
 
                     <v-col cols="12">

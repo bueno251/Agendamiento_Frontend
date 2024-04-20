@@ -8,7 +8,7 @@
 
 <script>
 
-// import Swal from 'sweetalert2'
+import Swal from 'sweetalert2'
 import service from '@/services/service'
 import CardRoom from './components/CardRoom'
 
@@ -33,6 +33,15 @@ export default {
                 .then(res => {
                     // Almacena la información de las habitaciones en this.rooms
                     this.rooms = res
+
+                    if (!res.length) {
+                        Swal.fire({
+                            text: "No se encuentran habitaciones registradas en sistemas, porfavor ingresar desde el módulo habitaciones.",
+                        })
+
+                        return
+                    }
+
                     // Itera sobre cada habitación
                     this.rooms.forEach(room => {
                         // Define una lista de días de la semana con precios iniciales y jornadas
