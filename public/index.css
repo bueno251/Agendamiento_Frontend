@@ -19,6 +19,6 @@
     flex-wrap: wrap;
 }
 
-.buttons span {
+.buttons button:not(.black--text) span {
     color: white;
 }

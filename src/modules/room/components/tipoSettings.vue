@@ -1,7 +1,8 @@
 <template>
     <v-card width="90%" class="my-5" elevation="5">
         <v-card-title>
-            <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details></v-text-field>
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                hide-details></v-text-field>
             <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
                 <v-icon>mdi-plus-circle</v-icon> agregar
             </v-btn>
@@ -36,6 +37,12 @@
         </v-data-table>
         <v-dialog :value="dialogCreate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogCreate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formCreate" v-model="validCreate" @submit.prevent="newTipo">
                     <v-row>
                         <v-col cols="12">
@@ -48,15 +55,25 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validCreate" type="submit" :loading="loadingbtn"
-                            color="light-green">crear</v-btn>
+                        <v-btn @click="dialogCreate = false, $refs.formCreate.reset()" color="blue">
+                            cancelar
+                        </v-btn>
+                        <v-btn :disabled="!validCreate" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            crear
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
         </v-dialog>
+
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogUpdate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="updateTipo">
                     <v-row>
                         <v-col cols="12">
@@ -69,21 +86,36 @@
                         </v-col>
                     </v-row>
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
-                            color="light-green">actualizar</v-btn>
+                        <v-btn @click="dialogUpdate = false" color="blue">
+                            cancelar
+                        </v-btn>
+                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            actualizar
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
         </v-dialog>
+
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar el tipo {{ type.tipo }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogDelete = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Eliminar el tipo {{ type.tipo }}?
+                    </h3>
                     <div class="buttons">
-                        <v-btn @click="dialogDelete = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="deleted" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                        <v-btn @click="dialogDelete = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">
+                            eliminar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>
@@ -218,7 +250,7 @@ export default {
         /**
          * Elimina un tipo de habitación.
          */
-        deleted() {
+        eliminar() {
             this.loadingbtn = true
 
             // Llama al servicio para eliminar un tipo de habitación

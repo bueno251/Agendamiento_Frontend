@@ -40,6 +40,7 @@
                         </v-menu>
                     </td>
                     <td>{{ item.nombre }}</td>
+                    <td>{{ item.cliente }}</td>
                     <td>{{ item.fechaInicio }}</td>
                     <td>{{ item.fechaFin }}</td>
                     <td><span v-if="item.tipoId == 2">$</span>{{ comaEnMiles(item.descuento) }}<span
@@ -53,6 +54,12 @@
 
         <v-dialog :value="dialogCreate" width="90%" max-width="600px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogCreate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
                     <v-row>
 
@@ -189,12 +196,22 @@
                             </v-menu>
                         </v-col>
 
+                        <v-col cols="12">
+                            <v-autocomplete v-model="cliente" :items="clientes"
+                                :item-text="item => `${item.documento} - ${item.nombre1} ${item.apellido1}`"
+                                item-value="id" label="Cliente" auto-select-first outlined></v-autocomplete>
+                        </v-col>
+
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogCreate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
-                            color="light-green">crear</v-btn>
+                        <v-btn @click="dialogCreate = false" color="blue">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit" class="light-green black--text">
+                            crear
+                        </v-btn>
                     </div>
 
                 </v-form>
@@ -203,6 +220,12 @@
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="600px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogUpdate = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="actualizar">
                     <v-row>
 
@@ -343,6 +366,12 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
+                            <v-autocomplete v-model="clienteUpdate" :items="clientes"
+                                :item-text="item => `${item.documento} - ${item.nombre1} ${item.apellido1}`"
+                                item-value="id" label="Cliente" auto-select-first outlined></v-autocomplete>
+                        </v-col>
+
+                        <v-col cols="12" md="6" sm="6">
                             <div class="flex">
                                 <p>
                                     Activo
@@ -354,9 +383,13 @@
                     </v-row>
 
                     <div class="buttons">
-                        <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
-                            color="light-green">actualizar</v-btn>
+                        <v-btn @click="dialogUpdate = false" color="blue">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            actualizar
+                        </v-btn>
                     </div>
 
                 </v-form>
@@ -364,13 +397,22 @@
         </v-dialog>
 
         <v-dialog :value="dialogDelete" width="90%" max-width="600px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar el cupón {{ coupon.nombre }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogDelete = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Eliminar el cupón {{ coupon.nombre }}?</h3>
                     <div class="buttons">
-                        <v-btn @click="dialogDelete = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                        <v-btn @click="dialogDelete = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">
+                            confirmar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>
@@ -458,6 +500,7 @@ export default {
             handler(newItem) {
                 if ('id' in newItem) {
                     this.nombreUpdate = newItem.nombre
+                    this.clienteUpdate = newItem.clienteId
                     this.tipoUpdate = newItem.tipoId
                     this.precioUpdate = {
                         id: newItem.precioId,
@@ -548,6 +591,7 @@ export default {
     data() {
         return {
             search: '',
+            cliente: '',
             codigo: '',
             nombre: '',
             cantidad: 1,
@@ -556,6 +600,7 @@ export default {
             tipo: 1,
             precio: 1,
             habitacionesSelected: '',
+            clienteUpdate: '',
             codigoUpdate: '',
             nombreUpdate: '',
             descuentoUpdate: '',
@@ -585,9 +630,11 @@ export default {
             habitaciones: [],
             tipos: [],
             precios: [],
+            clientes: [],
             headers: [
                 { text: '', key: 'actions', sortable: false },
                 { text: 'Nombre', key: 'nombre', value: 'nombre' },
+                { text: 'cliente', key: 'cliente', value: 'cliente' },
                 { text: 'Fecha Inicio', key: 'fechaInicio', value: 'fechaInicio' },
                 { text: 'Fecha Fin', key: 'fechaFin', value: 'fechaFin' },
                 { text: 'Descuento', key: 'descuento', value: 'descuento' },
@@ -618,6 +665,7 @@ export default {
             let data = {
                 fechaInicio: this.fechaInicio,
                 fechaFin: this.fechaFinal,
+                cliente: this.cliente,
                 nombre: this.nombre,
                 descuento: this.descuento,
                 habitaciones: this.habitacionesSelected,
@@ -681,6 +729,7 @@ export default {
             let data = {
                 fechaInicio: this.fechaInicioUpd,
                 fechaFin: this.fechasUpd[1],
+                cliente: this.clienteUpdate,
                 nombre: this.nombreUpdate,
                 descuento: this.descuentoUpdate,
                 habitaciones: this.habitacionesSelectedUpdate.map(item => item.id),
@@ -820,6 +869,14 @@ export default {
             service.obtenerTiposDescuento()
                 .then(res => {
                     this.tipos = res
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+
+            service.obtenerClientes()
+                .then(res => {
+                    this.clientes = res
                 })
                 .catch(err => {
                     console.error(err)

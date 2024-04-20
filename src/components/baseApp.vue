@@ -18,9 +18,4 @@ export default {
 };
 </script>
   
-<style scoped>
-.main {
-    display: flex;
-    width: 100%;
-}
-</style>
+<style scoped></style>

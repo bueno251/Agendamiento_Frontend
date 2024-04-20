@@ -1,6 +1,12 @@
 <template>
     <v-dialog :value="show" width="95%" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer />
+                <v-btn icon class="ml-3" @click="$emit('close')">
+                    <v-icon>mdi-close-box</v-icon>
+                </v-btn>
+            </v-toolbar>
             <v-form ref="form" v-model="valid" @submit.prevent="save()">
                 <div class="grid">
 
@@ -37,7 +43,7 @@
 
                 <div class="buttons">
                     <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" class="light-green black--text">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>
@@ -94,12 +100,12 @@ export default {
             valid: false,
             loading: false,
             week: [
-                { name: 'Domingo', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
+                { name: 'Domingo', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
                 { name: 'Lunes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
                 { name: 'Martes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
                 { name: 'Miércoles', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
                 { name: 'Jueves', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
-                { name: 'Viernes', precio: '250.000', previoFestivo: '330.000', jornada_id: 1 },
+                { name: 'Viernes', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
                 { name: 'Sábado', precio: '330.000', previoFestivo: '330.000', jornada_id: 2 },
             ],
             jornadas: [],
@@ -191,16 +197,17 @@ export default {
 
                     this.$refs.form.resetValidation()
 
-                    res.map((day) => {
-                        const index = this.week.findIndex((weekDay) => weekDay.name === day.name)
+                    if (res.length) {
+                        res.map((day) => {
+                            const index = this.week.findIndex((weekDay) => weekDay.name === day.name)
 
-                        if (index !== -1) {
-                            this.week[index].precio = this.comaEnMiles(day.precio)
-                            this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
-                            this.week[index].jornada_id = day.jornada_id
-                        }
-                    });
-
+                            if (index !== -1) {
+                                this.week[index].precio = this.comaEnMiles(day.precio)
+                                this.week[index].previoFestivo = this.comaEnMiles(day.previoFestivo)
+                                this.week[index].jornada_id = day.jornada_id
+                            }
+                        });
+                    }
                 })
                 .catch(err => {
                     console.error(err)

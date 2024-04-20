@@ -5,8 +5,17 @@
         </h1>
         <v-card width="90%" class="my-5">
             <v-card-title>
-                <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
-                    hide-details></v-text-field>
+                <v-row>
+                    <v-col cols="12" md="10" sm="8">
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line
+                            hide-details />
+                    </v-col>
+                    <v-col cols="12" md="2" sm="4">
+                        <v-btn class="mx-5" @click="dialogCreate = true" color="primary">
+                            <v-icon>mdi-plus-circle</v-icon> agregar
+                        </v-btn>
+                    </v-col>
+                </v-row>
             </v-card-title>
             <v-data-table :headers="headers" :items="reservas" :search="search" :loading="loading"
                 :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }"
@@ -22,6 +31,7 @@
                                     </v-btn>
                                 </template>
                                 <v-list>
+
                                     <v-list-item v-if="item.comprobante" link
                                         @click="reserva = item, dialogComprobante = true">
                                         <v-list-item-title v-text="'Ver Comprobante'"></v-list-item-title>
@@ -32,8 +42,8 @@
                                             <v-list-item-title v-text="'Registrar llegada'"></v-list-item-title>
                                         </v-list-item>
 
-                                        <v-list-item link @click="reserva = item">
-                                            <v-list-item-title v-text="'Reagendar'"></v-list-item-title>
+                                        <v-list-item link @click="reserva = item, dialogReprogramar = true">
+                                            <v-list-item-title v-text="'Reprogramar'"></v-list-item-title>
                                         </v-list-item>
 
                                         <v-list-item link @click="reserva = item, dialogCancelar = true">
@@ -88,9 +98,13 @@
         </v-card>
 
         <v-dialog :value="dialogAprobar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Aprobar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogAprobar = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Aprobar la Reserva?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogAprobar = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
@@ -101,9 +115,13 @@
         </v-dialog>
 
         <v-dialog :value="dialogRechazar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Rechazar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogRechazar = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Rechazar la Reserva?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogRechazar = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
@@ -139,6 +157,21 @@
             </v-card>
         </v-dialog>
 
+        <v-dialog :value="dialogCreate" width="90%" persistent>
+            <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogCreate = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <div class='calendario'>
+                    <CalendarioDisponibilidad :route="'roomAdmin'" />
+                </div>
+            </v-card>
+        </v-dialog>
+
+        <ReprogramarReserva :show="dialogReprogramar" :reserva="reserva" @close="dialogReprogramar = false"
+            @update="getReservas()" />
+
         <CancelacionReserva :show="dialogCancelar" :reserva="reserva" @close="dialogCancelar = false"
             @update="getReservas()" />
     </div>
@@ -148,12 +181,16 @@
 
 import Swal from 'sweetalert2'
 import service from '@/services/service'
-import CancelacionReserva from './components/CancelacionReserva.vue'
+import CancelacionReserva from './components/CancelacionReserva'
+import ReprogramarReserva from './components/ReprogramarReserva'
+import CalendarioDisponibilidad from './CalendarioDisponibilidad'
 
 export default {
     name: 'ReservasApp',
     components: {
-        CancelacionReserva
+        CancelacionReserva,
+        ReprogramarReserva,
+        CalendarioDisponibilidad,
     },
     data() {
         return {
@@ -164,6 +201,8 @@ export default {
             dialogRechazar: false,
             dialogComprobante: false,
             dialogCancelar: false,
+            dialogReprogramar: false,
+            dialogCreate: false,
             reserva: {
                 comprobante: '',
             },
@@ -237,7 +276,7 @@ export default {
                 .catch(err => {
                     this.loadingbtn = false
                     Swal.fire({
-                        icon: 'success',
+                        icon: 'error',
                         text: err.response.data.message,
                     })
                     console.error(err)
@@ -262,7 +301,7 @@ export default {
                 .catch(err => {
                     this.loadingbtn = false
                     Swal.fire({
-                        icon: 'success',
+                        icon: 'error',
                         text: err.response.data.message,
                     })
                     console.error(err)
@@ -275,4 +314,12 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+
+.calendario{
+    display: flex;
+    justify-content: center;
+    min-height: 500px;
+    padding-bottom: 70px;
+}
+</style>

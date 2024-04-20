@@ -80,12 +80,10 @@
                         </v-col>
 
                         <v-col cols="12" md="6" sm="6">
-                            <label>Monto <span class="red--text">*</span></label>
-                            <v-text-field v-model="monto" :rules="[rules.required]" readonly dense outlined required>
+                            <label>Pendiente de pago el dia de llegada ${{ abono }} {{
+                                divisa.codigo }} <span class="red--text">*</span></label>
+                            <v-text-field v-model="abono" :rules="[rules.required]" readonly dense outlined required>
                             </v-text-field>
-
-                            Pendiente de pago el dia de llegada ${{ comaEnMiles(reserva.valorSeparacion) }} {{
-                        divisa.codigo }}
                         </v-col>
 
                         <v-col v-if="metodoPago.requiereComprobante" cols="12" md="6" sm="6">
@@ -98,18 +96,18 @@
 
                 <div class="buttons">
                     <v-btn @click="$router.back()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validPagos" :loading="loading" color="light-green" type="submit">
+                    <v-btn :disabled="!validPagos" :loading="loading" class="light-green black--text" type="submit">
                         {{ metodoPago.requiereComprobante ? 'Guardar' : 'Pagar' }}
                     </v-btn>
                 </div>
             </v-form>
         </v-card>
 
-        <v-dialog :value="modalDatosUser" width="90%" persistent>
+        <v-dialog :value="modalDatosUser" width="95%" persistent>
             <v-card class="pa-5" elevation="5">
                 <v-toolbar elevation="0">
-                    <h2>{{ titulos[steps] }}</h2>
-                    <v-col v-if="steps == 0" class="py-0" cols="12" md="6" sm="6">
+                    <p class="text-sm-h6 py-0 ma-0">{{ titulos[steps] }}</p>
+                    <v-col v-if="steps == 0" class="d-none d-md-block py-0" cols="2" md="6" sm="6">
                         <v-select v-model="huesped" :items="huespedes" @change="changeHuesped"
                             :item-text="item => `${item.nombre} ${item.apellido}`" return-object hide-details dense
                             outlined required>
@@ -124,6 +122,13 @@
                         <v-form ref="form" v-model="validHuesped" @submit.prevent="reservar">
                             <v-row class="pt-5">
 
+                                <v-col v-if="steps == 0" class="d-block d-md-none" cols="12" md="6" sm="6">
+                                    <v-select v-model="huesped" :items="huespedes" @change="changeHuesped"
+                                        :item-text="item => `${item.nombre} ${item.apellido}`" return-object
+                                        hide-details dense outlined required>
+                                    </v-select>
+                                </v-col>
+
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>
                                         Tipo de documento <span class="red--text">*</span>
@@ -136,7 +141,8 @@
 
                                 <v-col class="py-0" cols="12" md="6" sm="6">
                                     <label>Número Documento <span class="red--text">*</span></label>
-                                    <v-text-field v-model="huesped.documento" :rules="[rules.required, rules.unique]"
+                                    <v-text-field ref="documento" v-model="huesped.documento"
+                                        :rules="[rules.required, rules.unique]" @focusout="getUser(huesped.documento)"
                                         type="number" hide-spin-buttons dense outlined required>
                                     </v-text-field>
                                 </v-col>
@@ -172,7 +178,7 @@
                                 <v-col class="py-0" cols="12" md="4" sm="6">
                                     <label>País De Residencia <span class="red--text">*</span></label>
                                     <v-select v-model="huesped.paisResidencia" :items="paises"
-                                        no-data-text="Espere un momento..." @change="getDepartamentos('Residencia')"
+                                        no-data-text="Espere un momento..." @focusout="getDepartamentos('Residencia')"
                                         :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
                                         required>
                                     </v-select>
@@ -181,7 +187,7 @@
                                 <v-col class="py-0" cols="12" md="4" sm="6">
                                     <label>Departamento De Residencia <span class="red--text">*</span></label>
                                     <v-select v-model="huesped.departamentoResidencia" :items="departamentosResidencia"
-                                        no-data-text="Seleccione un pais" @change="getCiudades('Residencia')"
+                                        no-data-text="Seleccione un pais" @focusout="getCiudades('Residencia')"
                                         :rules="[rules.required]" :loading="loadingDepartamentosResidencia"
                                         item-text="nombre" item-value="id" outlined dense required>
                                     </v-select>
@@ -199,7 +205,7 @@
                                 <v-col class="py-0" cols="12" md="4" sm="6">
                                     <label>País De Procedencia <span class="red--text">*</span></label>
                                     <v-select v-model="huesped.paisProcedencia" :items="paises"
-                                        no-data-text="Espere un momento..." @change="getDepartamentos('Procedencia')"
+                                        no-data-text="Espere un momento..." @focusout="getDepartamentos('Procedencia')"
                                         :rules="[rules.required]" item-text="nombre" item-value="id" outlined dense
                                         required>
                                     </v-select>
@@ -209,7 +215,7 @@
                                     <label>Departamento De Procedencia <span class="red--text">*</span></label>
                                     <v-select v-model="huesped.departamentoProcedencia"
                                         :items="departamentosProcedencia" no-data-text="Seleccione un pais"
-                                        @change="getCiudades('Procedencia')" :rules="[rules.required]"
+                                        @focusout="getCiudades('Procedencia')" :rules="[rules.required]"
                                         :loading="loadingDepartamentosProcedencia" item-text="nombre" item-value="id"
                                         outlined dense required>
                                     </v-select>
@@ -239,11 +245,11 @@
                                     cancelar
                                 </v-btn>
                                 <v-btn v-if="!validHuespedes" :disabled="!validHuesped" :loading="loading"
-                                    color="light-green" @click="checkHuespedes()">
+                                    class="light-green black--text" @click="checkHuespedes()">
                                     continuar
                                 </v-btn>
-                                <v-btn v-else :disabled="!validHuesped" :loading="loading" color="light-green"
-                                    type="submit">
+                                <v-btn v-else :disabled="!validHuesped" :loading="loading"
+                                    class="light-green black--text" type="submit">
                                     guardar
                                 </v-btn>
                             </div>
@@ -265,6 +271,7 @@ import service from "@/services/service"
 
 export default {
     name: 'PagarReserva',
+
     computed: {
         validHuespedes() {
             for (let i = 0; i < this.huespedes.length; i++) {
@@ -278,21 +285,21 @@ export default {
             return true
         },
     },
+
     data() {
         return {
             reserva: vuex.state.reserva,
             roomid: vuex.state.reserva.room.id,
-            monto: this.comaEnMiles(vuex.state.reserva.precioTotal),
+            abono: this.comaEnMiles(vuex.state.reserva.valorSeparacion),
             motivo: 1,
             steps: 0,
-            metodoPago: { id: 0 },
+            metodoPago: { id: 1 },
             porcentajeSeparacion: 0,
             validPagos: false,
-            validInfo: false,
             validHuesped: false,
             modalDatosUser: false,
             loading: false,
-            correoRequired: true,
+            correoRequired: false,
             loadingDepartamentosProcedencia: false,
             loadingCiudadesProcedencia: false,
             loadingDepartamentosResidencia: false,
@@ -351,6 +358,7 @@ export default {
             },
         }
     },
+
     methods: {
         /**
         * Realiza la reserva de una habitación.
@@ -372,8 +380,6 @@ export default {
                 huesped.apellido2 = lastnames[1] ? lastnames[1] : null
             })
 
-            
-
             let data = {
                 dateIn: this.reserva.dateIn,
                 dateOut: this.reserva.dateOut,
@@ -382,12 +388,30 @@ export default {
                 niños: this.reserva.niños,
                 precio: this.reserva.precioTotal,
                 huespedes: this.huespedes,
+                abono: this.reserva.valorSeparacion,
+                useTarifasEspeciales: this.reserva.useTarifasEspeciales,
                 verificacion_pago: this.metodoPago.id == 1 ? 0 : 1,
             }
 
-            if ('id' in this.reserva.cupon) {
+            let route = this.$route.path
+
+            let isForAdmin = route.includes('admin')
+
+            if (isForAdmin) {
+                data.origen = 2
+            } else {
+                data.origen = 1
+            }
+
+            if (!!this.reserva.cupon && 'id' in this.reserva.cupon) {
                 data.cupon = this.reserva.cupon
             }
+
+            if (this.reserva.descuentos) {
+                data.descuentos = this.reserva.descuentos
+            }
+
+            this.$store.dispatch('setReserva', { ...data, ...this.reserva })
 
             // Realiza la llamada al servicio para reservar
             service.reservar(data)
@@ -397,10 +421,20 @@ export default {
                     Swal.fire({
                         icon: 'success',
                         text: res.message,
-                    }).then(this.$router.back())
+                    })
+
+                    if (isForAdmin) {
+                        this.$router.push({ name: 'reservasApp' })
+                    } else {
+                        this.$router.push({ name: 'confirmacionReserva' })
+                    }
                 })
                 .catch(err => {
                     console.error(err)
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                    })
                     this.loading = false
                 })
         },
@@ -429,6 +463,7 @@ export default {
 
                 if (!huesped.nombre || !huesped.apellido || !huesped.documento || !huesped.telefono || (!huesped.correo && this.correoRequired)) {
                     this.huesped = huesped
+                    this.$refs.documento.focus()
                     return
                 }
             }
@@ -438,6 +473,8 @@ export default {
             this.getDepartamentos('Procedencia')
             this.getCiudades('Residencia')
             this.getCiudades('Procedencia')
+
+            this.$refs.documento.focus()
         },
         async getDatos() {
             service.obtenerMetodosPago()
@@ -490,7 +527,7 @@ export default {
                     console.error(err)
                 })
 
-            service.obtenerConfigFormReserva()
+            await service.obtenerConfigFormReserva()
                 .then(async res => {
                     if ('id' in res) {
 
@@ -531,12 +568,12 @@ export default {
             await service.encontrarClienteDocumento(this.reserva.documento)
                 .then(res => {
                     if ('id' in res) {
-                        this.tipoDocumento = res.tipo_documento_id
+                        this.huespedes[0].tipoDocumento = res.tipo_documento_id
                         this.huespedes[0].nombre = res.nombre1 + (res.nombre2 ? ' ' + res.nombre2 : '')
                         this.huespedes[0].apellido = res.apellido1 + (res.apellido2 ? ' ' + res.apellido2 : '')
-                        this.paisResidencia = res.paisId
-                        this.departamentoResidencia = res.departamentoId
-                        this.ciudadResidencia = res.ciudadId
+                        this.huespedes[0].paisResidencia = res.paisId
+                        this.huespedes[0].departamentoResidencia = res.departamentoId
+                        this.huespedes[0].ciudadResidencia = res.ciudadId
                     }
                 })
                 .catch(err => {
@@ -603,7 +640,32 @@ export default {
                 this[loading] = false
             }
         },
+        /**
+        * Obtiene la información del usuario mediante su número de cédula y actualiza el teléfono del usuario actual.
+        */
+        getUser(documento) {
+            // Busca al cliente usando su número de cédula
+            service.encontrarClienteDocumento(documento)
+                .then(res => {
+                    // Verifica si se encontró al cliente y actualiza el teléfono si está disponible
+                    if ('id' in res) {
+                        this.huesped.tipoDocumento = res.tipo_documento_id
+                        this.huesped.nombre = `${res.nombre1} ${res.nombre2 ? res.nombre2 : ''}`
+                        this.huesped.apellido = `${res.apellido1} ${res.apellido2 ? res.apellido2 : ''}`
+                        this.huesped.correo = res.correo
+                        this.huesped.telefono = res.telefono
+                        this.huesped.paisResidencia = res.paisId
+                        this.huesped.departamentoResidencia = res.departamentoId
+                        this.huesped.ciudadResidencia = res.ciudadId
+                    }
+                })
+                .catch(err => {
+                    // Maneja cualquier error que pueda ocurrir durante la búsqueda del cliente
+                    console.error(err)
+                })
+        },
     },
+
     mounted() {
         this.getDatos()
     },

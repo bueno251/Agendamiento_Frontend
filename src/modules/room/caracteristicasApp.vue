@@ -51,11 +51,14 @@
             </template>
         </v-data-table>
 
-        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false"
-            @update="getCaracteristicas()" />
+        <CreateCaracteristicRoom :show="dialogCreate" @close="dialogCreate = false" @update="getCaracteristicas()" />
 
         <v-dialog :value="dialogUpdate" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogUpdate = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
                 <v-form ref="formUpdate" v-model="validUpdate" @submit.prevent="actualizar">
                     <v-row>
                         <v-col cols="12">
@@ -101,25 +104,37 @@
                     <div class="buttons">
                         <v-btn @click="dialogUpdate = false" color="blue">cancelar</v-btn>
                         <v-btn :disabled="!validUpdate" type="submit" :loading="loadingbtn"
-                            color="light-green">actualizar</v-btn>
+                            class="light-green black--text">actualizar</v-btn>
                     </div>
                 </v-form>
             </v-card>
         </v-dialog>
 
         <v-dialog :value="dialogDelete" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Eliminar la decoración {{ caracteristica.nombre }}?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogDelete = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Eliminar la decoración {{ caracteristica.nombre }}?
+                    </h3>
+
                     <div class="buttons">
-                        <v-btn @click="dialogDelete = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">eliminar</v-btn>
+                        <v-btn @click="dialogDelete = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn @click="eliminar" :loading="loadingbtn" color="primary">
+                            eliminar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>
         </v-dialog>
-        
+
     </v-card>
 </template>
 

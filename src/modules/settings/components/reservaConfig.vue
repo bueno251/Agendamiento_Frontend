@@ -49,6 +49,24 @@
                 <v-col cols="12" md="3" sm="6">
                     <div class="flex">
                         <p>
+                            Extrangeros pagan impuestos?
+                        </p>
+                        <v-switch v-model="extrangerosPaganImpuestos" :label="extrangerosPaganImpuestos ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
+                            Habilitar ventas en OTAS?
+                        </p>
+                        <v-switch v-model="ventasOtas" :label="ventasOtas ? 'Si' : 'No'" inset></v-switch>
+                    </div>
+                </v-col>
+
+                <v-col cols="12" md="3" sm="6">
+                    <div class="flex">
+                        <p>
                             Usar tarifas generales?
                         </p>
                         <v-switch v-model="tarifasGenerales" :label="tarifasGenerales ? 'Si' : 'No'" inset></v-switch>
@@ -85,6 +103,12 @@
 
         <v-dialog :value="tarifasGeneralesDialog" width="90%" max-width="500px" persistent>
             <v-card class="pa-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="tarifasGeneralesDialog = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
                 <v-form v-model="valid" @submit.prevent="saveTarifas()">
                     <v-row>
 
@@ -140,9 +164,13 @@
                     </v-row>
 
                     <div class="buttons pt-5">
-                        <v-btn @click="tarifasGeneralesDialog = false" color="blue">cancelar</v-btn>
-                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn"
-                            color="light-green">guardar</v-btn>
+                        <v-btn @click="tarifasGeneralesDialog = false" color="blue">
+                            cancelar
+                        </v-btn>
+
+                        <v-btn :disabled="!valid" type="submit" :loading="loadingbtn" class="light-green black--text">
+                            guardar
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card>
@@ -174,9 +202,11 @@ export default {
                     this.canReservar = newItem.usuarioReserva
                     this.calendarioInhabilitado = newItem.calendarioInhabilitado
                     this.correoRequired = newItem.correoObligatorio
+                    this.extrangerosPaganImpuestos = newItem.extrangerosPaganImpuestos
                     this.porcentSeparacion = newItem.porcentajeSeparacion
                     this.tarifasGenerales = newItem.tarifasGenerales
                     this.edadNiños = newItem.edadTarifaNiños
+                    this.ventasOtas = newItem.ventasOtas
                     this.loadingcard = false
                 }
             },
@@ -207,7 +237,9 @@ export default {
             canReservar: true,
             calendarioInhabilitado: false,
             correoRequired: true,
+            extrangerosPaganImpuestos: true,
             tarifasGenerales: false,
+            ventasOtas: false,
             loading: false,
             loadingcard: true,
             loadingbtn: false,
@@ -239,7 +271,9 @@ export default {
                 reservar: this.canReservar,
                 calendario: this.calendarioInhabilitado,
                 correo: this.correoRequired,
+                extrangerosPaganImpuestos: this.extrangerosPaganImpuestos,
                 tarifasGenerales: this.tarifasGenerales,
+                ventasOtas: this.ventasOtas,
                 porcentaje: this.porcentSeparacion,
                 edadTarifaNiños: this.edadNiños,
             }

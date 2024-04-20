@@ -1,6 +1,12 @@
 <template>
     <v-dialog :value="show" width="90%" max-width="500px" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer />
+                <v-btn icon class="ml-3" @click="$emit('close')">
+                    <v-icon>mdi-close-box</v-icon>
+                </v-btn>
+            </v-toolbar>
             <v-form ref="formCreate" v-model="validCreate" @submit.prevent="crear">
                 <v-row>
                     <v-col cols="12">
@@ -12,13 +18,24 @@
                     </v-col>
 
                     <v-col cols="12">
-                        <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`"
-                            append-outer-icon="mdi-help-circle-outline" @click:append-outer="toIcons" dense outlined
-                            required>
+                        <v-text-field v-model="icon" :rules="[rules.required]" :append-icon="`mdi-${icon}`" dense
+                            outlined required>
                             <template v-slot:label>
                                 Icono <span class="red--text">*</span>
                             </template>
+
+                            <template v-slot:append-outer>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-icon color="primary" dark v-bind="attrs" v-on="on" @click="toIcons">
+                                            mdi-help-circle-outline
+                                        </v-icon>
+                                    </template>
+                                    <span>Buscar icono y copiar nombre en el input</span>
+                                </v-tooltip>
+                            </template>
                         </v-text-field>
+
                     </v-col>
 
                     <v-col cols="12">
@@ -41,9 +58,12 @@
                 </v-row>
 
                 <div class="buttons">
-                    <v-btn @click="$emit('close'), $refs.formCreate.reset()" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit"
-                        color="light-green">crear</v-btn>
+                    <v-btn @click="$emit('close'), $refs.formCreate.reset()" color="blue">
+                        cancelar
+                    </v-btn>
+                    <v-btn :disabled="!validCreate" :loading="loadingbtn" type="submit" class="light-green black--text">
+                        crear
+                    </v-btn>
                 </div>
             </v-form>
         </v-card>

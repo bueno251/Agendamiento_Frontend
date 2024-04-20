@@ -1,6 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
-import CacheManager from "./CacheManager/CacheManager"
+import CacheManager from "../CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -21,17 +21,17 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const DecoracionService = {
+const roomService = {
 
     /**
-     * Crea una nueva decoración mediante una solicitud POST a la API.
+     * Crea un nuevo estado de habitación mediante una solicitud POST a la API.
      * @function
-     * @memberof DecoracionService
-     * @param {Object} data - Datos de la decoración a crear.
+     * @memberof RoomService
+     * @param {Object} data - Datos del estado de habitación a crear.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    crearDecoracion(data) {
-        let url = 'decoracion'
+    crearEstadoRoom(data) {
+        let url = 'estado-room'
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -45,30 +45,30 @@ const DecoracionService = {
     },
 
     /**
-     * Obtiene la lista de decoraciones disponibles mediante una solicitud GET a la API.
+     * Obtiene todos los estados de habitaciones mediante una solicitud GET a la API.
      * @function
-     * @memberof DecoracionService
-     * @returns {Promise} Promesa que se resuelve con la lista de decoraciones o se rechaza con un error.
+     * @memberof RoomService
+     * @returns {Promise} Promesa que se resuelve con la lista de estados de habitaciones o se rechaza con un error.
      */
-    obtenerDecoraciones() {
-        let url = 'decoraciones'
+    obtenerEstadosRoom() {
+        let url = 'estados-room'
 
-        return cacheManager.obtenerDatos('decoraciones', url)
+        return cacheManager.obtenerDatos('estados-room', url)
     },
 
     /**
-     * Actualiza la información de una decoración existente mediante una solicitud PATCH a la API.
+     * Actualiza un estado de habitación existente mediante una solicitud PATCH a la API.
      * @function
-     * @memberof DecoracionService
-     * @param {Object} data - Nuevos datos de la decoración a actualizar.
-     * @param {number} id - Identificador único de la decoración.
+     * @memberof RoomService
+     * @param {Object} data - Datos actualizados del estado de habitación.
+     * @param {number} id - Identificador único del estado de habitación a actualizar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    actualizarDecoracion(data, id) {
-        let url = `decoracion/${id}`
+    actualizarEstadoRoom(data, id) {
+        let url = `estado-room/${id}`
 
         return new Promise((resolve, reject) => {
-            LOCAL.api.post(url, data)
+            LOCAL.api.patch(url, data)
                 .then((res) => {
                     resolve(res.data)
                 })
@@ -79,14 +79,14 @@ const DecoracionService = {
     },
 
     /**
-     * Elimina una decoración existente mediante una solicitud DELETE a la API.
+     * Elimina un estado de habitación existente mediante una solicitud DELETE a la API.
      * @function
-     * @memberof DecoracionService
-     * @param {number} id - Identificador único de la decoración a eliminar.
+     * @memberof RoomService
+     * @param {number} id - Identificador único del estado de habitación a eliminar.
      * @returns {Promise} Promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    eliminarDecoracion(id) {
-        let url = `decoracion/${id}`
+    eliminarEstadoRoom(id) {
+        let url = `estado-room/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -98,6 +98,7 @@ const DecoracionService = {
                 })
         })
     },
+
 }
 
-export default DecoracionService
+export default roomService

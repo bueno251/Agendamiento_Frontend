@@ -13,10 +13,6 @@
                             <v-list-item-title>Reservas</v-list-item-title>
                         </template>
 
-                        <v-list-item router :to="{ name: 'reservas' }">
-                            <v-list-item-title>Hacer Reserva</v-list-item-title>
-                        </v-list-item>
-
                         <v-list-item router :to="{ name: 'reservasApp' }">
                             <v-list-item-title>Consultar Reservas</v-list-item-title>
                         </v-list-item>

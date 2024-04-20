@@ -1,6 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
-import CacheManager from "./CacheManager/CacheManager"
+import CacheManager from "../CacheManager/CacheManager"
 
 const LOCAL = {
     /**
@@ -73,7 +73,7 @@ const roomService = {
     obtenerRooms() {
         let url = 'rooms'
 
-        return cacheManager.obtenerDatos('rooms', url)
+        return cacheManager.obtenerDatos(url, url)
     },
 
     /**

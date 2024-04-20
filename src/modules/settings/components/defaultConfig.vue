@@ -15,7 +15,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>País</label>
                         <v-select v-model="pais" :items="paises" no-data-text="Espere un momento..."
-                            @change="getDepartamentos" :rules="[rules.required]" item-text="nombre" item-value="id"
+                            @focusout="getDepartamentos" :rules="[rules.required]" item-text="nombre" item-value="id"
                             outlined dense required>
                         </v-select>
                     </v-col>
@@ -23,7 +23,7 @@
                     <v-col cols="12" md="3" sm="6">
                         <label>Departamento</label>
                         <v-select v-model="departamento" :items="departamentos" no-data-text="Seleccione pais"
-                            @change="getCiudades" :rules="[rules.required]" :loading="loadingDepartamentos"
+                            @focusout="getCiudades" :rules="[rules.required]" :loading="loadingDepartamentos"
                             item-text="nombre" item-value="id" outlined dense required>
                         </v-select>
                     </v-col>

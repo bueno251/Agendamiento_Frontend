@@ -1,6 +1,6 @@
 import axios from "axios"
 import vuex from "@/store"
-import CacheManager from "./CacheManager/CacheManager"
+import CacheManager from "../CacheManager/CacheManager"
 
 const LOCAL = {
     Axios() {
@@ -16,10 +16,10 @@ const LOCAL = {
 LOCAL.Axios()
 const cacheManager = new CacheManager(LOCAL.api)
 
-const DescuentosService = {
+const CuponesService = {
 
-    crearDescuento(data) {
-        let url = `descuento`
+    crearCupon(data) {
+        let url = `cupon`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.post(url, data)
@@ -32,31 +32,31 @@ const DescuentosService = {
         })
     },
 
-    obtenerTiposDescuento() {
-        let url = `descuento-tipos`
+    obtenerCupones(id = '') {
 
-        return cacheManager.obtenerDatos('descuento-tipos', url)
-    },
-
-    obtenerRoomsDescuento() {
-        let url = `descuento-rooms`
-
-        return cacheManager.obtenerDatos('descuento-rooms', url)
-    },
-
-    obtenerDescuentos(id = '') {
-
-        let url = `descuentos`
+        let url = `cupones`
 
         if (id) {
             url += `/${id}`
         }
 
+        return cacheManager.obtenerDatos('cupones', url)
+    },
+
+    obtenerCupon(codigo, id) {
+        let url = `cupones-${codigo}-${id}`
+
         return cacheManager.obtenerDatos(url, url)
     },
 
-    actualizarDescuento(data, id) {
-        let url = `descuento/${id}`
+    obtenerPrecios() {
+        let url = `precios`
+
+        return cacheManager.obtenerDatos(`precios`, url)
+    },
+
+    actualizarCupon(data, id) {
+        let url = `cupon/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.patch(url, data)
@@ -69,8 +69,22 @@ const DescuentosService = {
         })
     },
 
-    eliminarDescuento(id) {
-        let url = `descuento/${id}`
+    actualizarCodigosCupon(data) {
+        let url = `cupones`
+
+        return new Promise((resolve, reject) => {
+            LOCAL.api.patch(url, data)
+                .then((res) => {
+                    resolve(res.data)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    },
+
+    eliminarCupon(id) {
+        let url = `cupon/${id}`
 
         return new Promise((resolve, reject) => {
             LOCAL.api.delete(url)
@@ -84,4 +98,4 @@ const DescuentosService = {
     },
 }
 
-export default DescuentosService
+export default CuponesService

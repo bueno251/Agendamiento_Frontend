@@ -1,5 +1,5 @@
 <template>
-    <v-card width="90%" elevation="5">
+    <v-card width="98%" elevation="5">
         <v-card-title class="blue lighten-2 white--text">
             Reservas En Proceso
         </v-card-title>
@@ -42,6 +42,20 @@
                             </template>
                             <v-date-picker v-model="fechaSalida" :min="fechaLLegada"
                                 @change="save('menu2', fechaSalida)" locale="es">
+                            </v-date-picker>
+                        </v-menu>
+                    </v-col>
+
+                    <v-col v-if="!twoDates && date == 'Creación Registro'" cols="12" md="2" sm="4">
+                        <v-menu ref="menu3" v-model="menu3" :close-on-content-click="false"
+                            transition="scale-transition" offset-y min-width="auto">
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field v-model="fechaCreacion" label="Fecha Creación"
+                                    prepend-inner-icon="mdi-calendar" v-bind="attrs" v-on="on" clearable readonly dense
+                                    outlined>
+                                </v-text-field>
+                            </template>
+                            <v-date-picker v-model="fechaCreacion" @change="save('menu3', fechaCreacion)" locale="es">
                             </v-date-picker>
                         </v-menu>
                     </v-col>
@@ -121,7 +135,53 @@
                         <td>{{ item.huesped.documento }}</td>
                         <td>{{ item.huesped.telefono }}</td>
                         <td>{{ item.huesped.fullname }}</td>
-                        <td>$ {{ comaEnMiles(item.precio) }} COP</td>
+                        <td>${{ comaEnMiles(item.precio) }}</td>
+                        <td>${{ comaEnMiles(item.abono) }}</td>
+                        <td>
+                            <template v-if="item.cupon">
+                                <span v-if="item.cupon.esPorcentaje">
+                                    {{ item.cupon.porcentaje }}% (${{ comaEnMiles(item.cupon.descuento) }})
+                                </span>
+                                <span v-else>
+                                    ${{ comaEnMiles(item.cupon.descuento) }}
+                                </span>
+                                <div>
+                                    {{ item.cupon.nombre }}
+                                </div>
+                            </template>
+                        </td>
+                        <td>
+                            <v-row class="ma-0" v-if="item.descuentos">
+                                <span class="mr-5">
+                                    ${{ comaEnMiles(item.descuentos.reduce((acum, item) => acum + item.descuento, 0)) }}
+                                </span>
+                                <v-tooltip right v-if="item.descuentos">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on">
+                                            <v-icon size="20px">mdi-help-circle</v-icon>
+                                        </span>
+                                    </template>
+                                    <v-row>
+                                        <v-col cols="12" v-for="descuento in item.descuentos"
+                                            :key="item.id + descuento.id">
+                                            <div>
+                                                Nombre: {{ descuento.nombre }}
+                                            </div>
+                                            <div>
+                                                <span v-if="descuento.esPorcentaje">
+                                                    Descuento: {{ descuento.porcentaje }}% (${{
+                                                        comaEnMiles(descuento.descuento)
+                                                    }})
+                                                </span>
+                                                <span v-else>
+                                                    Descuento: ${{ comaEnMiles(descuento.descuento) }}
+                                                </span>
+                                            </div>
+                                        </v-col>
+                                    </v-row>
+                                </v-tooltip>
+                            </v-row>
+                        </td>
                         <td>{{ item.estado }}</td>
                     </tr>
                 </template>
@@ -129,22 +189,37 @@
         </v-container>
 
         <v-dialog :value="dialogAprobar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Aprobar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer />
+                    <v-btn icon class="ml-3" @click="dialogAprobar = false">
+                        <v-icon>mdi-close-box</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">
+                        Aprobar la Reserva?
+                    </h3>
                     <div class="buttons">
-                        <v-btn @click="dialogAprobar = false" color="error"
-                            class="white--text text--accent-4">cancelar</v-btn>
-                        <v-btn @click="aprobar" :loading="loadingbtn" color="primary">confirmar</v-btn>
+                        <v-btn @click="dialogAprobar = false" color="error" class="white--text text--accent-4">
+                            cancelar
+                        </v-btn>
+                        <v-btn @click="aprobar" :loading="loadingbtn" color="primary">
+                            confirmar
+                        </v-btn>
                     </div>
                 </v-sheet>
             </v-card>
         </v-dialog>
 
         <v-dialog :value="dialogRechazar" width="90%" max-width="500px" persistent>
-            <v-card>
-                <v-sheet class="d-flex justify-center align-center flex-column pa-5">
-                    <h3>Rechazar la Reserva?</h3>
+            <v-card class="pb-5">
+                <v-toolbar elevation="0">
+                    <v-spacer></v-spacer>
+                    <v-btn icon class="ml-3" @click="dialogRechazar = false"><v-icon>mdi-close-box</v-icon></v-btn>
+                </v-toolbar>
+                <v-sheet class="d-flex justify-center align-center flex-column">
+                    <h3 class="mb-5">Rechazar la Reserva?</h3>
                     <div class="buttons">
                         <v-btn @click="dialogRechazar = false" color="error"
                             class="white--text text--accent-4">cancelar</v-btn>
@@ -194,17 +269,28 @@ export default {
             handler() {
                 this.fechaLLegada = null
                 this.fechaSalida = null
+                this.fechaCreacion = null
             },
             immediate: true,
         },
         date: {
             handler(newItem) {
-                if(newItem == 'Llegada') {
-                    this.fechaSalida = null
+                let opciones = {
+                    Llegada: () => {
+                        this.fechaSalida = null
+                        this.fechaCreacion = null
+                    },
+                    Salida: () => {
+                        this.fechaLLegada = null
+                        this.fechaCreacion = null
+                    },
+                    'Creación Registro': () => {
+                        this.fechaLLegada = null
+                        this.fechaSalida = null
+                    },
                 }
-                if(newItem == 'Salida') {
-                    this.fechaLLegada = null
-                }
+
+                opciones[newItem]()
             },
             immediate: true,
         }
@@ -216,22 +302,25 @@ export default {
             telefono: '',
             estado: '',
             date: 'Llegada',
-            fechaLLegada: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-            fechaSalida: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            fechaLLegada: null,
+            fechaSalida: null,
+            fechaCreacion: null,
             loading: true,
             loadingbtn: false,
-            twoDates: false,
             menu1: false,
             menu2: false,
+            menu3: false,
             dialogAprobar: false,
             dialogRechazar: false,
             dialogComprobante: false,
+            twoDates: false,
             reserva: {
                 comprobante: '',
             },
             reservas: [],
             reservasFilter: [],
             dates: [
+                'Creación Registro',
                 'Llegada',
                 'Salida',
             ],
@@ -245,6 +334,9 @@ export default {
                 { text: 'Telefono', key: 'huesped.telefono', value: 'huesped.telefono' },
                 { text: 'Huesped', key: 'huesped.fullname', value: 'huesped.fullname' },
                 { text: 'Precio', key: 'precio', value: 'precio' },
+                { text: 'Abono', key: 'abono', value: 'abono' },
+                { text: 'Cupon', key: 'cupon.descuento', value: 'cupon.descuento' },
+                { text: 'Descuentos', key: 'descuentos', sortable: false },
                 { text: 'Estado', key: 'estado', value: 'estado' },
             ],
             rootBackend: process.env.VUE_APP_URL_BASE + '/storage/',
@@ -257,7 +349,7 @@ export default {
         getReservas() {
             this.loading = true
 
-            service.obtenerReservas('No Confirmada')
+            service.obtenerReservas('Pendiente')
                 .then(res => {
                     this.reservas = res
                     this.reservasFilter = res
@@ -281,7 +373,8 @@ export default {
          */
         filtrar() {
             // Verifica si no se han proporcionado criterios de filtrado.
-            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida) {
+            if (!this.documento && !this.telefono && !this.fechaLLegada && !this.fechaSalida && !this.fechaCreacion) {
+                // Si no se proporcionan criterios, se muestra la lista de reservas sin filtrar.
                 this.reservasFilter = this.reservas
                 return
             }
@@ -289,7 +382,8 @@ export default {
             // Filtra las reservas según los criterios proporcionados.
             this.reservasFilter = this.reservas.filter(reserva => {
                 // Verificar si ambas fechas están presentes.
-                if (this.fechaLLegada && this.fechaSalida) {
+                if (this.twoDates) {
+                    // Filtrar según documento, teléfono y rango de fechas si ambas fechas están presentes.
                     return (
                         reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
@@ -300,8 +394,9 @@ export default {
                     return (
                         reserva.cedula == this.documento ||
                         reserva.telefono == this.telefono ||
-                        (this.fechaLLegada && reserva.fechaEntrada >= this.fechaLLegada) ||
-                        (this.fechaSalida && reserva.fechaSalida <= this.fechaSalida)
+                        (this.fechaLLegada && reserva.fechaEntrada == this.fechaLLegada) ||
+                        (this.fechaSalida && reserva.fechaSalida == this.fechaSalida) ||
+                        (this.fechaCreacion && reserva.created_at.split(' ')[0] == this.fechaCreacion)
                     )
                 }
             })
@@ -332,7 +427,11 @@ export default {
         aprobar() {
             this.loadingbtn = true
 
-            service.aprobarReserva(this.reserva.id)
+            let data = {
+                esTemporal: this.reserva.esTemporal
+            }
+
+            service.aprobarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogAprobar = false
@@ -358,7 +457,11 @@ export default {
         rechazar() {
             this.loadingbtn = true
 
-            service.rechazarReserva(this.reserva.id)
+            let data = {
+                esTemporal: this.reserva.esTemporal
+            }
+
+            service.rechazarReserva(data, this.reserva.id)
                 .then(res => {
                     this.loadingbtn = false
                     this.dialogRechazar = false

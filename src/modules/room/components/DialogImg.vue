@@ -1,6 +1,12 @@
 <template>
     <v-dialog :value="show" width="90%" persistent>
         <v-card class="pa-5">
+            <v-toolbar elevation="0">
+                <v-spacer />
+                <v-btn icon class="ml-3" @click="$emit('close')">
+                    <v-icon>mdi-close-box</v-icon>
+                </v-btn>
+            </v-toolbar>
             <v-form ref="form" v-model="valid" @submit.prevent="updateImgs">
 
                 <v-file-input v-model="imgsToUpload" :rules="[rules.file]" @change="handleFileChange" label="Imagenes"
@@ -13,9 +19,8 @@
                     <template v-for="(img, index) in imgsToUpload">
                         <v-menu :key="index" offset-y style="max-width: 600px">
                             <template v-slot:activator="{ on, attrs }">
-                                <v-card class="portrait"
-                                    :img="img.preview" height="300"
-                                    width="600" v-bind="attrs" v-on="on"></v-card>
+                                <v-card class="portrait" :img="img.preview" height="300" width="600" v-bind="attrs"
+                                    v-on="on"></v-card>
                             </template>
 
                             <v-list>
@@ -45,7 +50,7 @@
 
                 <div class="buttons">
                     <v-btn @click="$emit('close')" color="blue">cancelar</v-btn>
-                    <v-btn :disabled="!valid" type="submit" :loading="loading" color="light-green">guardar</v-btn>
+                    <v-btn :disabled="!valid" type="submit" :loading="loading" class="light-green black--text">guardar</v-btn>
                 </div>
             </v-form>
         </v-card>

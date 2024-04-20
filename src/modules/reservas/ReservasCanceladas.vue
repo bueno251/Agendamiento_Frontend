@@ -130,9 +130,9 @@
                     :footer-props="{ itemsPerPageText: 'Número de filas', pageText: '{0}-{1} de {2}' }">
                     <template v-slot:item="{ item }">
                         <tr>
-                            <td>{{ item.cedula }}</td>
-                            <td>{{ item.telefono }}</td>
-                            <td>{{ item.fullname }}</td>
+                            <td>{{ item.huesped.documento }}</td>
+                            <td>{{ item.huesped.telefono }}</td>
+                            <td>{{ item.huesped.fullname }}</td>
                             <td>{{ item.bitacora.motivo }}</td>
                         </tr>
                     </template>
