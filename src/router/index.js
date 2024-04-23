@@ -111,8 +111,7 @@ const routes = [
 				name: 'pagar',
 				component: () => import('@/modules/reservas/PagarReserva.vue'),
 				beforeEnter: (to, from, next) => {
-					console.log(vuex.state.reserva);
-					if (!vuex.state.reserva) {
+					if (Object.keys(vuex.state.reserva)) {
 						next({ name: 'viewRooms' })
 					} else {
 						next()
@@ -124,7 +123,7 @@ const routes = [
 				name: 'confirmacionReserva',
 				component: () => import('@/modules/reservas/ConfirmacionReserva.vue'),
 				beforeEnter: (to, from, next) => {
-					if (!vuex.state.reserva) {
+					if (Object.keys(vuex.state.reserva)) {
 						next({ name: 'viewRooms' })
 					} else {
 						next()
